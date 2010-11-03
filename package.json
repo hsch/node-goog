@@ -1,0 +1,10 @@
+{
+   "name": "goog",
+   "description": "Server-side Google Closure with Node.js",
+   "author": "Hendrik Schnepel (hendrik.schnepel@gmail.com)",
+   "version": "0.1.0",
+   "engines": { "node": ">=0.3.0-pre" },
+   "repository": { "type": "git",
+                   "url" : "git@github.com:hsch/node-goog.git" }
+}
+
