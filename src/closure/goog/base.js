@@ -3,7 +3,7 @@ var Script = process.binding('evals').Script;
 
 exports.goog = (function() {
 	
-	var closure_home = process.env['CLOSURE_HOME'] || './closure/goog/';
+	var closure_home = process.env['CLOSURE_BASE_PATH'] || './closure/goog/';
 	
 	function loadScript(context, basedir, filename) {
 		var code = fs.readFileSync(basedir + filename, 'utf-8');
