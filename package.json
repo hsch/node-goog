@@ -5,6 +5,7 @@
    "version": "0.1.0",
    "engines": { "node": ">=0.3.0-pre" },
    "repository": { "type": "git",
-                   "url" : "git@github.com:hsch/node-goog.git" }
+                   "url" : "git@github.com:hsch/node-goog.git" },
+   "licenses": [ { "type": "Apache License, Version 2.0",
+                   "url": "http://www.apache.org/licenses/LICENSE-2.0" } ]
 }
-
