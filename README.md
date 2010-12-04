@@ -15,7 +15,7 @@ Installation
 
 2. `node-goog` itself is available as an [npm](http://npmjs.org/) package:
     
-        npm install node-goog
+        npm install goog
 
     Or, get the source, fiddle around with it and install `node-goog` locally:
 
@@ -28,7 +28,7 @@ Usage
 
 1. Include `node-goog` in your application through Node's standard mechanism:
     
-        var goog = require( 'node-goog' ).goog;
+        var goog = require( 'goog' ).goog;
     
 2. Import any namespace from Google Closure like you would in a browser-based application:
     
