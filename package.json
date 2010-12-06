@@ -4,7 +4,7 @@
    "author": "Hendrik Schnepel (hendrik.schnepel@gmail.com)",
    "directories": { "lib": "./lib" },
    "main": "./lib/goog",
-   "version": "0.2.0",
+   "version": "0.2.1",
    "engines": { "node": ">=0.3.0-pre" },
    "repository": { "type": "git",
                    "url" : "git@github.com:hsch/node-goog.git" },
