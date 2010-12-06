@@ -3,7 +3,16 @@
  * use Closure's way of importing namespaces.
  */
 var goog = require( 'goog' ).goog;
+goog.require( 'goog.async.Delay' );
 goog.require( 'goog.structs.Trie' );
+
+/*
+ * Create a delayed function which will be executed
+ * in 1.5 seconds.
+ */
+var delay = new goog.async.Delay( function() {
+	console.info( "Bye!" );
+} ).start( 1500 );
 
 /*
  * Create a trie and insert some data.
