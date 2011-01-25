@@ -2,7 +2,14 @@
  * Load node-goog through Node's standard mechanism, then
  * use Closure's way of importing namespaces.
  */
-var goog = require( 'goog' ).goog;
+var nodegoog = require( 'goog' ).goog;
+
+nodegoog.init({
+  closureBasePath:
+    '/home/gatapia/dev/picnet-closure-repo/lib/closure-library/closure/goog/',
+  additionalDeps: ['/home/gatapia/dev/picnet-closure-repo/src/deps.js']
+});
+
 goog.require( 'goog.async.Delay' );
 goog.require( 'goog.structs.Trie' );
 goog.require( 'picnet.Utils' );
