@@ -5,6 +5,7 @@
 var goog = require( 'goog' ).goog;
 goog.require( 'goog.async.Delay' );
 goog.require( 'goog.structs.Trie' );
+goog.require( 'picnet.Utils' );
 
 /*
  * Create a delayed function which will be executed
@@ -27,3 +28,4 @@ trie.add( "example", { "hello": "world" } );
  * in this case) in O(L), where L is the length of the key:
  */
 console.info( trie.getKeyAndPrefixes( "examples" ) );
+console.info('Using picnet.Utils.isNull: ' + picnet.Utils.isNull(trie));
