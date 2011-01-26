@@ -42,7 +42,14 @@ Usage
     
         CLOSURE_BASE_PATH=~/opt/closure-library/closure/goog/ node example.js
 
-
+TODO
+----
+- Compiling js files with the #!node bash instruction fails
+- Ensure compiled file has #!node bash instruction if the source had this
+- Turn compile into an npm exec
+- Add a goog.provide to the compiled file if not already there (as its 
+    required by the closurebuilder.py script)
+    
 License
 =======
 

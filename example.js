@@ -6,13 +6,15 @@ var nodegoog = require( 'goog' ).goog;
 
 nodegoog.init({
   closureBasePath:
-    '/home/gatapia/dev/picnet-closure-repo/lib/closure-library/closure/goog/',
-  additionalDeps: ['/home/gatapia/dev/picnet-closure-repo/src/deps.js']
+    '../picnet-closure-repo/lib/closure-library/closure/goog/',
+  additionalDeps: ['../picnet-closure-repo/src/deps.js']
 });
 
 goog.require( 'goog.async.Delay' );
 goog.require( 'goog.structs.Trie' );
 goog.require( 'picnet.Utils' );
+
+goog.provide('example'); // Required for compilation
 
 /*
  * Create a delayed function which will be executed
