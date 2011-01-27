@@ -26,25 +26,39 @@ Installation
 Usage
 -----
 
-1. Include `node-goog` in your application through Node's standard mechanism:
+1. Add a closure.json object to the root of your source code.  Here you can 
+  specify the following attributes:
+    closureBasePath: Location of the closure-library/closure/goog/ directory 
+    additionalDeps: Any additional dependency files required to run your code.  
+        These files generally point to other closure libraries.  Note these deps 
+        files must have paths relative to the same closureBasePath as specified 
+        above.
+    compiler_jar: Path to the compiler jar you want to use.  
+      Default: 'compiler.jar'
+    additionalCompileOptions: Additional compiler options, 
+      e.g: --jscomp_warning=newWarningType
+    additionalCompileRoots: These are directories containing source code that 
+      needs to be included in the compilation.  If this is not included then 
+      additionalDeps is used to try to guess any additional roots required 
+      (assumes that the deps.js file is in the root folder of the 
+      source directory).
+2. Include `node-goog` in your application through Node's standard mechanism:
     
         var goog = require( 'goog' ).goog;
-    
-2. Import any namespace from Google Closure like you would in a browser-based application:
+
+3. Initialise the goog object.  This can take in an options object with the same
+  options as specified in step 1.
+  
+        goog.init();
+        
+4. Import any namespace from Google Closure like you would in a browser-based 
+  application:
     
         goog.require( 'goog.structs.Trie' );
     
-3. Hack on!
+5. Hack on!
     
-        var trie = new goog.structs.Trie();
-    
-3. Start your application. Set `CLOSURE_BASE_PATH` according to your own configuration:
-    
-        CLOSURE_BASE_PATH=~/opt/closure-library/closure/goog/ node example.js
-
-TODO
-----
-- Turn compile into an npm exec
+        var trie = new goog.structs.Trie();    
     
 License
 =======
