@@ -12,7 +12,7 @@ function run() {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
       'specify a jsdocToolkitDir property pointing to the jsdoc-toolkit root ' +
       'directory.  This setting can reside in the global closure.json ' +
-      ' settings file or the closure.json file in the code root dir';
+      'settings file or the closure.json file in the code root dir');
   }
   var entryPoint = process.argv[2];
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
