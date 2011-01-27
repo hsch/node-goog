@@ -1,33 +1,48 @@
 #!node
 
-/*
- * Load node-goog through Node's standard mechanism, then
- * use Closure's way of importing namespaces.
+/**
+ * @fileoverview  To get started with node-goog you will need to do the 
+ *  following:
+ * <ul>
+ *  <li>Load node-goog through Node's standard mechanism 
+ *    <p>i.e. [var nodegoog = require( 'goog' )].</p>
+ *  </li><li>Initialise nodegoog:
+ *    <p>i.e. [nodegoog.init(options)]</p>
+ *    <p>
+ *    <strong>Note: </strong>Before initialisation no goog commands can be run.
+ *    </p><p>
+ *    The nodegoog.init method takes in an options object with the following 
+ *    properties:
+ *    </p>
+ *    <pre>
+ *    {
+ *       // Location of the closure-library/closure/goog/ directory 
+ *       closureBasePath:{string}, 
+ *       // Any additional dependency files required to run your code.  These files 
+ *       // generally point to other closure libraries.  Note these deps files
+ *       // must have paths relative to the same closureBasePath as specified above
+ *       additionalDeps:{Array.<string>},
+ *       // Path to the compiler jar you want to use.  Default: 'compiler.jar'.
+ *       compiler_jar: {string},
+ *       // Additional compiler options, e.g: --jscomp_warning=newWarningType
+ *       additionalCompileOptions: {Array.<string>},
+ *       // These are directories containing source code that needs to be included 
+ *       // in the compilation.  If this is not included then additionalDeps is 
+ *       // used to try to guess any additional roots required (assumes that the 
+ *       // deps.js file is in the root folder of the source directory).
+ *       additionalCompileRoots: {Array.<string>}
+ *    }
+ *    </pre>
+ * </li><li>Use closure library depenencies as required
+ *    <p>i.e. [goog.require( 'goog.async.Delay' )]</p>
+ * </li></ul>
+ */
+ 
+/**
+ * @type {NodeGoog} The node-goog object
  */
 var nodegoog = require( 'goog' ).goog;
 
-/**
- * Initialise nodegoog. Before initialisation no goog commands can be run.
- * The nodegoog.init method takes in an options object with the following 
- * properties:
- * {
- *    // Location of the closure-library/closure/goog/ directory 
- *    closureBasePath:{string}, 
- *    // Any additional dependency files required to run your code.  These files 
- *    // generally point to other closure libraries.  Note these deps files
- *    // must have paths relative to the same closureBasePath as specified above
- *    additionalDeps:{Array.<string>},
- *    // Path to the compiler jar you want to use.  Default: 'compiler.jar'.
- *    compiler_jar: {string},
- *    // Additional compiler options, e.g: --jscomp_warning=newWarningType
- *    additionalCompileOptions: {Array.<string>},
- *    // These are directories containing source code that needs to be included 
- *    // in the compilation.  If this is not included then additionalDeps is 
- *    // used to try to guess any additional roots required (assumes that the 
- *    // deps.js file is in the root folder of the source directory).
- *    additionalCompileRoots: {Array.<string>}
- * }
- */
 nodegoog.init({
   closureBasePath:
     '../picnet-closure-repo/lib/closure-library/closure/goog/',
@@ -46,6 +61,14 @@ goog.require( 'node.goog.external.Utils' );
 goog.provide('node.goog.Example'); // Required for compilation
 
 /**
+ * Example of how to use node-goog project.  The node-goog project allows you 
+ * to levarage google's closure compiler and libraries to provide you with a 
+ * rich set of tools and type-safety not found in any other JavaScript stack.
+ * This example aims to demonstrate how to use the node-goog tool not teach 
+ * you the basics of google closure.  For more information on google closure 
+ * tools see the Closure Tools project documentation.
+ *
+ * @see <a href="http://code.google.com/closure/">Closure Tools</a>. 
  * @constructor
  */
 node.goog.Example = function() {

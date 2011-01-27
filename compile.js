@@ -46,22 +46,17 @@ function parseFileContentsForCompilerArgs(code) {
   var err = 'Could not find a call to goog.init in the specified file.';
   if (!m) throw new Error(err);  
   var varName = m[1].trim();
-  // console.log('varName: ' + varName);
-  var regespStr = varName + '\\s*\\.\\s*init\\s*\\(\\s*({[^}]*})';
-  // console.log('regespStr: ' + regespStr);
+  var regespStr = varName + '\\s*\\.\\s*init\\s*\\(\\s*({[^}]*})';  
   regex = new RegExp(regespStr, 'gm');
   var m = regex.exec(code);  
   if (!m) throw new Error(err);
-  var optsString = m[1];
-  // console.log('optsString: ' + optsString);
+  var optsString = m[1];  
   Script.runInThisContext('var opts = ' + optsString);
-  if (!opts) throw new Error(err);
-  // console.dir(opts);
+  if (!opts) throw new Error(err);  
   return opts;
 };
 
-function runCompiler(tmpFileToCompile, compiledFileName, bashInstructions, args, callback) {
-  console.log('tmpFileToCompile: ' + tmpFileToCompile);
+function runCompiler(tmpFileToCompile, compiledFileName, bashInstructions, args, callback) {  
   var pathIdx = tmpFileToCompile.lastIndexOf('/');
   var path = pathIdx > 0 ? tmpFileToCompile.substring(0, pathIdx) : '.';
   var clArgs = [
