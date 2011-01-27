@@ -1,23 +1,24 @@
 #!node
 
 var spawn = require('child_process').spawn,
-    fs = require('fs'),
-    Script = process.binding('evals').Script;
+    fs = require('fs'),    
+    common_utils = require('./common_utils').common_utils;
 
 run();
 
 function run() {
   // Only support one file at the moment, this needs attention
   var fileToCompile = process.argv[2];
-  var fileContents = fs.readFileSync(fileToCompile, encoding='utf8');
+  var fileContents = fs.readFileSync(fileToCompile, encoding='utf8');    
   var tmpFileName = fileToCompile.replace('.js', '.tmp.js');  
+  var args = common_utils.readSettingObject(fileToCompile);
+  
   var bashInst = createTmpFile(tmpFileName, fileContents);
-  var parsed = parseFileContentsForCompilerArgs(fileContents);
   var compiledFileName = tmpFileName.replace('.tmp.js', '.min.js')
   var fileToCompileIgnore = fileToCompile.replace('.js', '.ignorejs');
   fs.renameSync(fileToCompile, fileToCompileIgnore);  
   
-  runCompiler(tmpFileName, compiledFileName, bashInst, parsed, function() {
+  runCompiler(tmpFileName, compiledFileName, bashInst, args, function() {
     fs.unlinkSync(tmpFileName);    
     fs.renameSync(fileToCompileIgnore, fileToCompile);
   });  
@@ -40,25 +41,9 @@ function createTmpFile(tmpFileName, code) {
   return bashInst;
 };
 
-function parseFileContentsForCompilerArgs(code) {
-  var regex = /var\s+([\w\d^=\s]+)\s*=\s*require\(\s*['"]goog['"]\s*\)\s*\.\s*goog/gm
-  var m = regex.exec(code);
-  var err = 'Could not find a call to goog.init in the specified file.';
-  if (!m) throw new Error(err);  
-  var varName = m[1].trim();
-  var regespStr = varName + '\\s*\\.\\s*init\\s*\\(\\s*({[^}]*})';  
-  regex = new RegExp(regespStr, 'gm');
-  var m = regex.exec(code);  
-  if (!m) throw new Error(err);
-  var optsString = m[1];  
-  Script.runInThisContext('var opts = ' + optsString);
-  if (!opts) throw new Error(err);  
-  return opts;
-};
-
 function runCompiler(tmpFileToCompile, compiledFileName, bashInstructions, args, callback) {  
   var pathIdx = tmpFileToCompile.lastIndexOf('/');
-  var path = pathIdx > 0 ? tmpFileToCompile.substring(0, pathIdx) : '.';
+  var path = pathIdx > 0 ? tmpFileToCompile.substring(0, pathIdx) : '.';  
   var clArgs = [
     '--input=' + tmpFileToCompile,
     '--root=' + args.closureBasePath + '/../..',
@@ -103,7 +88,7 @@ function runCompiler(tmpFileToCompile, compiledFileName, bashInstructions, args,
     });
   }
 
-  var exec = args.closureBasePath + '../bin/build/closurebuilder.py';  
+  var exec = args.closureBasePath + '../bin/build/closurebuilder.py';    
   var closurebuilder  = spawn(exec, clArgs);
   var output = '';
   var err = '';

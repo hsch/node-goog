@@ -11,8 +11,8 @@
  *    <p>
  *    <strong>Note: </strong>Before initialisation no goog commands can be run.
  *    </p><p>
- *    The nodegoog.init method takes in an options object with the following 
- *    properties:
+ *    The nodegoog.init method takes in an optional options object with the 
+ *    following properties:
  *    </p>
  *    <pre>
  *    {
@@ -33,9 +33,17 @@
  *       additionalCompileRoots: {Array.<string>}
  *    }
  *    </pre>
- * </li><li>Use closure library depenencies as required
+ *  </li><li>
+ *    You can also place a closure.json file in the root directory of your 
+ *    source code that will allow you to call the init method with no 
+ *    parameters.  Using a closure.json is highly recommended as this will 
+ *    allow you to use other tools such as jsdoc-toolkit and give you more 
+ *    configuration over other settings.  See the example closure.json file 
+ *    included in this directory.
+ *  </li><li>Use closure library depenencies as required
  *    <p>i.e. [goog.require( 'goog.async.Delay' )]</p>
  * </li></ul>
+ * @see closure.json
  */
  
 /**
@@ -43,11 +51,9 @@
  */
 var nodegoog = require( 'goog' ).goog;
 
-nodegoog.init({
-  closureBasePath:
-    '../picnet-closure-repo/lib/closure-library/closure/goog/',
-  additionalDeps: ['example_external_lib/deps.js']
-});
+// Does not require an opts parameter as we are providing all the options in 
+// the closure.json file in this directory;
+nodegoog.init();
 
 /*
  * Now that the nodegoog is initialised you can use any base.js functionality 

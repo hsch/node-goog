@@ -1,13 +1,19 @@
 #!node
 
 var spawn = require('child_process').spawn,
-    fs = require('fs');
-
-var jsDocToolkitDir = '../lib/jsdoc-toolkit/'
-
+    fs = require('fs'),
+    common_utils = require('./common_utils').common_utils;
 run();
 
 function run() {
+  var args = common_utils.readSettingObject();
+  var jsDocToolkitDir = args.jsdocToolkitDir;
+  if (!jsDocToolkitDir) {
+    throw new Error('To run the jsdoc-toolkit documentation module please ' +
+      'specify a jsdocToolkitDir property pointing to the jsdoc-toolkit root ' +
+      'directory.  This setting can reside in the global closure.json ' +
+      ' settings file or the closure.json file in the code root dir';
+  }
   var entryPoint = process.argv[2];
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var entryPointDir = entryPointDirIdx > 0 ? 
