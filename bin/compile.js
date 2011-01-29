@@ -168,12 +168,17 @@ node.goog.compile.prototype.runCompilerOrDeps_ = function (compiler,
 node.goog.compile.prototype.getCompilerClArgs_ = 
     function (tmpFileToCompile, compiledFileName, args) {  
   var path = this.getDirectory_(tmpFileToCompile);
+  var addedPaths = {};
+  this.isPathInMap_(addedPaths, path);    
   
   var clArgs = [        
     '--root=' + args.closureBasePath.replace('/closure/goog/', '/'),
     '--root=' + path    
   ];
-  clArgs.push('--root=lib');
+  var libPath = 'lib';  
+  if (!this.isPathInMap_(addedPaths, libPath)) {    
+    clArgs.push('--root=' + libPath);
+  }
   clArgs.push('--input=' + tmpFileToCompile);
   clArgs.push('--output_mode=compiled');
   clArgs.push('--compiler_jar=' + (args.compiler_jar || 'lib/compiler.jar'));
@@ -209,16 +214,33 @@ node.goog.compile.prototype.getCompilerClArgs_ =
   }
   
   if (args.additionalCompileRoots) {
-    args.additionalCompileRoots.forEach(function(root) {      
-      clArgs.push('--root=' + root);
+    args.additionalCompileRoots.forEach(function(root) {            
+      if (!this.isPathInMap_(addedPaths, root)) {
+        addedPaths[root] = 1;
+        clArgs.push('--root=' + root);
+      }      
     });
   } else if (args.additionalDeps) { 
     // Only try to guess roots if additionalCompileRoots not specified
     args.additionalDeps.forEach(function(dep) {      
       clArgs.push('--root=' + dep + '/..');
     });
-  }
+  }  
   return clArgs;
+};
+
+/**
+ * @private
+ * @param {Object.<number>} map The map to check
+ * @param {string} s The string to check in the map
+ * @return {boolean} Wether the string was already in the map.  If not it is 
+ *    then added to the specified map.
+ */
+node.goog.compile.prototype.isPathInMap_ = function(map, s) {
+  var real = node.goog.compile.fs_.realpathSync(s);
+  if (map[real]) return true;
+  map[real] = 1;
+  return false;
 };
 
 /**
