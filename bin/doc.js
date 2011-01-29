@@ -1,7 +1,7 @@
 #!node
 
-/*
- * Copyright 2011 Guido Tapia (guido@tapia.com.au)
+/**
+ * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
+require( 'goog' ).goog.init();
 
-var spawn = require('child_process').spawn,
-    fs = require('fs'),
-    common_utils = require('./common_utils').common_utils;
-run();
+goog.provide('node.goog.doc');
 
-function run() {
-  var args = common_utils.readSettingObject();
+/**
+ * @constructor
+ */
+node.goog.doc = function() {
+  var args = require('./utils').closureUtils.readSettingObject();
   var jsDocToolkitDir = args.jsdocToolkitDir;
   if (!jsDocToolkitDir) {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
@@ -31,11 +32,21 @@ function run() {
       'directory.  This setting can reside in the global closure.json ' +
       'settings file or the closure.json file in the code root dir');
   }
-  var entryPoint = process.argv[2];
+  
+  this.init_(jsDocToolkitDir, process.argv[2]);
+};
+
+/**
+ * @private
+ * @param {string} jsDocToolkitDir The directory of the jsdoc-toolkit lib
+ * @param {string} entryPoint The file/directory to document
+ */
+node.goog.doc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {    
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var entryPointDir = entryPointDirIdx > 0 ? 
     entryPoint.substring(0, entryPointDirIdx) : '.';
-  var jsdoc = spawn('java', [
+  /** @type {extern_process} */
+  var jsdoc = require('child_process').spawn('java', [
     '-jar',
     jsDocToolkitDir + 'jsrun.jar',
     jsDocToolkitDir + 'app/run.js',
@@ -59,9 +70,12 @@ function run() {
   jsdoc.on('exit', function (code) {            
     
     if (code !== 0) {
-      console.log('CODE: ' + code + ' ERROR: ' + err + '\n\n\nOUTPUT: ' + output); 
+      console.log('CODE: ' + code + ' ERROR: ' + err + 
+        '\n\n\nOUTPUT: ' + output); 
     } else {            
       console.log(err + '\nSuccessfully js-doc\n' + output);
     }    
   });
 };
+
+new node.goog.doc();

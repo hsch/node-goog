@@ -18,18 +18,20 @@
  *    {
  *       // Location of the closure-library/closure/goog/ directory 
  *       closureBasePath:{string}, 
- *       // Any additional dependency files required to run your code.  These files 
- *       // generally point to other closure libraries.  Note these deps files
- *       // must have paths relative to the same closureBasePath as specified above
+ *       // Any additional dependency files required to run your code.  These 
+ *       // files generally point to other closure libraries.  Note these deps 
+ *       // files must have paths relative to the same closureBasePath as 
+ *       // specified above
  *       additionalDeps:{Array.<string>},
  *       // Path to the compiler jar you want to use.  Default: 'compiler.jar'.
  *       compiler_jar: {string},
  *       // Additional compiler options, e.g: --jscomp_warning=newWarningType
  *       additionalCompileOptions: {Array.<string>},
- *       // These are directories containing source code that needs to be included 
- *       // in the compilation.  If this is not included then additionalDeps is 
- *       // used to try to guess any additional roots required (assumes that the 
- *       // deps.js file is in the root folder of the source directory).
+ *       // These are directories containing source code that needs to be 
+ *       // included in the compilation.  If this is not included then 
+ *       // additionalDeps is used to try to guess any additional roots 
+ *       // required (assumes that the deps.js file is in the root folder of 
+ *       // the source directory).
  *       additionalCompileRoots: {Array.<string>}
  *    }
  *    </pre>
@@ -46,25 +48,22 @@
  * @see closure.json
  */
  
-/**
- * @type {NodeGoog} The node-goog object
+/*
+ * Does not require an opts parameter as we are providing all the options in 
+ * the closure.json file in this directory;
  */
-var nodegoog = require( 'goog' ).goog;
-
-// Does not require an opts parameter as we are providing all the options in 
-// the closure.json file in this directory;
-nodegoog.init();
+require( 'goog' ).goog.init();
 
 /*
  * Now that the nodegoog is initialised you can use any base.js functionality 
  * such as goog.require / goog.provide
  */
-
 goog.require( 'goog.async.Delay' );
 goog.require( 'goog.structs.Trie' );
 goog.require( 'node.goog.external.Utils' );
 
-goog.provide('node.goog.Example'); // Required for compilation
+// At least one namespace must be provided for compilation purposes
+goog.provide('node.goog.examples.simple.Example'); 
 
 /**
  * Example of how to use node-goog project.  The node-goog project allows you 
@@ -77,7 +76,7 @@ goog.provide('node.goog.Example'); // Required for compilation
  * @see <a href="http://code.google.com/closure/">Closure Tools</a>. 
  * @constructor
  */
-node.goog.Example = function() {
+node.goog.examples.simple.Example = function() {
   this.createDelay_();
   this.testTrie_();
   this.testExternalLib_();
@@ -88,7 +87,7 @@ node.goog.Example = function() {
  *
  * @private
  */
-node.goog.Example.prototype.createDelay_ = function() {
+node.goog.examples.simple.Example.prototype.createDelay_ = function() {
   new goog.async.Delay( function() {
     console.info( "Bye!" );
   } ).start( 1500 );
@@ -101,7 +100,7 @@ node.goog.Example.prototype.createDelay_ = function() {
  *
  * @private
  */
-node.goog.Example.prototype.testTrie_ = function() {
+node.goog.examples.simple.Example.prototype.testTrie_ = function() {
   var trie = new goog.structs.Trie();
   trie.add( "demo", "node-goog" );
   trie.add( "ex", [ "girlfriend", "parrot" ] );
@@ -115,8 +114,9 @@ node.goog.Example.prototype.testTrie_ = function() {
  *
  * @private
  */
-node.goog.Example.prototype.testExternalLib_ = function() {
-  console.info('Using node.goog.external.Utils.echo("hello world"): ' + node.goog.external.Utils.echo('hello world'));
+node.goog.examples.simple.Example.prototype.testExternalLib_ = function() {
+  console.info('Using node.goog.external.Utils.echo("hello world"): ' + 
+    node.goog.external.Utils.echo('hello world'));
 };
 
-new node.goog.Example();
+new node.goog.examples.simple.Example();
