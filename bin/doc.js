@@ -45,6 +45,7 @@ node.goog.doc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var entryPointDir = entryPointDirIdx > 0 ? 
     entryPoint.substring(0, entryPointDirIdx) : '.';
+    
   /** @type {extern_process} */
   var jsdoc = require('child_process').spawn('java', [
     '-jar',
@@ -53,7 +54,10 @@ node.goog.doc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
     '-a',
     '-t=' + jsDocToolkitDir + 'templates/jsdoc/',
     '-d=' + entryPointDir + '/docs',
-    entryPoint
+    '-r=10',    
+    '-E=\.min\.js',    
+    '-E=deps\.js',     
+    entryPointDir
   ]);
   
   var output = '';
@@ -73,7 +77,7 @@ node.goog.doc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
       console.log('CODE: ' + code + ' ERROR: ' + err + 
         '\n\n\nOUTPUT: ' + output); 
     } else {            
-      console.log(err + '\nSuccessfully js-doc\n' + output);
+      console.log(err + '\nSuccessfully js-doc\'ed\n' + output);
     }    
   });
 };
