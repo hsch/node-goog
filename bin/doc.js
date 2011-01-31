@@ -1,4 +1,4 @@
-# !node;
+#!node
 
 /**
  * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
@@ -30,8 +30,8 @@ node.goog.doc = function() {
   var jsDocToolkitDir = args.jsdocToolkitDir;
   if (!jsDocToolkitDir) {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
-        'specify a jsdocToolkitDir property pointing to the jsdoc-toolkit root ' +
-        'directory.  This setting can reside in the global closure.json ' +
+        'specify a jsdocToolkitDir property pointing to the jsdoc-toolkit ' +
+        'root directory.  This setting can reside in the global closure.json ' +
         'settings file or the closure.json file in the code root dir');
   }
 

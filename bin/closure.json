@@ -1,5 +1,5 @@
 {
-  closureBasePath:'../lib/picnet-closure-repo/lib/closure-library/closure/goog/',  
-  jsdocToolkitDir: '../lib/jsdoc-toolkit/',
-  nodeDir: '../../node',
+  closureBasePath:'../picnet-closure-repo/lib/closure-library/closure/goog/',  
+  jsdocToolkitDir: '../jsdoc-toolkit/',
+  nodeDir: '../lib/node',
 }

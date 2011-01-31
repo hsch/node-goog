@@ -1,3 +1,4 @@
+
 /**
  * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
  *
@@ -27,22 +28,27 @@ goog.node.utils.cachedArgs_;
 
 
 /**
- * @param {string} The file to try to parse settings out of.  It is also used
- *    to determine which directory to look for the closure.json settings file.
+ * @param {string} file The file to try to parse settings out of.  It is also
+ *    used to determine which directory to look for the closure.json settings
+ *    file.
  * @return {node_goog.opts} The correct options object in the current context.
  */
 goog.node.utils.readSettingObject = function(file) {
   if (goog.node.utils.cachedArgs_) return goog.node.utils.cachedArgs_;
 
-  var contents = file ? require('fs').readFileSync(file, encoding = 'utf8') : null;
-  var fileSettings = contents ? goog.node.utils.parseCompilerArgsFromFile_(contents) : null;
+  var contents = file ? require('fs').readFileSync(file, encoding = 'utf8') :
+      null;
+  var fileSettings = contents ?
+      goog.node.utils.parseCompilerArgsFromFile_(contents) : null;
 
   file = file || process.argv[1];
   var dirIdx = file.lastIndexOf('/');
   var dir = dirIdx > 0 ? file.substring(0, dirIdx) : '.';
 
-  var codeDirSettings = goog.node.utils.readArgsFromJSONFile_(dir + '/closure.json');
-  var globalSettings = goog.node.utils.readArgsFromJSONFile_(__dirname + '/closure.json');
+  var codeDirSettings = goog.node.utils.readArgsFromJSONFile_(dir +
+      '/closure.json');
+  var globalSettings = goog.node.utils.readArgsFromJSONFile_(__dirname +
+      '/closure.json');
 
   var settings = globalSettings || {};
   if (codeDirSettings) {
@@ -84,7 +90,8 @@ goog.node.utils.readArgsFromJSONFile_ = function(file) {
  *    specified javascript code.
  */
 goog.node.utils.parseCompilerArgsFromFile_ = function(code) {
-  var regex = /var\s+([\w\d^=\s]+)\s*=\s*require\(\s*['"]goog['"]\s*\)\s*\.\s*goog/gm;
+  var regex =
+      /var\s+([\w\d^=\s]+)\s*=\s*require\(\s*['"]goog['"]\s*\)\s*\.\s*goog/gm;
   var m = regex.exec(code);
   var err = 'Could not find a call to goog.init in the specified file.';
   if (!m) return null;
@@ -100,7 +107,7 @@ goog.node.utils.parseCompilerArgsFromFile_ = function(code) {
 
 /**
  * @private
- * @param {optsString} JSON string representation of an options object.
+ * @param {string} optsString JSON string representation of an options object.
  * @return {node_goog.opts} The options object.
  */
 goog.node.utils.getOptsObject_ = function(optsString) {
@@ -109,4 +116,8 @@ goog.node.utils.getOptsObject_ = function(optsString) {
   return opts;
 };
 
+
+/**
+ * @type {goog.node.utils}
+ */
 exports.closureUtils = goog.node.utils;
