@@ -18,7 +18,7 @@
 
 require('goog').goog.init();
 
-goog.provide('node.goog.codecheck');
+goog.provide('node.goog.googcodecheck');
 
 goog.require('goog.array');
 
@@ -27,16 +27,16 @@ goog.require('goog.array');
 /**
  * @constructor
  */
-node.goog.codecheck = function() {
+node.goog.googcodecheck = function() {
   var dir = process.argv[2];
-  var isDir = node.goog.codecheck.fs_.statSync(dir).isDirectory();
+  var isDir = node.goog.googcodecheck.fs_.statSync(dir).isDirectory();
   if (!isDir) {
     dir = dir.substring(0, dir.lastIndexOf('/') + 1);
   }  
   var that = this;
   this.runFixStyle_(dir, function() {
     that.runGSJLint_(dir, function() {
-      goog.array.forEach(node.goog.codecheck.fs_.readdirSync(dir),
+      goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
           function(f) { that.fixBashInstructions_(dir, f); }, that);
     });
   });
@@ -48,7 +48,7 @@ node.goog.codecheck = function() {
  * @const
  * @type {extern_fs}
  */
-node.goog.codecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
+node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
 
 
 /**
@@ -56,12 +56,12 @@ node.goog.codecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
  * @param {string} dir The directory to code check.
  * @param {string} file The file to check.
  */
-node.goog.codecheck.prototype.fixBashInstructions_ = function(dir, file) {
+node.goog.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
   if (this.isIgnorableFile_(dir, file)) return;
-  var fileContents = node.goog.codecheck.fs_.
+  var fileContents = node.goog.googcodecheck.fs_.
       readFileSync(dir + file, encoding = 'utf8');
   fileContents = fileContents.replace('# !node;', '#!node');
-  node.goog.codecheck.fs_.
+  node.goog.googcodecheck.fs_.
       writeFileSync(dir + file, fileContents, encoding = 'utf8');
 };
 
@@ -71,7 +71,7 @@ node.goog.codecheck.prototype.fixBashInstructions_ = function(dir, file) {
  * @param {string} dir The directory to code check.
  * @param {function():undefined} callback The exit callback.
  */
-node.goog.codecheck.prototype.runFixStyle_ = function(dir, callback) {
+node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
   var excludes = this.getLinterExcludeFiles_(dir);  
   this.runProcess_('fixjsstyle', ['--strict', 
     '-x ' + excludes.join(','), '-r', dir], callback);
@@ -83,7 +83,7 @@ node.goog.codecheck.prototype.runFixStyle_ = function(dir, callback) {
  * @param {string} dir The directory to code check.
  * @param {function():undefined} callback The exit callback.
  */
-node.goog.codecheck.prototype.runGSJLint_ = function(dir, callback) {
+node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
   var excludes = this.getLinterExcludeFiles_(dir);
   this.runProcess_('gjslint', ['--strict',
     '-x ' + excludes.join(','), '-r', dir], callback);
@@ -95,8 +95,8 @@ node.goog.codecheck.prototype.runGSJLint_ = function(dir, callback) {
  * @param {string} dir The directory to code check.
  * @return {Array.<string>} An array of all files to ignore.
  */
-node.goog.codecheck.prototype.getLinterExcludeFiles_ = function(dir) {
-  var excludes = goog.array.filter(node.goog.codecheck.fs_.readdirSync(dir),
+node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
+  var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
       function(f) { return this.isIgnorableFile_(dir, f); }, this);  
   return goog.array.map(excludes, function(f) { return dir + f; });
 };
@@ -107,7 +107,7 @@ node.goog.codecheck.prototype.getLinterExcludeFiles_ = function(dir) {
  * @param {string} f If this file can be ignored from the checks.
  * @return {boolean} Wether the specified file can be safely ignored.
  */
-node.goog.codecheck.prototype.isIgnorableFile_ = function(dir, f) {  
+node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {  
   var ignore = 
     f === 'goog.js' ||
     f.indexOf('.min.js') >= 0 ||
@@ -116,7 +116,7 @@ node.goog.codecheck.prototype.isIgnorableFile_ = function(dir, f) {
     f.indexOf('deps.js') >= 0 ||
     f.indexOf('.extern.js') >= 0 ||
     f.indexOf('.externs.js') >= 0 ||
-    node.goog.codecheck.fs_.statSync(dir + f).isDirectory();
+    node.goog.googcodecheck.fs_.statSync(dir + f).isDirectory();
             
   return ignore;
 };
@@ -128,7 +128,7 @@ node.goog.codecheck.prototype.isIgnorableFile_ = function(dir, f) {
  * @param {Array.<string>} args The arguments to pass to the command.
  * @param {function():undefined} callback The exit callback.
  */
-node.goog.codecheck.prototype.runProcess_ = function(command, args, callback) {
+node.goog.googcodecheck.prototype.runProcess_ = function(command, args, callback) {
   var cmd = require('child_process').spawn(command, args);
 
   var output = '', err = '';
@@ -151,4 +151,4 @@ node.goog.codecheck.prototype.runProcess_ = function(command, args, callback) {
   });
 };
 
-new node.goog.codecheck();
+new node.goog.googcodecheck();

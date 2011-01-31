@@ -1,13 +1,19 @@
 {
-   "name": "goog",
-   "description": "Server-side Google Closure with Node.js",
-   "author": "Hendrik Schnepel (hendrik.schnepel@gmail.com)",
-   "directories": { "lib": "./lib" },
-   "main": "./lib/goog",
-   "version": "0.2.1",
-   "engines": { "node": ">=0.3.0-pre" },
-   "repository": { "type": "git",
-                   "url" : "git@github.com:hsch/node-goog.git" },
-   "licenses": [ { "type": "Apache License, Version 2.0",
-                   "url": "http://www.apache.org/licenses/LICENSE-2.0" } ]
+  "name": "goog",
+  "description": "Server-side Google Closure with Node.js",
+  "author": "Hendrik Schnepel <hendrik.schnepel@gmail.com>",
+  "url":"https://github.com/hsch/node-goog",
+  "directories": { 
+    "lib": "./lib",
+    "bin": "./bin",
+    "man": "./doc",
+    "example": "./examples" 
+  },    
+  "main": "./lib/goog",
+  "version": "0.3.1",
+  "engines": { "node": ">=0.3.0-pre" },
+  "repository": { "type": "git",
+                 "url" : "git://github.com/hsch/node-goog.git" },
+  "licenses": [ { "type": "Apache License, Version 2.0",
+                 "url": "http://www.apache.org/licenses/LICENSE-2.0" } ]
 }

@@ -1,0 +1,6 @@
+TODO
+====
+- Review whole code base
+- Test additionalDeps path when compiling running from different directories
+- Test directory runner
+- Promote

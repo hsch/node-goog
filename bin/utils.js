@@ -1,6 +1,6 @@
 
-/**
- * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
+/*
+ * Copyright 2011 Guido Tapia (guido@tapia.com.au).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,24 @@
  * This file is used by lib/goog.js and cannot be a closure provided file.
  */
 
+/**
+ * @fileoverview This file contains utilties that are required by the utils 
+ * in node-goog project.  The files using this include googdoc.js, 
+ * googcodecheck.js and googcompile.js in this directory and lib/goog.js.
+ *
+ * Since lib/goog.js is loaded without the closure scope set this file must 
+ * support running outside of closure scope.
+ *
+ * @author Guido Tapia (guido@tapia.com.au)
+ */
 var goog = {node: {utils: {}}};
 
 
 /**
+ * We only read the settings object once and then it is cached to allow
+ * for safe multiple calls of the goog.node.utils.readSettingObject method
+ * below.
+ * 
  * @private
  * @type {node_goog.opts}
  */

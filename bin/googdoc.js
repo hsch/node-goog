@@ -18,14 +18,14 @@
 
 require('goog').goog.init();
 
-goog.provide('node.goog.doc');
+goog.provide('node.goog.googdoc');
 
 
 
 /**
  * @constructor
  */
-node.goog.doc = function() {
+node.goog.googdoc = function() {
   var args = require('./utils').closureUtils.readSettingObject();
   var jsDocToolkitDir = args.jsdocToolkitDir;
   if (!jsDocToolkitDir) {
@@ -44,7 +44,7 @@ node.goog.doc = function() {
  * @param {string} jsDocToolkitDir The directory of the jsdoc-toolkit lib.
  * @param {string} entryPoint The file/directory to document.
  */
-node.goog.doc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
+node.goog.googdoc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var entryPointDir = entryPointDirIdx > 0 ?
       entryPoint.substring(0, entryPointDirIdx) : '.';
@@ -85,4 +85,4 @@ node.goog.doc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
   });
 };
 
-new node.goog.doc();
+new node.goog.googdoc();
