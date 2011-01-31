@@ -108,11 +108,15 @@ node.goog.codecheck.prototype.getLinterExcludeFiles_ = function(dir) {
  * @return {boolean} Wether the specified file can be safely ignored.
  */
 node.goog.codecheck.prototype.isIgnorableFile_ = function(dir, f) {  
-  var ignore = f.indexOf('.min.js') >= 0 ||
-      f.indexOf('.tmp.js') >= 0 ||
-          f.indexOf('_') === 0 ||
-          f.indexOf('deps.js') >= 0 ||
-          node.goog.codecheck.fs_.statSync(dir + f).isDirectory();
+  var ignore = 
+    f === 'goog.js' ||
+    f.indexOf('.min.js') >= 0 ||
+    f.indexOf('.tmp.js') >= 0 ||
+    f.indexOf('_') === 0 ||
+    f.indexOf('deps.js') >= 0 ||
+    f.indexOf('.extern.js') >= 0 ||
+    f.indexOf('.externs.js') >= 0 ||
+    node.goog.codecheck.fs_.statSync(dir + f).isDirectory();
             
   return ignore;
 };
