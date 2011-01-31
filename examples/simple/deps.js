@@ -3,3 +3,5 @@
 goog.addDependency('/home/guidot/dev/node-goog/examples/simple/deps.js', [], []);
 goog.addDependency('/home/guidot/dev/node-goog/examples/simple/example.js', ['node.goog.examples.simple.Example'], ['goog.async.Delay', 'goog.structs.Trie', 'node.goog.external.Utils']);
 goog.addDependency('/home/guidot/dev/node-goog/examples/simple/example.min.js', [], []);
+goog.addDependency('/home/guidot/dev/node-goog/examples/simple/tests/deps.js', [], []);
+goog.addDependency('/home/guidot/dev/node-goog/examples/simple/tests/tests1.js', ['node.goog.examples.simple.tests.tests1'], ['goog.testing.jsunit', 'node.goog.examples.simple.Example']);

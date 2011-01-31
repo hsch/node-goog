@@ -124,4 +124,8 @@ node.goog.examples.simple.Example.prototype.testExternalLib_ = function() {
       node.goog.external.Utils.echo('hello world'));
 };
 
-new node.goog.examples.simple.Example();
+/**
+ * A reference to the running example for testing purposes
+ * @type {node.goog.examples.simple.Example}
+ */
+var example_ = new node.goog.examples.simple.Example();
