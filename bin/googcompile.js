@@ -25,30 +25,39 @@ goog.provide('node.goog.googcompile');
 /**
  * @constructor
  */
-node.goog.googcompile = function() {
-  // Only support one file at the moment, this needs attention
-  var fileToCompile = process.argv[2];
+node.goog.googcompile = function() {    
+  var fileToCompile = process.argv[2];    
   var fileContents = node.goog.googcompile.fs_.
       readFileSync(fileToCompile, encoding = 'utf8');
-  var tmpFileName = fileToCompile.replace('.js', '.tmp.js');
+  var tmpFileName = fileToCompile.replace('.js', '.tmp.js');  
   var args = require('./utils').closureUtils.readSettingObject(fileToCompile);
 
   var compiledFileName = tmpFileName.replace('.tmp.js', '.min.js');
   var fileToCompileIgnore = fileToCompile.replace('.js', '.ignorejs');
 
   var that = this;
-  this.runCompilerOrDeps_(false, fileToCompile,
+  try {
+    this.runCompilerOrDeps_(false, fileToCompile,
       compiledFileName.substring(0, compiledFileName.lastIndexOf('/') + 1) +
           'deps.js', '', args, function() {
 
-        var bashInst = that.createTmpFile_(tmpFileName, fileContents);
-        node.goog.googcompile.fs_.
-            renameSync(fileToCompile, fileToCompileIgnore);
-        that.runCompilerOrDeps_(true, tmpFileName, compiledFileName,
-            bashInst, args, function() {
-              that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
-            });
-      });
+      var bashInst = that.createTmpFile_(tmpFileName, fileContents);
+      node.goog.googcompile.fs_.
+          renameSync(fileToCompile, fileToCompileIgnore);
+      try { 
+      that.runCompilerOrDeps_(true, tmpFileName, compiledFileName,
+          bashInst, args, function() {
+            that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
+          });
+      } catch(ex2) {
+        that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
+        throw ex2;
+      }
+    });
+  } catch (ex) {    
+    that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
+    throw ex;
+  }
 };
 
 
@@ -187,8 +196,8 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   var clArgs = [
     '--root=' + args.closureBasePath.replace('/closure/goog/', '/'),
     '--root=' + path
-  ];
-  var libPath = 'lib';
+  ];    
+  var libPath = __dirname + '/../lib';    
   if (!this.isPathInMap_(addedPaths, libPath)) {
     clArgs.push('--root=' + libPath);
   }

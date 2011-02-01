@@ -5,8 +5,7 @@
   "url":"https://github.com/hsch/node-goog",
   "directories": { 
     "lib": "./lib",
-    "bin": "./bin",
-    "man": "./doc",
+    "bin": "./bin",    
     "example": "./examples" 
   },    
   "main": "./lib/goog",

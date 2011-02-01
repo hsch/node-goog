@@ -58,8 +58,11 @@ Installation
   So the closure.json file should reside beside the entry file into your 
   project.
   
-  Finally when calling require( 'goog' ).goog.init(opts) you can also pass in
-  the configuration object.
+  The closure.json file can finally reside in the directory that you are calling
+  the node-goog command from.
+  
+  Optionally, when calling require( 'goog' ).goog.init(opts) you can also pass 
+  in the configuration object.
   
   The configuration files and the configuration object (passed to 
   require( 'goog' ).goog.init(opts) ) take the following format:

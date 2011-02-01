@@ -29,17 +29,17 @@
  */
 var goog = {node: {utils: {}}};
 
+/**
+ * @private
+ * @type {extern_fs}
+ */
+goog.node.utils.fs_ = require('fs');
 
 /**
- * We only read the settings object once and then it is cached to allow
- * for safe multiple calls of the goog.node.utils.readSettingObject method
- * below.
- *
  * @private
- * @type {node_goog.opts}
+ * @type {extern_path}
  */
-goog.node.utils.cachedArgs_;
-
+goog.node.utils.path_ = require('path');
 
 /**
  * @param {string} file The file to try to parse settings out of.  It is also
@@ -48,28 +48,44 @@ goog.node.utils.cachedArgs_;
  * @return {node_goog.opts} The correct options object in the current context.
  */
 goog.node.utils.readSettingObject = function(file) {
-  if (goog.node.utils.cachedArgs_) return goog.node.utils.cachedArgs_;
-
-  var contents = file ? require('fs').readFileSync(file, encoding = 'utf8') :
-      null;
+  var contents = file ? 
+      goog.node.utils.fs_.readFileSync(file, encoding = 'utf8') : null;
   var fileSettings = contents ?
       goog.node.utils.parseCompilerArgsFromFile_(contents) : null;
-
-  file = file || process.argv[1];
-  var dirIdx = file.lastIndexOf('/');
-  var dir = dirIdx > 0 ? file.substring(0, dirIdx) : '.';
-
-  var codeDirSettings = goog.node.utils.readArgsFromJSONFile(dir +
-      '/closure.json');
-  var globalSettings = goog.node.utils.readArgsFromJSONFile(__dirname +
-      '/closure.json');
-
-  var settings = globalSettings || {};
+       
+  var globalSettings = 
+    goog.node.utils.readArgsFromJSONFile(__dirname + '/closure.json');     
+  var codeDirSettings = goog.node.utils.readArgsFromSourceDir_(file);  
+  var currentDirSettings = 
+    goog.node.utils.readArgsFromJSONFile(process.cwd() + '/closure.json');
+    
+  var settings = globalSettings || {};  
   goog.node.utils.extendObject_(settings, codeDirSettings);
-  goog.node.utils.extendObject_(settings, fileSettings);
-  return goog.node.utils.cachedArgs_ = settings;
+  goog.node.utils.extendObject_(settings, currentDirSettings);
+  goog.node.utils.extendObject_(settings, fileSettings);  
+    
+  return goog.node.utils.validateOpsObject_(settings, false);
 };
 
+/**
+ * @param {string} file The file currently being executed.
+ * @return {node_goog.opts} The options object represented in the
+ *    specified file.
+ */
+goog.node.utils.readArgsFromSourceDir_ = function(file) {
+  if (!file) {
+    file = process.argv[1];
+    if (file.indexOf('googcompile') >= 0 || 
+          file.indexOf('googdoc') >= 0 || 
+          file.indexOf('googtest') >= 0) {
+      file = process.argv[2];
+    }
+  }  
+  var dirIdx = file.lastIndexOf('/');
+  var dir = dirIdx > 0 ? file.substring(0, dirIdx) : '.';
+  
+  return goog.node.utils.readArgsFromJSONFile(dir + '/closure.json');
+}
 
 /**
  * @param {string} file The settings (JSON) file to read.
@@ -77,13 +93,10 @@ goog.node.utils.readSettingObject = function(file) {
  *    specified file.
  */
 goog.node.utils.readArgsFromJSONFile = function(file) {
-  try {
-    var json = require('fs').readFileSync(file,
-        encoding = 'utf8');
-    return goog.node.utils.getOptsObject_(json);
-  } catch (ex) {
-    return null;
-  }
+  if (!goog.node.utils.path_.existsSync(file)) return null;
+  var json = goog.node.utils.fs_.readFileSync(file,
+      encoding = 'utf8');
+  return goog.node.utils.getOptsObject_(json);  
 };
 
 
@@ -131,10 +144,48 @@ goog.node.utils.parseCompilerArgsFromFile_ = function(code) {
 goog.node.utils.getOptsObject_ = function(optsString) {
   process.binding('evals').Script.runInThisContext('var opts = ' + optsString);
   if (!opts) throw new Error(err);
+  return goog.node.utils.validateOpsObject_(opts, true);  
+};
+
+/**
+ * @private
+ * @param {!node_goog.opts} opts The options object to validate.
+ * @param {boolean} allowNullMandatories Wether to allow null mandatory directories
+ * @return {!node_goog.opts} The validated options object.
+ */
+goog.node.utils.validateOpsObject_ = function(opts, allowNullMandatories) {
+  goog.node.utils.validateDir_('closureBasePath', opts.closureBasePath, allowNullMandatories);
+  goog.node.utils.validateDir_('jsdocToolkitDir', opts.jsdocToolkitDir, true);
+  goog.node.utils.validateDir_('nodeDir', opts.nodeDir, true);
+  if (opts.additionalDeps) {
+    for (var i = 0, len = opts.additionalDeps.length; i < len; i++) {
+      goog.node.utils.validateDir_('additionalDeps', opts.additionalDeps[i], true);
+    }
+  };  
   return opts;
 };
 
-
+/**
+ * @private
+ * @param {string} name The name or description of the directory
+ * @param {string} dir The directory to validate
+ * @param {boolean} allowNull Wether we can have null
+ */
+goog.node.utils.validateDir_ = function(name, dir, allowNull) {
+  if (!dir) {
+    if (allowNull) return;
+    throw new Error('Directory/File: ' + name + ' must be specified.');
+  }
+  if (dir.charAt(0) !== '/' && dir.charAt(0) !== '\\') {
+    throw new Error('All directories/files specified in node-goog ' +
+      'configuration must be absolute: ' + dir);
+  };
+  if (!goog.node.utils.path_.existsSync(dir)) {
+    throw new Error('The directories/files specified in node-goog ' +
+      'configuration could not be found: ' + dir);
+  };
+}
+ 
 /**
  * @type {goog.node.utils}
  */
