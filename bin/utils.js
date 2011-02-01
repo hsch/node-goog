@@ -18,14 +18,14 @@
  */
 
 /**
- * @fileoverview This file contains utilties that are required by the utils 
- * in node-goog project.  The files using this include googdoc.js, 
+ * @fileoverview This file contains utilties that are required by the utils
+ * in node-goog project.  The files using this include googdoc.js,
  * googcodecheck.js and googcompile.js in this directory and lib/goog.js.
  *
- * Since lib/goog.js is loaded without the closure scope set this file must 
+ * Since lib/goog.js is loaded without the closure scope set this file must
  * support running outside of closure scope.
  *
- * @author Guido Tapia (guido@tapia.com.au)
+ * @author guido@tapia.com.au (Guido Tapia)
  */
 var goog = {node: {utils: {}}};
 
@@ -34,7 +34,7 @@ var goog = {node: {utils: {}}};
  * We only read the settings object once and then it is cached to allow
  * for safe multiple calls of the goog.node.utils.readSettingObject method
  * below.
- * 
+ *
  * @private
  * @type {node_goog.opts}
  */
@@ -59,33 +59,24 @@ goog.node.utils.readSettingObject = function(file) {
   var dirIdx = file.lastIndexOf('/');
   var dir = dirIdx > 0 ? file.substring(0, dirIdx) : '.';
 
-  var codeDirSettings = goog.node.utils.readArgsFromJSONFile_(dir +
+  var codeDirSettings = goog.node.utils.readArgsFromJSONFile(dir +
       '/closure.json');
-  var globalSettings = goog.node.utils.readArgsFromJSONFile_(__dirname +
+  var globalSettings = goog.node.utils.readArgsFromJSONFile(__dirname +
       '/closure.json');
 
   var settings = globalSettings || {};
-  if (codeDirSettings) {
-    for (var i in codeDirSettings) {
-      settings[i] = codeDirSettings[i];
-    }
-  }
-  if (fileSettings) {
-    for (var i in fileSettings) {
-      settings[i] = fileSettings[i];
-    }
-  }
+  goog.node.utils.extendObject_(settings, codeDirSettings);
+  goog.node.utils.extendObject_(settings, fileSettings);
   return goog.node.utils.cachedArgs_ = settings;
 };
 
 
 /**
- * @private
  * @param {string} file The settings (JSON) file to read.
  * @return {node_goog.opts} The options object represented in the
  *    specified file.
  */
-goog.node.utils.readArgsFromJSONFile_ = function(file) {
+goog.node.utils.readArgsFromJSONFile = function(file) {
   try {
     var json = require('fs').readFileSync(file,
         encoding = 'utf8');
@@ -93,6 +84,19 @@ goog.node.utils.readArgsFromJSONFile_ = function(file) {
   } catch (ex) {
     return null;
   }
+};
+
+
+/**
+ * @private
+ * @param {Object} target The object to extend.
+ * @param {Object} newData The data to add or replace in the target object.
+ * @return {Object} The modified target object.
+ */
+goog.node.utils.extendObject_ = function(target, newData) {
+  if (!newData) { return target; }
+  for (var i in newData) { target[i] = newData[i]; }
+  return target;
 };
 
 

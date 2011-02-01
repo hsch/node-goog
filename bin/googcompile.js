@@ -18,17 +18,17 @@
 
 require('goog').goog.init();
 
-goog.provide('node.goog.googcodecheck');
+goog.provide('node.goog.googcompile');
 
 
 
 /**
  * @constructor
  */
-node.goog.googcodecheck = function() {
+node.goog.googcompile = function() {
   // Only support one file at the moment, this needs attention
   var fileToCompile = process.argv[2];
-  var fileContents = node.goog.googcodecheck.fs_.
+  var fileContents = node.goog.googcompile.fs_.
       readFileSync(fileToCompile, encoding = 'utf8');
   var tmpFileName = fileToCompile.replace('.js', '.tmp.js');
   var args = require('./utils').closureUtils.readSettingObject(fileToCompile);
@@ -42,7 +42,7 @@ node.goog.googcodecheck = function() {
           'deps.js', '', args, function() {
 
         var bashInst = that.createTmpFile_(tmpFileName, fileContents);
-        node.goog.googcodecheck.fs_.
+        node.goog.googcompile.fs_.
             renameSync(fileToCompile, fileToCompileIgnore);
         that.runCompilerOrDeps_(true, tmpFileName, compiledFileName,
             bashInst, args, function() {
@@ -57,7 +57,7 @@ node.goog.googcodecheck = function() {
  * @const
  * @type {extern_fs}
  */
-node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
+node.goog.googcompile.fs_ = /** @type {extern_fs} */ (require('fs'));
 
 
 /**
@@ -65,7 +65,7 @@ node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
  * @const
  * @type {extern_path}
  */
-node.goog.googcodecheck.path_ = /** @type {extern_path} */ (require('path'));
+node.goog.googcompile.path_ = /** @type {extern_path} */ (require('path'));
 
 
 /**
@@ -76,13 +76,13 @@ node.goog.googcodecheck.path_ = /** @type {extern_path} */ (require('path'));
  * @param {string} fileToCompile The original name of the file that was to be
  *    compiled.
  */
-node.goog.googcodecheck.prototype.onExit_ =
+node.goog.googcompile.prototype.onExit_ =
     function(tmpFileName, fileToCompileIgnore, fileToCompile) {
-  if (node.goog.googcodecheck.path_.existsSync(tmpFileName)) {
-    node.goog.googcodecheck.fs_.unlinkSync(tmpFileName);
+  if (node.goog.googcompile.path_.existsSync(tmpFileName)) {
+    node.goog.googcompile.fs_.unlinkSync(tmpFileName);
   }
-  if (node.goog.googcodecheck.path_.existsSync(fileToCompileIgnore)) {
-    node.goog.googcodecheck.fs_.renameSync(fileToCompileIgnore, fileToCompile);
+  if (node.goog.googcompile.path_.existsSync(fileToCompileIgnore)) {
+    node.goog.googcompile.fs_.renameSync(fileToCompileIgnore, fileToCompile);
   }
 };
 
@@ -94,7 +94,8 @@ node.goog.googcodecheck.prototype.onExit_ =
  * @return {string} Any bash shell instructions that need to be copied into
  *    the compiled file.
  */
-node.goog.googcodecheck.prototype.createTmpFile_ = function(tmpFileName, contents) {
+node.goog.googcompile.prototype.createTmpFile_ =
+    function(tmpFileName, contents) {
   var bashInstIdx = contents.indexOf('#!node');
   var hasInst = bashInstIdx >= 0;
   var bashInst = '';
@@ -107,7 +108,8 @@ node.goog.googcodecheck.prototype.createTmpFile_ = function(tmpFileName, content
   var newCode = 'goog.require(\'node.goog\');' +
       (hasInst ? '\n' : '') +
       contents;
-  node.goog.googcodecheck.fs_.writeFileSync(tmpFileName, newCode, encoding = 'utf8');
+  node.goog.googcompile.fs_.writeFileSync(tmpFileName, newCode,
+      encoding = 'utf8');
   return bashInst;
 };
 
@@ -123,7 +125,7 @@ node.goog.googcodecheck.prototype.createTmpFile_ = function(tmpFileName, content
  * @param {node_goog.opts} args The closure.json settings for this compilation.
  * @param {function():undefined} callback The callback to call on exit.
  */
-node.goog.googcodecheck.prototype.runCompilerOrDeps_ = function(compiler, 
+node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler, 
     tmpFileToCompile, compiledFileName, bashInstructions, args, callback) {
   var clArgs = compiler ?
       this.getCompilerClArgs_(tmpFileToCompile, compiledFileName, args) :
@@ -154,12 +156,12 @@ node.goog.googcodecheck.prototype.runCompilerOrDeps_ = function(compiler,
     err = err.replace(/\.tmp\.js/g, '.js');
     if (code === 0) {
       output = (bashInstructions || '') + output;
-      node.goog.googcodecheck.fs_.
+      node.goog.googcompile.fs_.
           writeFileSync(compiledFileName, output, encoding = 'utf8');
 
     }
     console.log(
-        (code ? 'exit code: ' + code : '') + 
+        (code ? 'exit code: ' + code : '') +
         (err ? '\nSTDError: ' + err : '') +
         (code !== 0 ? '\nSTDOut:: ' + output : '') +
         '\nSuccessfully ' + (compiler ? 'compiled' : 'generated dependencies') +
@@ -176,7 +178,7 @@ node.goog.googcodecheck.prototype.runCompilerOrDeps_ = function(compiler,
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   operation.
  */
-node.goog.googcodecheck.prototype.getCompilerClArgs_ =
+node.goog.googcompile.prototype.getCompilerClArgs_ =
     function(tmpFileToCompile, compiledFileName, args) {
   var path = this.getDirectory_(tmpFileToCompile);
   var addedPaths = {};
@@ -250,12 +252,12 @@ node.goog.googcodecheck.prototype.getCompilerClArgs_ =
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   dependency check operation.
  */
-node.goog.googcodecheck.prototype.getDepsClArgs_ =
+node.goog.googcompile.prototype.getDepsClArgs_ =
     function(fileToCompile, compiledFileName, args) {
   var path = this.getDirectory_(fileToCompile);
   return [
     '--root_with_prefix=' + path + ' ' +
-        node.goog.googcodecheck.fs_.realpathSync(path)
+        node.goog.googcompile.fs_.realpathSync(path)
   ];
 };
 
@@ -267,8 +269,8 @@ node.goog.googcodecheck.prototype.getDepsClArgs_ =
  * @return {boolean} Wether the string was already in the map.  If not it is
  *    then added to the specified map.
  */
-node.goog.googcodecheck.prototype.isPathInMap_ = function(map, s) {
-  var real = node.goog.googcodecheck.fs_.realpathSync(s);
+node.goog.googcompile.prototype.isPathInMap_ = function(map, s) {
+  var real = node.goog.googcompile.fs_.realpathSync(s);
   if (map[real]) return true;
   map[real] = 1;
   return false;
@@ -280,10 +282,10 @@ node.goog.googcodecheck.prototype.isPathInMap_ = function(map, s) {
  * @param {string} file The file whose parent directory we are trying to find.
  * @return {string} The parent directory of the soecified file.
  */
-node.goog.googcodecheck.prototype.getDirectory_ = function(file) {
+node.goog.googcompile.prototype.getDirectory_ = function(file) {
   var pathIdx = file.lastIndexOf('/');
   var path = pathIdx > 0 ? file.substring(0, pathIdx) : '.';
   return path;
 };
 
-new node.goog.googcodecheck();
+new node.goog.googcompile();

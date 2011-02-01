@@ -196,7 +196,11 @@ You cannot declare tests like this:
       var testName = function() { ...
       or
       function testName() { ...       
-    
+
+To run all tests in a single directory run the following command:
+
+      googtest <dirname>
+      
 License
 =======
 

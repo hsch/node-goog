@@ -32,7 +32,7 @@ node.goog.googcodecheck = function() {
   var isDir = node.goog.googcodecheck.fs_.statSync(dir).isDirectory();
   if (!isDir) {
     dir = dir.substring(0, dir.lastIndexOf('/') + 1);
-  }  
+  }
   var that = this;
   this.runFixStyle_(dir, function() {
     that.runGSJLint_(dir, function() {
@@ -72,8 +72,8 @@ node.goog.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
  * @param {function():undefined} callback The exit callback.
  */
 node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
-  var excludes = this.getLinterExcludeFiles_(dir);  
-  this.runProcess_('fixjsstyle', ['--strict', 
+  var excludes = this.getLinterExcludeFiles_(dir);
+  this.runProcess_('fixjsstyle', ['--strict',
     '-x ' + excludes.join(','), '-r', dir], callback);
 };
 
@@ -97,27 +97,28 @@ node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
  */
 node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
   var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
-      function(f) { return this.isIgnorableFile_(dir, f); }, this);  
+      function(f) { return this.isIgnorableFile_(dir, f); }, this);
   return goog.array.map(excludes, function(f) { return dir + f; });
 };
 
 
 /**
  * @private
+ * @param {string} dir The directory of the files we are checking.
  * @param {string} f If this file can be ignored from the checks.
  * @return {boolean} Wether the specified file can be safely ignored.
  */
-node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {  
-  var ignore = 
-    f === 'goog.js' ||
-    f.indexOf('.min.js') >= 0 ||
-    f.indexOf('.tmp.js') >= 0 ||
-    f.indexOf('_') === 0 ||
-    f.indexOf('deps.js') >= 0 ||
-    f.indexOf('.extern.js') >= 0 ||
-    f.indexOf('.externs.js') >= 0 ||
-    node.goog.googcodecheck.fs_.statSync(dir + f).isDirectory();
-            
+node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
+  var ignore =
+      f === 'goog.js' ||
+      f.indexOf('.min.js') >= 0 ||
+      f.indexOf('.tmp.js') >= 0 ||
+      f.indexOf('_') === 0 ||
+      f.indexOf('deps.js') >= 0 ||
+      f.indexOf('.extern.js') >= 0 ||
+      f.indexOf('.externs.js') >= 0 ||
+      node.goog.googcodecheck.fs_.statSync(dir + f).isDirectory();
+
   return ignore;
 };
 
@@ -128,7 +129,8 @@ node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
  * @param {Array.<string>} args The arguments to pass to the command.
  * @param {function():undefined} callback The exit callback.
  */
-node.goog.googcodecheck.prototype.runProcess_ = function(command, args, callback) {
+node.goog.googcodecheck.prototype.runProcess_ =
+    function(command, args, callback) {
   var cmd = require('child_process').spawn(command, args);
 
   var output = '', err = '';
