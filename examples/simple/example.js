@@ -79,6 +79,12 @@ goog.provide('node.goog.examples.simple.Example');
  * @constructor
  */
 node.goog.examples.simple.Example = function() {
+  /**
+   * Wether the timer is finnished
+   * @type {boolean}
+   */
+  this.completed = false;
+
   this.createDelay_();
   this.testTrie_();
   this.testExternalLib_();
@@ -93,7 +99,8 @@ node.goog.examples.simple.Example = function() {
 node.goog.examples.simple.Example.prototype.createDelay_ = function() {
   new goog.async.Delay(function() {
     console.info('Bye!');
-  }).start(1500);
+    this.completed = true;
+  }, 300, this).start(300);
 };
 
 

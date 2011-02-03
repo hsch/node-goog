@@ -257,10 +257,7 @@ node.goog.utils.validateDir_ = function(currentDir, name, dir, allowNull) {
     if (allowNull) return dir;
     throw new Error('Directory/File: ' + name + ' must be specified.');
   }
-  if (dir.charAt(0) !== '/' && dir.charAt(0) !== '\\') {
-    if (!currentDir) {
-      throw new Error('directory ' + dir + ' must have an absolute path');
-    }
+  if (dir.charAt(0) !== '/' && dir.charAt(0) !== '\\' && currentDir) {
     dir = node.goog.utils.getPath(currentDir, dir);
   }
   if (!node.goog.utils.checkDirExists_(dir)) {
