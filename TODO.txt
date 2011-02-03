@@ -1,13 +1,9 @@
 TODO
 ====
-- Add tests that ensures all sample tests passing
 - Add better command line support for compilation
   - Do not generate deps.js or file.min.js option
   - Do not compile dependencies
-- googtest should run recursivelly into directories of tests
-- Running individual tests say: 'Starting tests: Untitled Test Case'. Lets give the
-  tests a name, file name should be fine
 - Currently all paths in settings are absolute
-  they should also allow relative from the settings file location
+    they should also allow relative from the settings file location
 - Asynchronous tests not working in googtest
 - Async tests not printing to console properly

@@ -64,6 +64,13 @@ node.goog.googtest = function() {
   goog.testing.TestCase.prototype.isInsideMultiTestRunner = function() {
     return true;
   }
+
+  /**
+   * @private
+   * @type {extern_fs}
+   */
+  this.fs_ = /** @type {extern_fs} */ (require('fs'));
+
   /**
    * All test files found in the specified directory.
    *
@@ -117,19 +124,32 @@ node.goog.googtest.prototype.displayResults_ = function() {
 
 /**
  * @private
- * @return {Array.<string>} All tests files in this directory.
+ * @return {Array.<string>} All tests files in this directory (recursive).
  */
 node.goog.googtest.prototype.getAllTestsInCurrentDirectory_ = function() {
-  var fs = require('fs');
   var dirOrFile = process.argv[2];
-  if (!fs.statSync(dirOrFile).isDirectory()) { return [dirOrFile]; }
+  if (!this.fs_.statSync(dirOrFile).isDirectory()) { return [dirOrFile]; }
 
-  return goog.array.map(
-      goog.array.filter(fs.readdirSync(dirOrFile),
-      function(f) { return f.toLowerCase().indexOf('test') >= 0; }
-      ),
-      function(f) { return node.goog.utils.getPath(dirOrFile, f); }
-  );
+  return this.getTestFilesImpl_([], dirOrFile);
+};
+
+
+/**
+ * @private
+ * @param {Array.<string>} testFiles The array to hold all test files.
+ * @param {string} dir The directory to check for test files.
+ * @return {Array.<string>} All tests files in this directory.
+ */
+node.goog.googtest.prototype.getTestFilesImpl_ = function(testFiles, dir) {
+  goog.array.forEach(this.fs_.readdirSync(dir), function(f) {
+    var path = node.goog.utils.getPath(dir, f);
+    if (this.fs_.statSync(path).isDirectory()) {
+      return this.getTestFilesImpl_(testFiles, path);
+    } else if (f.toLowerCase().indexOf('test') >= 0) {
+      testFiles.push(path);
+    }
+  }, this);
+  return testFiles;
 };
 
 
@@ -139,10 +159,9 @@ node.goog.googtest.prototype.getAllTestsInCurrentDirectory_ = function() {
  */
 node.goog.googtest.prototype.runTest_ = function(testFile) {
   var script_ = process.binding('evals').Script;
-  var code = require('fs').readFileSync(testFile, 'utf-8').
+  var code = this.fs_.readFileSync(testFile, 'utf-8').
       replace(/^#![^\n]+/, '');
   var shortName = testFile.substring(0, testFile.lastIndexOf('/') + 1);
-  console.log('running: ' + testFile + ' code: ' + code);
   // This actually runs the tests
   script_.runInThisContext.call(global, code, shortName);
   var async = code.indexOf('AsyncTestCase') >= 0;

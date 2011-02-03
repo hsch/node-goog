@@ -1,4 +1,4 @@
-# !/ usr / local / bin / node;
+#!/usr/local/bin/node
 
 require('goog').goog.init();
 

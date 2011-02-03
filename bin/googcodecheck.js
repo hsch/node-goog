@@ -38,8 +38,7 @@ node.goog.googcodecheck = function() {
   var that = this;
   this.runFixStyle_(dir, function() {
     that.runGSJLint_(dir, function() {
-      goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
-          function(f) { that.fixBashInstructions_(dir, f); }, that);
+      that.fixBashInstructionsOnDir_(dir);
     });
   });
 };
@@ -51,6 +50,23 @@ node.goog.googcodecheck = function() {
  * @type {extern_fs}
  */
 node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
+
+
+/**
+ * @private
+ * @param {string} dir The directory to recursively fix the bash instructions
+ *    on.
+ */
+node.goog.googcodecheck.prototype.fixBashInstructionsOnDir_ = function(dir) {
+  goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
+      function(f) {
+        var path = node.goog.utils.getPath(dir, f);
+        if (node.goog.googcodecheck.fs_.statSync(path).isDirectory()) {
+          return this.fixBashInstructionsOnDir_(path);
+        }
+        this.fixBashInstructions_(dir, f);
+      }, this);
+};
 
 
 /**

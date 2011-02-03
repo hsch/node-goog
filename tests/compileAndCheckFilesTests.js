@@ -12,9 +12,9 @@ goog.require('goog.array');
 var baseDir = '../';
 var compileDirs = ['lib/', 'bin/']
 var checkDirs = ['lib/', 'bin/', 'examples/simple', 'examples/animals'];
-var additionalFiles = ['examples/animals/example.js',
-  'examples/simple/example.js'];
+var additionalFiles = ['examples/animals/example.js', 'examples/simple/example.js'];
 var ignoreable = ['.min.js', 'deps.js', '.externs.js', '.tmp.js', 'utils.js'];
+var doNotDelete = ['simple/deps.js'];
 
 var allTestableFiles = getAllTestableFiles();
 
@@ -127,7 +127,11 @@ function deleteAllDepsAndMinFiles() {
     goog.array.forEach(fs_.readdirSync(dir), function(f) {
       if (f.indexOf('.min.js') > 0 || f.indexOf('.tmp.js') > 0 || f === 'deps.js') {
         var file = dir + '/' + f;
-        fs_.unlinkSync(file);
+        if (goog.array.findIndex(doNotDelete, function (dnd) {
+              return file.indexOf(dnd) >= 0;
+            }) < 0) {
+          fs_.unlinkSync(file);
+        }
       }
     });
   });

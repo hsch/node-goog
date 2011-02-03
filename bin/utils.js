@@ -67,8 +67,7 @@ node.goog.utils.readSettingObject = function(file) {
   var globalSettings =
       node.goog.utils.readArgsFromJSONFile(
       node.goog.utils.getPath(__dirname, '/closure.json'));
-  var codeDirSettings = file ?
-      node.goog.utils.readArgsFromSourceDir_(file) : null;
+  var codeDirSettings = node.goog.utils.readArgsFromSourceDir_(file);
   var currentDirSettings =
       node.goog.utils.readArgsFromJSONFile(
       node.goog.utils.getPath(process.cwd(), '/closure.json'));
@@ -84,7 +83,7 @@ node.goog.utils.readSettingObject = function(file) {
 
 /**
  * @private
- * @param {string} file The file currently being executed.
+ * @param {string=} file The file currently being executed.
  * @return {node.goog.opts?} The options object represented in the
  *    specified file.
  */
