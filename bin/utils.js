@@ -59,25 +59,25 @@ node.goog.utils.path_ = /** @type {extern_path} */ (require('path'));
  * @return {node.goog.opts} The correct options object in the current context.
  */
 node.goog.utils.readSettingObject = function(file) {
-  var contents = file ?
-      node.goog.utils.fs_.readFileSync(file, encoding = 'utf8') : null;
-  var fileSettings = contents ?
-      node.goog.utils.parseCompilerArgsFromFile_(contents) : null;
+  var contents = null, fileSettings = null;
+  if (file) {
+    contents = node.goog.utils.fs_.readFileSync(file, encoding = 'utf8');
+    fileSettings = node.goog.utils.parseCompilerArgsFromFile_(file, contents);
+  }
 
   var globalSettings =
-      node.goog.utils.readArgsFromJSONFile(
+      node.goog.utils.readArgsFromJSONFile(__dirname,
       node.goog.utils.getPath(__dirname, '/closure.json'));
   var codeDirSettings = node.goog.utils.readArgsFromSourceDir_(file);
   var currentDirSettings =
-      node.goog.utils.readArgsFromJSONFile(
+      node.goog.utils.readArgsFromJSONFile(process.cwd(),
       node.goog.utils.getPath(process.cwd(), '/closure.json'));
 
   var settings = globalSettings || /** @type {node.goog.opts} */ ({});
   node.goog.utils.extendObject_(settings, codeDirSettings);
   node.goog.utils.extendObject_(settings, currentDirSettings);
   node.goog.utils.extendObject_(settings, fileSettings);
-
-  return node.goog.utils.validateOpsObject_(settings, false);
+  return node.goog.utils.validateOpsObject_(null, settings, false);
 };
 
 
@@ -92,7 +92,8 @@ node.goog.utils.readArgsFromSourceDir_ = function(file) {
     file = process.argv[1];
     if (file.indexOf('googcompile') >= 0 ||
         file.indexOf('googdoc') >= 0 ||
-        file.indexOf('googtest') >= 0) {
+        file.indexOf('googtest') >= 0 ||
+        file.indexOf('googcodecheck') >= 0) {
       file = process.argv[2];
     }
   }
@@ -100,7 +101,7 @@ node.goog.utils.readArgsFromSourceDir_ = function(file) {
   var dir = dirIdx > 0 ? file.substring(0, dirIdx) : '.';
 
   return node.goog.utils.readArgsFromJSONFile(
-      node.goog.utils.getPath(dir, '/closure.json'));
+      dir, node.goog.utils.getPath(dir, '/closure.json'));
 };
 
 
@@ -119,15 +120,17 @@ node.goog.utils.getPath = function(baseDir, file) {
 
 
 /**
+ * @param {string} currentDir The directory of the current settings file or
+ *    executing javascript file.
  * @param {string} file The settings (JSON) file to read.
  * @return {node.goog.opts?} The options object represented in the
  *    specified file.
  */
-node.goog.utils.readArgsFromJSONFile = function(file) {
+node.goog.utils.readArgsFromJSONFile = function(currentDir, file) {
   if (!node.goog.utils.path_.existsSync(file)) return null;
   var json = node.goog.utils.fs_.readFileSync(file,
       encoding = 'utf8');
-  return node.goog.utils.getOptsObject_(json);
+  return node.goog.utils.getOptsObject_(currentDir, json);
 };
 
 
@@ -139,19 +142,33 @@ node.goog.utils.readArgsFromJSONFile = function(file) {
  */
 node.goog.utils.extendObject_ = function(target, newData) {
   if (!newData) { return target; }
-  for (var i in newData) { target[i] = newData[i]; }
+  for (var i in newData) {
+    var orig = target[i];
+    var newprop = newData[i];
+    if (orig && newprop && typeof(newprop) !== 'string' &&
+        typeof (newprop.length) === 'number') {
+      for (var i = 0, len = newprop.length; i < len; i++) {
+        orig.push(newprop[i]);
+      }
+    } else {
+      target[i] = newprop;
+    }
+  }
   return target;
 };
 
 
 /**
  * @private
+ * @param {string} file The file to try to parse settings out of.  It is also
+ *    used to determine which directory to look for the closure.json settings
+ *    file.
  * @param {string} code The javascript code to parse trying to find the
  *    settings object.
  * @return {node.goog.opts?} The options object represented in the
  *    specified javascript code.
  */
-node.goog.utils.parseCompilerArgsFromFile_ = function(code) {
+node.goog.utils.parseCompilerArgsFromFile_ = function(file, code) {
   var regex =
       /var\s+([\w\d^=\s]+)\s*=\s*require\(\s*['"]goog['"]\s*\)\s*\.\s*goog/gm;
   var m = regex.exec(code);
@@ -163,41 +180,63 @@ node.goog.utils.parseCompilerArgsFromFile_ = function(code) {
   m = regex.exec(code);
   if (!m) return null;
   var optsString = m[1];
-  return node.goog.utils.getOptsObject_(optsString);
+  var dir = file.substring(0, file.lastIndexOf('/'));
+
+  return node.goog.utils.getOptsObject_(dir, optsString);
 };
 
 
 /**
  * @private
+ * @param {string} currentDir The directory of the current settings file or
+ *    executing javascript file.
  * @param {string} optsString JSON string representation of an options object.
  * @return {node.goog.opts} The options object.
  */
-node.goog.utils.getOptsObject_ = function(optsString) {
+node.goog.utils.getOptsObject_ = function(currentDir, optsString) {
   process.binding('evals').Script.runInThisContext('var opts = ' + optsString);
   if (!opts) {
     throw new Error('Could not create an options object from ' +
         'the specified string');
   }
-  return node.goog.utils.validateOpsObject_(opts, true);
+  return node.goog.utils.validateOpsObject_(currentDir, opts, true);
 };
 
 
 /**
  * @private
+ * @param {string?} currentDir The directory of the current settings file or
+ *    executing javascript file.
  * @param {!node.goog.opts} opts The options object to validate.
  * @param {boolean} allowNullMandatories Wether to allow null mandatory
  *    directories.
  * @return {!node.goog.opts} The validated options object.
  */
-node.goog.utils.validateOpsObject_ = function(opts, allowNullMandatories) {
-  node.goog.utils.validateDir_('closureBasePath', opts.closureBasePath,
-      allowNullMandatories);
-  node.goog.utils.validateDir_('jsdocToolkitDir', opts.jsdocToolkitDir, true);
-  node.goog.utils.validateDir_('nodeDir', opts.nodeDir, true);
+node.goog.utils.validateOpsObject_ =
+    function(currentDir, opts, allowNullMandatories) {
+  if (opts.closureBasePath)
+    opts.closureBasePath = node.goog.utils.validateDir_(currentDir,
+        'closureBasePath', opts.closureBasePath, allowNullMandatories);
+  if (opts.jsdocToolkitDir)
+    opts.jsdocToolkitDir = node.goog.utils.validateDir_(currentDir,
+        'jsdocToolkitDir', opts.jsdocToolkitDir, true);
+  if (opts.nodeDir)
+    opts.nodeDir = node.goog.utils.validateDir_(currentDir,
+        'nodeDir', opts.nodeDir, true);
+  if (opts.compiler_jar)
+    opts.compiler_jar = node.goog.utils.validateDir_(currentDir,
+        'compiler_jar', opts.compiler_jar, true);
   if (opts.additionalDeps) {
     for (var i = 0, len = opts.additionalDeps.length; i < len; i++) {
-      node.goog.utils.validateDir_('additionalDeps',
-          opts.additionalDeps[i], true);
+      opts.additionalDeps[i] = node.goog.utils.validateDir_(currentDir,
+          'additionalDeps', opts.additionalDeps[i], true);
+    }
+  }
+  if (opts.additionalCompileRoots) {
+    for (var i = 0, len = opts.additionalCompileRoots.length; i < len; i++) {
+      opts.additionalCompileRoots[i] = node.goog.utils.validateDir_(
+          currentDir, 'additionalCompileRoots',
+          opts.additionalCompileRoots[i], true);
     }
   }
   return opts;
@@ -206,23 +245,39 @@ node.goog.utils.validateOpsObject_ = function(opts, allowNullMandatories) {
 
 /**
  * @private
+ * @param {string?} currentDir The directory of the current settings file or
+ *    executing javascript file.
  * @param {string} name The name or description of the directory.
  * @param {string} dir The directory to validate.
  * @param {boolean} allowNull Wether we can have null.
+ * @return {string} The valid directory (turned into absolute).
  */
-node.goog.utils.validateDir_ = function(name, dir, allowNull) {
+node.goog.utils.validateDir_ = function(currentDir, name, dir, allowNull) {
   if (!dir) {
-    if (allowNull) return;
+    if (allowNull) return dir;
     throw new Error('Directory/File: ' + name + ' must be specified.');
   }
   if (dir.charAt(0) !== '/' && dir.charAt(0) !== '\\') {
-    throw new Error('All directories/files specified in node-goog ' +
-        'configuration must be absolute: ' + dir);
+    if (!currentDir) {
+      throw new Error('directory ' + dir + ' must have an absolute path');
+    }
+    dir = node.goog.utils.getPath(currentDir, dir);
   }
-  if (!node.goog.utils.path_.existsSync(dir)) {
+  if (!node.goog.utils.checkDirExists_(dir)) {
     throw new Error('The directories/files specified in node-goog ' +
         'configuration could not be found: ' + dir);
   }
+  return dir;
+};
+
+
+/**
+ * @private
+ * @param {string} dir The directory to check wether exists.
+ * @return {boolean} Wether the specified directory exists.
+ */
+node.goog.utils.checkDirExists_ = function(dir) {
+  return node.goog.utils.path_.existsSync(dir);
 };
 
 

@@ -3,7 +3,5 @@ TODO
 - Add better command line support for compilation
   - Do not generate deps.js or file.min.js option
   - Do not compile dependencies
-- Currently all paths in settings are absolute
-    they should also allow relative from the settings file location
 - Asynchronous tests not working in googtest
 - Async tests not printing to console properly
