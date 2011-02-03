@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 
-var ng_ = require('goog').goog.init();
-var utils = ng_.getUtils();
+require('goog').goog.init();
+
 var fs_ = require('fs');
 var path_ = require('path');
 
@@ -12,7 +12,8 @@ goog.require('goog.array');
 var baseDir = '../';
 var compileDirs = ['lib/', 'bin/']
 var checkDirs = ['lib/', 'bin/', 'examples/simple', 'examples/animals'];
-var additionalFiles = ['examples/simple/example.js', 'examples/animals/example.js'];
+var additionalFiles = ['examples/animals/example.js',
+  'examples/simple/example.js'];
 var ignoreable = ['.min.js', 'deps.js', '.externs.js', '.tmp.js', 'utils.js'];
 
 var allTestableFiles = getAllTestableFiles();

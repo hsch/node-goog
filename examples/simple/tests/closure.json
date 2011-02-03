@@ -1,8 +1,8 @@
 // This document extends the global settings object which can be found in the
 // bin/closure.json file.
-{  
+{
   additionalDeps: [
-    '/home/guidot/dev/node-goog/examples/external_lib/deps.js' ,
-    '/home/guidot/dev/node-goog/examples/simple/deps.js' 
+    '/home/ubuntu/Dev/projects/node-goog/examples/external_lib/deps.js' ,
+    '/home/ubuntu/Dev/projects/node-goog/examples/simple/deps.js'
   ]
 }

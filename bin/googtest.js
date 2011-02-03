@@ -26,17 +26,19 @@
 
 /**
  * @private
- * @const
- * @type {NodeGoog}
+ * @type {*}
  */
 var ng_ = require('goog').goog.init();
 
+
 goog.provide('node.goog.googtest');
 
-goog.require('NodeGoog');
 goog.require('goog.array');
+
+goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
 goog.require('goog.testing.jsunit');
+goog.require('node.goog.utils');
 
 goog.testing.jsunit['AUTO_RUN_ONLOAD'] = false;
 
@@ -106,7 +108,7 @@ node.goog.googtest.prototype.runNextTest_ = function() {
  * @private
  */
 node.goog.googtest.prototype.displayResults_ = function() {
-  console.log('\n\nRESULTS\n=======');
+  console.log('\nRESULTS\n=======');
   goog.array.forEach(this.results_, function(tc) {
     console.log(tc.getReport(false));
   });
@@ -118,12 +120,16 @@ node.goog.googtest.prototype.displayResults_ = function() {
  * @return {Array.<string>} All tests files in this directory.
  */
 node.goog.googtest.prototype.getAllTestsInCurrentDirectory_ = function() {
-  var tests = [];
+  var fs = require('fs');
+  var dirOrFile = process.argv[2];
+  if (!fs.statSync(dirOrFile).isDirectory()) { return [dirOrFile]; }
 
-  return goog.array.filter(
-      require('fs').readdirSync(process.argv[2]), function(f) {
-        return f.toLowerCase().indexOf('test') >= 0;
-      });
+  return goog.array.map(
+      goog.array.filter(fs.readdirSync(dirOrFile),
+      function(f) { return f.toLowerCase().indexOf('test') >= 0; }
+      ),
+      function(f) { return node.goog.utils.getPath(dirOrFile, f); }
+  );
 };
 
 
@@ -133,14 +139,18 @@ node.goog.googtest.prototype.getAllTestsInCurrentDirectory_ = function() {
  */
 node.goog.googtest.prototype.runTest_ = function(testFile) {
   var script_ = process.binding('evals').Script;
-  var path = ng_.getUtils().getPath(process.argv[2] || './', testFile);
-  var code = require('fs').readFileSync(path, 'utf-8').
+  var code = require('fs').readFileSync(testFile, 'utf-8').
       replace(/^#![^\n]+/, '');
-  script_.runInThisContext.call(global, code, testFile);
-
+  var shortName = testFile.substring(0, testFile.lastIndexOf('/') + 1);
+  console.log('running: ' + testFile + ' code: ' + code);
+  // This actually runs the tests
+  script_.runInThisContext.call(global, code, shortName);
+  var async = code.indexOf('AsyncTestCase') >= 0;
   var tr = global['G_testRunner'];
 
-  var test = new goog.testing.TestCase(testFile);
+  var test = async ?
+      new goog.testing.AsyncTestCase(shortName) :
+      new goog.testing.TestCase(shortName);
   test.autoDiscoverTests();
   tr.initialize(test);
   tr.execute();

@@ -16,17 +16,11 @@
  * limitations under the License.
  */
 
-
-/**
- * @private
- * @const
- * @type {NodeGoog}
- */
-var ng_ = require('goog').goog.init();
+require('goog').goog.init();
 
 goog.provide('node.goog.googdoc');
 
-goog.require('NodeGoog');
+goog.require('node.goog.utils');
 
 
 
@@ -34,7 +28,7 @@ goog.require('NodeGoog');
  * @constructor
  */
 node.goog.googdoc = function() {
-  var args = ng_.getUtils().readSettingObject();
+  var args = node.goog.utils.readSettingObject();
   var jsDocToolkitDir = args.jsdocToolkitDir;
   if (!jsDocToolkitDir) {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
@@ -60,11 +54,11 @@ node.goog.googdoc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
   /** @type {extern_process} */
   var jsdoc = require('child_process').spawn('java', [
     '-jar',
-    ng_.getUtils().getPath(jsDocToolkitDir, 'jsrun.jar'),
-    ng_.getUtils().getPath(jsDocToolkitDir, 'app/run.js'),
+    node.goog.utils.getPath(jsDocToolkitDir, 'jsrun.jar'),
+    node.goog.utils.getPath(jsDocToolkitDir, 'app/run.js'),
     '-a',
-    '-t=' + ng_.getUtils().getPath(jsDocToolkitDir, 'templates/jsdoc/'),
-    '-d=' + ng_.getUtils().getPath(entryPointDir, '/docs'),
+    '-t=' + node.goog.utils.getPath(jsDocToolkitDir, 'templates/jsdoc/'),
+    '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
     '-r=10',
     '-E=\.min\.js',
     '-E=deps\.js',

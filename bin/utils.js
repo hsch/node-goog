@@ -28,28 +28,35 @@
  * @author guido@tapia.com.au (Guido Tapia)
  */
 
-var node = {goog: {utils: {}}};
+if (typeof(goog) !== 'undefined') {
+  goog.provide('node.goog.utils');
+} else {
+  global['node'] = global['node'] || {goog: {utils: {}}};
+  global['node'].goog = global['node'].goog || {};
+  global['node']['goog'].utils = global['node']['goog'].utils || {};
+
+}
 
 
 /**
  * @private
  * @type {extern_fs}
  */
-node.goog.utils.fs_ = require('fs');
+node.goog.utils.fs_ = /** @type {extern_fs} */ (require('fs'));
 
 
 /**
  * @private
  * @type {extern_path}
  */
-node.goog.utils.path_ = require('path');
+node.goog.utils.path_ = /** @type {extern_path} */ (require('path'));
 
 
 /**
- * @param {string} file The file to try to parse settings out of.  It is also
+ * @param {string=} file The file to try to parse settings out of.  It is also
  *    used to determine which directory to look for the closure.json settings
  *    file.
- * @return {node_goog.opts} The correct options object in the current context.
+ * @return {node.goog.opts} The correct options object in the current context.
  */
 node.goog.utils.readSettingObject = function(file) {
   var contents = file ?
@@ -60,12 +67,13 @@ node.goog.utils.readSettingObject = function(file) {
   var globalSettings =
       node.goog.utils.readArgsFromJSONFile(
       node.goog.utils.getPath(__dirname, '/closure.json'));
-  var codeDirSettings = node.goog.utils.readArgsFromSourceDir_(file);
+  var codeDirSettings = file ?
+      node.goog.utils.readArgsFromSourceDir_(file) : null;
   var currentDirSettings =
       node.goog.utils.readArgsFromJSONFile(
       node.goog.utils.getPath(process.cwd(), '/closure.json'));
 
-  var settings = globalSettings || {};
+  var settings = globalSettings || /** @type {node.goog.opts} */ ({});
   node.goog.utils.extendObject_(settings, codeDirSettings);
   node.goog.utils.extendObject_(settings, currentDirSettings);
   node.goog.utils.extendObject_(settings, fileSettings);
@@ -77,7 +85,7 @@ node.goog.utils.readSettingObject = function(file) {
 /**
  * @private
  * @param {string} file The file currently being executed.
- * @return {node_goog.opts} The options object represented in the
+ * @return {node.goog.opts?} The options object represented in the
  *    specified file.
  */
 node.goog.utils.readArgsFromSourceDir_ = function(file) {
@@ -113,7 +121,7 @@ node.goog.utils.getPath = function(baseDir, file) {
 
 /**
  * @param {string} file The settings (JSON) file to read.
- * @return {node_goog.opts} The options object represented in the
+ * @return {node.goog.opts?} The options object represented in the
  *    specified file.
  */
 node.goog.utils.readArgsFromJSONFile = function(file) {
@@ -141,7 +149,7 @@ node.goog.utils.extendObject_ = function(target, newData) {
  * @private
  * @param {string} code The javascript code to parse trying to find the
  *    settings object.
- * @return {node_goog.opts} The options object represented in the
+ * @return {node.goog.opts?} The options object represented in the
  *    specified javascript code.
  */
 node.goog.utils.parseCompilerArgsFromFile_ = function(code) {
@@ -153,7 +161,7 @@ node.goog.utils.parseCompilerArgsFromFile_ = function(code) {
   var varName = m[1].trim();
   var regespStr = varName + '\\s*\\.\\s*init\\s*\\(\\s*({[^}]*})';
   regex = new RegExp(regespStr, 'gm');
-  var m = regex.exec(code);
+  m = regex.exec(code);
   if (!m) return null;
   var optsString = m[1];
   return node.goog.utils.getOptsObject_(optsString);
@@ -163,21 +171,24 @@ node.goog.utils.parseCompilerArgsFromFile_ = function(code) {
 /**
  * @private
  * @param {string} optsString JSON string representation of an options object.
- * @return {node_goog.opts} The options object.
+ * @return {node.goog.opts} The options object.
  */
 node.goog.utils.getOptsObject_ = function(optsString) {
   process.binding('evals').Script.runInThisContext('var opts = ' + optsString);
-  if (!opts) throw new Error(err);
+  if (!opts) {
+    throw new Error('Could not create an options object from ' +
+        'the specified string');
+  }
   return node.goog.utils.validateOpsObject_(opts, true);
 };
 
 
 /**
  * @private
- * @param {!node_goog.opts} opts The options object to validate.
+ * @param {!node.goog.opts} opts The options object to validate.
  * @param {boolean} allowNullMandatories Wether to allow null mandatory
  *    directories.
- * @return {!node_goog.opts} The validated options object.
+ * @return {!node.goog.opts} The validated options object.
  */
 node.goog.utils.validateOpsObject_ = function(opts, allowNullMandatories) {
   node.goog.utils.validateDir_('closureBasePath', opts.closureBasePath,
@@ -217,6 +228,16 @@ node.goog.utils.validateDir_ = function(name, dir, allowNull) {
 
 
 /**
- * @type {node.goog.utils}
+ * @typedef {{closureBasePath:string,
+ *    additionalDeps:Array.<string>,
+ *    jsdocToolkitDir:string,
+ *    nodeDir:string,
+ *    compiler_jar:string,
+ *    additionalCompileOptions:Array.<string>,
+ *    additionalCompileRoots:Array.<string>}}
  */
+node.goog.opts;
+
+
+/** @type {Object} */
 exports.closureUtils = node.goog.utils;

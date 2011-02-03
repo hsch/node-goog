@@ -1,8 +1,6 @@
 TODO
 ====
-
-- Find a way of compiling utils.js and removing it from the static.externs.js file
-- Tests need to better print errors
+- Add tests that ensures all sample tests passing
 - Add better command line support for compilation
   - Do not generate deps.js or file.min.js option
   - Do not compile dependencies
@@ -12,3 +10,4 @@ TODO
 - Currently all paths in settings are absolute
   they should also allow relative from the settings file location
 - Asynchronous tests not working in googtest
+- Async tests not printing to console properly

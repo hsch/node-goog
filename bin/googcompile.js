@@ -23,15 +23,11 @@
  */
 
 
-/**
- * @private
- * @const
- * @type {NodeGoog}
- */
-var ng_ = require('goog').goog.init();
+require('goog').goog.init();
 
 goog.provide('node.goog.googcompile');
-goog.require('NodeGoog');
+
+goog.require('node.goog.utils');
 
 
 
@@ -43,7 +39,7 @@ node.goog.googcompile = function() {
   var fileContents = node.goog.googcompile.fs_.
       readFileSync(fileToCompile, encoding = 'utf8');
   var tmpFileName = fileToCompile.replace('.js', '.tmp.js');
-  var args = ng_.getUtils().readSettingObject(fileToCompile);
+  var args = node.goog.utils.readSettingObject(fileToCompile);
 
   var compiledFileName = tmpFileName.replace('.tmp.js', '.min.js');
   var fileToCompileIgnore = fileToCompile.replace('.js', '.ignorejs');
@@ -143,7 +139,7 @@ node.goog.googcompile.prototype.createTmpFile_ =
  * @param {string} compiledFileName The compiled (minified) file name.
  * @param {string} bashInstructions Any bash shell instructions that are
  *    required in the compiled file.
- * @param {node_goog.opts} args The closure.json settings for this compilation.
+ * @param {node.goog.opts} args The closure.json settings for this compilation.
  * @param {function():undefined} callback The callback to call on exit.
  */
 node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
@@ -196,7 +192,7 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
  * @private
  * @param {string} tmpFileToCompile The file name to compile.
  * @param {string} compiledFileName The compiled (minified) file name.
- * @param {node_goog.opts} args The closure.json settings for this compilation.
+ * @param {node.goog.opts} args The closure.json settings for this compilation.
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   operation.
  */
@@ -209,9 +205,13 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
     '--root=' + args.closureBasePath.replace('/closure/goog/', '/'),
     '--root=' + path
   ];
-  var libPath = ng_.getUtils().getPath(__dirname, '../lib');
+  var libPath = node.goog.utils.getPath(__dirname, '../lib');
+  var binPath = node.goog.utils.getPath(__dirname, '../bin');
   if (!this.isPathInMap_(addedPaths, libPath)) {
     clArgs.push('--root=' + libPath);
+  }
+  if (!this.isPathInMap_(addedPaths, binPath)) {
+    clArgs.push('--root=' + binPath);
   }
   clArgs.push('--input=' + tmpFileToCompile);
   clArgs.push('--output_mode=compiled');
@@ -219,7 +219,7 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
 
   clArgs.push(
       '--compiler_flags=--js=' +
-      ng_.getUtils().getPath(args.closureBasePath, 'deps.js'),
+      node.goog.utils.getPath(args.closureBasePath, 'deps.js'),
       '--compiler_flags=--compilation_level=ADVANCED_OPTIMIZATIONS',
       '--compiler_flags=--externs=lib/node.externs.js',
       '--compiler_flags=--externs=lib/node.static.externs.js',
@@ -272,7 +272,7 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
  * @private
  * @param {string} fileToCompile The file name to compile.
  * @param {string} compiledFileName The compiled (minified) file name.
- * @param {node_goog.opts} args The closure.json settings for this compilation.
+ * @param {node.goog.opts} args The closure.json settings for this compilation.
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   dependency check operation.
  */
