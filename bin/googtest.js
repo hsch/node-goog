@@ -49,6 +49,8 @@ goog.testing.jsunit['AUTO_RUN_ONLOAD'] = false;
  * @constructor
  */
 node.goog.googtest = function() {
+  global.__filename = __filename;
+  global.__dirname = __dirname;
 
   var dir = process.argv[2];
   if (!dir) {
@@ -133,7 +135,7 @@ node.goog.googtest.prototype.runTest_ = function(testFile) {
   var script_ = process.binding('evals').Script;
   var path = ng_.getUtils().getPath(process.argv[2] || './', testFile);
   var code = require('fs').readFileSync(path, 'utf-8').
-      replace(/^#!node/, '');
+      replace(/^#![^\n]+/, '');
   script_.runInThisContext.call(global, code, testFile);
 
   var tr = global['G_testRunner'];

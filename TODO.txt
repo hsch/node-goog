@@ -2,16 +2,13 @@ TODO
 ====
 
 - Find a way of compiling utils.js and removing it from the static.externs.js file
-- Change all goog.node namespaces to node.goog or perhaps even change
-  all node.goog to ngoog
-- Implement tests to ensure all files pass all validations and basic
-  funcitonality works. This will allow quick testing on multiple platforms
 - Tests need to better print errors
 - Add better command line support for compilation
   - Do not generate deps.js or file.min.js option
   - Do not compile dependencies
-- Unit tests should run recursivelly into directories of tests
+- googtest should run recursivelly into directories of tests
 - Running individual tests say: 'Starting tests: Untitled Test Case'. Lets give the
   tests a name, file name should be fine
 - Currently all paths in settings are absolute
   they should also allow relative from the settings file location
+- Asynchronous tests not working in googtest
