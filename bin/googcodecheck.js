@@ -1,4 +1,4 @@
-#!node
+#!/usr/local/bin/node
 
 /**
  * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
@@ -16,10 +16,17 @@
  * limitations under the License.
  */
 
-require('goog').goog.init();
+
+/**
+ * @private
+ * @const
+ * @type {NodeGoog}
+ */
+var ng_ = require('goog').goog.init();
 
 goog.provide('node.goog.googcodecheck');
 
+goog.require('NodeGoog');
 goog.require('goog.array');
 
 
@@ -59,10 +66,13 @@ node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
 node.goog.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
   if (this.isIgnorableFile_(dir, file)) return;
   var fileContents = node.goog.googcodecheck.fs_.
-      readFileSync(dir + file, encoding = 'utf8');
-  fileContents = fileContents.replace('# !node;', '#!node');
-  node.goog.googcodecheck.fs_.
-      writeFileSync(dir + file, fileContents, encoding = 'utf8');
+      readFileSync(ng_.getUtils().getPath(dir, file), encoding = 'utf8');
+  var m = /^# !([^;]+)\;/g.exec(fileContents);
+  if (!m) { return; }
+  var fixed = m[1].replace(/ /g, '');
+  fileContents = fileContents.replace(m[0], '#!' + fixed);
+  node.goog.googcodecheck.fs_.writeFileSync(ng_.getUtils().getPath(dir, file),
+      fileContents, encoding = 'utf8');
 };
 
 
@@ -98,7 +108,9 @@ node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
 node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
   var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
       function(f) { return this.isIgnorableFile_(dir, f); }, this);
-  return goog.array.map(excludes, function(f) { return dir + f; });
+  return goog.array.map(excludes, function(f) {
+    return ng_.getUtils().getPath(dir, f);
+  });
 };
 
 
@@ -117,7 +129,8 @@ node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
       f.indexOf('deps.js') >= 0 ||
       f.indexOf('.extern.js') >= 0 ||
       f.indexOf('.externs.js') >= 0 ||
-      node.goog.googcodecheck.fs_.statSync(dir + f).isDirectory();
+      node.goog.googcodecheck.fs_.statSync(
+      ng_.getUtils().getPath(dir, f)).isDirectory();
 
   return ignore;
 };

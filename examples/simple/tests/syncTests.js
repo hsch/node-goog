@@ -1,4 +1,4 @@
-#!node
+# !node;
 
 require('goog').goog.init();
 

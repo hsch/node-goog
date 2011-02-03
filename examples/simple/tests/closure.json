@@ -2,7 +2,7 @@
 // bin/closure.json file.
 {  
   additionalDeps: [
-    'examples/external_lib/deps.js', 
-    'examples/simple/deps.js'
+    '/home/guidot/dev/node-goog/examples/external_lib/deps.js' ,
+    '/home/guidot/dev/node-goog/examples/simple/deps.js' 
   ]
 }

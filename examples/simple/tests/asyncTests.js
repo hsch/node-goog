@@ -1,15 +1,15 @@
-#!node
+# !node;
 
 require('goog').goog.init();
 
-goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
+goog.require('goog.testing.jsunit');
 goog.require('node.goog.examples.simple.Example');
 
 goog.provide('node.goog.examples.simple.tests.asyncTests');
 
 testFunction1 = function() {
-  asyncTestCase.waitForAsync();    	  
+  asyncTestCase.waitForAsync();
   setTimeout(function() {
     assertNotEquals(typeof(example_), 'undefined');
     asyncTestCase.continueTesting();

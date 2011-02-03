@@ -1,7 +1,7 @@
-#!node
+#!/usr/local/bin/node
 
-/**
- * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
+/*
+ * Copyright 2011 Guido Tapia (guido@tapia.com.au).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,24 @@
  * limitations under the License.
  */
 
-var ng = require('goog').goog.init();
+/**
+ * @fileoverview This is a utility for running all test in a specified
+ * directory.
+ *
+ * @author guido@tapia.com.au (Guido Tapia)
+ */
+
+
+/**
+ * @private
+ * @const
+ * @type {NodeGoog}
+ */
+var ng_ = require('goog').goog.init();
 
 goog.provide('node.goog.googtest');
 
+goog.require('NodeGoog');
 goog.require('goog.array');
 goog.require('goog.testing.TestCase');
 goog.require('goog.testing.jsunit');
@@ -40,9 +54,9 @@ node.goog.googtest = function() {
   if (!dir) {
     throw new Error('No directory specified.  USAGE: googtest <dirname>');
   }
-  ng.loadDependenciesFile(dir, 'deps.js');
-  ng.loadAdditionalSettingsFile(dir);
-  ng.setOnTestComplete(this.createTestCompletedHandler_());
+  ng_.loadDependenciesFile(dir, 'deps.js');
+  ng_.loadAdditionalSettingsFile(dir);
+  ng_.setOnTestComplete(this.createTestCompletedHandler_());
   goog.testing.TestCase.prototype.isInsideMultiTestRunner = function() {
     return true;
   }
@@ -63,7 +77,7 @@ node.goog.googtest = function() {
   this.results_ = [];
 
   var that = this;
-  ng.onTestsReady = function() {
+  ng_.onTestsReady = function() {
     that.runNextTest_();
   };
 };
@@ -117,7 +131,8 @@ node.goog.googtest.prototype.getAllTestsInCurrentDirectory_ = function() {
  */
 node.goog.googtest.prototype.runTest_ = function(testFile) {
   var script_ = process.binding('evals').Script;
-  var code = require('fs').readFileSync(process.argv[2] + testFile, 'utf-8').
+  var path = ng_.getUtils().getPath(process.argv[2] || './', testFile);
+  var code = require('fs').readFileSync(path, 'utf-8').
       replace(/^#!node/, '');
   script_.runInThisContext.call(global, code, testFile);
 
@@ -132,11 +147,13 @@ node.goog.googtest.prototype.runTest_ = function(testFile) {
 
 /**
  * @private
- * @this {goog.testing.TestRunner}
  * @return {function():undefined} The on complete handler.
  */
 node.goog.googtest.prototype.createTestCompletedHandler_ = function() {
   var that = this;
+  /**
+   * @this {goog.testing.TestRunner}
+   */
   return function() {
     that.results_.push(this.testCase);
     that.runNextTest_();

@@ -1,7 +1,7 @@
-#!node
+#!/usr/local/bin/node
 
-/**
- * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
+/*
+ * Copyright 2011 Guido Tapia (guido@tapia.com.au).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,34 @@
  * limitations under the License.
  */
 
-require('goog').goog.init();
+/**
+ * @fileoverview Utility to compile a specific JS project.
+ *
+ * @author guido@tapia.com.au (Guido Tapia)
+ */
+
+
+/**
+ * @private
+ * @const
+ * @type {NodeGoog}
+ */
+var ng_ = require('goog').goog.init();
 
 goog.provide('node.goog.googcompile');
+goog.require('NodeGoog');
 
 
 
 /**
  * @constructor
  */
-node.goog.googcompile = function() {    
-  var fileToCompile = process.argv[2];    
+node.goog.googcompile = function() {
+  var fileToCompile = process.argv[2];
   var fileContents = node.goog.googcompile.fs_.
       readFileSync(fileToCompile, encoding = 'utf8');
-  var tmpFileName = fileToCompile.replace('.js', '.tmp.js');  
-  var args = require('./utils').closureUtils.readSettingObject(fileToCompile);
+  var tmpFileName = fileToCompile.replace('.js', '.tmp.js');
+  var args = ng_.getUtils().readSettingObject(fileToCompile);
 
   var compiledFileName = tmpFileName.replace('.tmp.js', '.min.js');
   var fileToCompileIgnore = fileToCompile.replace('.js', '.ignorejs');
@@ -38,23 +51,22 @@ node.goog.googcompile = function() {
   var that = this;
   try {
     this.runCompilerOrDeps_(false, fileToCompile,
-      compiledFileName.substring(0, compiledFileName.lastIndexOf('/') + 1) +
-          'deps.js', '', args, function() {
-
-      var bashInst = that.createTmpFile_(tmpFileName, fileContents);
-      node.goog.googcompile.fs_.
-          renameSync(fileToCompile, fileToCompileIgnore);
-      try { 
-      that.runCompilerOrDeps_(true, tmpFileName, compiledFileName,
-          bashInst, args, function() {
+        compiledFileName.substring(0, compiledFileName.lastIndexOf('/') + 1) +
+        'deps.js', '', args, function() {
+          var bashInst = that.createTmpFile_(tmpFileName, fileContents);
+          node.goog.googcompile.fs_.
+              renameSync(fileToCompile, fileToCompileIgnore);
+          try {
+            that.runCompilerOrDeps_(true, tmpFileName, compiledFileName,
+                bashInst, args, function() {
+                  that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
+                });
+          } catch (ex2) {
             that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
-          });
-      } catch(ex2) {
-        that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
-        throw ex2;
-      }
-    });
-  } catch (ex) {    
+            throw ex2;
+          }
+        });
+  } catch (ex) {
     that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
     throw ex;
   }
@@ -105,16 +117,16 @@ node.goog.googcompile.prototype.onExit_ =
  */
 node.goog.googcompile.prototype.createTmpFile_ =
     function(tmpFileName, contents) {
-  var bashInstIdx = contents.indexOf('#!node');
-  var hasInst = bashInstIdx >= 0;
+  var bashInstIdx = contents.indexOf('#!');
+  var hasInst = bashInstIdx === 0; // Must be top line
   var bashInst = '';
 
   if (hasInst) {
-    var endIdx = contents.indexOf('\n', bashInstIdx) + 1;
+    var endIdx = contents.indexOf('\n') + 1;
     bashInst = contents.substring(bashInstIdx, endIdx);
     contents = contents.substring(endIdx);
   }
-  var newCode = 'goog.require(\'node.goog\');' +
+  var newCode = //'goog.require(\'node.goog\');' +
       (hasInst ? '\n' : '') +
       contents;
   node.goog.googcompile.fs_.writeFileSync(tmpFileName, newCode,
@@ -134,7 +146,7 @@ node.goog.googcompile.prototype.createTmpFile_ =
  * @param {node_goog.opts} args The closure.json settings for this compilation.
  * @param {function():undefined} callback The callback to call on exit.
  */
-node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler, 
+node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
     tmpFileToCompile, compiledFileName, bashInstructions, args, callback) {
   var clArgs = compiler ?
       this.getCompilerClArgs_(tmpFileToCompile, compiledFileName, args) :
@@ -173,8 +185,9 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
         (code ? 'exit code: ' + code : '') +
         (err ? '\nSTDError: ' + err : '') +
         (code !== 0 ? '\nSTDOut:: ' + output : '') +
-        '\nSuccessfully ' + (compiler ? 'compiled' : 'generated dependencies') +
-        ' to: ' + compiledFileName);
+        (code === 0 ? '\nSuccessfully ' +
+        (compiler ? 'compiled' : 'generated dependencies') + ' to: ' +
+            compiledFileName : ''));
   });
 };
 
@@ -192,12 +205,11 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   var path = this.getDirectory_(tmpFileToCompile);
   var addedPaths = {};
   this.isPathInMap_(addedPaths, path);
-
   var clArgs = [
     '--root=' + args.closureBasePath.replace('/closure/goog/', '/'),
     '--root=' + path
-  ];    
-  var libPath = __dirname + '/../lib';    
+  ];
+  var libPath = ng_.getUtils().getPath(__dirname, '../lib');
   if (!this.isPathInMap_(addedPaths, libPath)) {
     clArgs.push('--root=' + libPath);
   }
@@ -206,7 +218,8 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   clArgs.push('--compiler_jar=' + (args.compiler_jar || 'lib/compiler.jar'));
 
   clArgs.push(
-      '--compiler_flags=--js=' + args.closureBasePath + '/deps.js',
+      '--compiler_flags=--js=' +
+      ng_.getUtils().getPath(args.closureBasePath, 'deps.js'),
       '--compiler_flags=--compilation_level=ADVANCED_OPTIMIZATIONS',
       '--compiler_flags=--externs=lib/node.externs.js',
       '--compiler_flags=--externs=lib/node.static.externs.js',
@@ -239,15 +252,17 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   if (args.additionalCompileRoots) {
     args.additionalCompileRoots.forEach(function(root) {
       if (!this.isPathInMap_(addedPaths, root)) {
-        addedPaths[root] = 1;
         clArgs.push('--root=' + root);
       }
     });
   } else if (args.additionalDeps) {
     // Only try to guess roots if additionalCompileRoots not specified
     args.additionalDeps.forEach(function(dep) {
-      clArgs.push('--root=' + dep + '/..');
-    });
+      var path = dep.substring(0, dep.lastIndexOf('/'));
+      if (!this.isPathInMap_(addedPaths, path)) {
+        clArgs.push('--root=' + path);
+      }
+    }, this);
   }
   return clArgs;
 };

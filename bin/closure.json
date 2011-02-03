@@ -1,5 +1,5 @@
 {
-  closureBasePath:'/home/guidot/dev/picnet-closure-repo/lib/closure-library/closure/goog/',  
-  jsdocToolkitDir: '/home/guidot/dev/lib/jsdoc-toolkit/',
-  nodeDir: '/home/guidot/dev/lib/node',
+  closureBasePath:'/home/ubuntu/Dev/lib/picnet-closure-repo/lib/closure-library/closure/goog/',  
+  // jsdocToolkitDir: '/home/ubuntu/Dev/lib/jsdoc-toolkit/',
+  nodeDir: '/home/ubuntu/Dev/lib/node',
 }
