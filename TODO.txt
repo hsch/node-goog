@@ -3,6 +3,3 @@ TODO
 - Add better command line support for compilation
   - Do not generate deps.js or file.min.js option
   - Do not compile dependencies
-
-- Async tests not working in googtest, googtests reports completed before
-    actually done

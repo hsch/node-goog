@@ -162,15 +162,22 @@ node.goog.googtest.prototype.runTest_ = function(testFile) {
   var code = this.fs_.readFileSync(testFile, 'utf-8').
       replace(/^#![^\n]+/, '');
   var shortName = testFile.substring(0, testFile.lastIndexOf('/') + 1);
-  // This actually runs the tests
+
+  var test;
+  var orig = goog.testing.AsyncTestCase.createAndInstall;
+  goog.testing.AsyncTestCase.createAndInstall = function() {
+    return test = orig();
+  };
+
   script_.runInThisContext.call(global, code, shortName);
   var async = code.indexOf('AsyncTestCase') >= 0;
   var tr = global['G_testRunner'];
 
-  var test = async ?
-      new goog.testing.AsyncTestCase(shortName) :
-      new goog.testing.TestCase(shortName);
-  test.autoDiscoverTests();
+  if (!test) {
+    test = new goog.testing.TestCase(shortName);
+    test.autoDiscoverTests();
+  }
+
   tr.initialize(test);
   tr.execute();
 };

@@ -10,7 +10,6 @@ goog.provide('node.goog.examples.simple.tests.asyncTests');
 
 testFunction1 = function() {
   asyncTestCase.waitForAsync();
-  assertFalse(example_.completed);
   setTimeout(function() {
     assertNotEquals(typeof(example_), 'undefined');
     assertTrue(example_.completed);
