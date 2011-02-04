@@ -35,84 +35,167 @@ goog.require('node.goog.utils');
  * @constructor
  */
 node.goog.googcompile = function() {
-  var fileToCompile = process.argv[2];
-  var fileContents = node.goog.googcompile.fs_.
-      readFileSync(fileToCompile, encoding = 'utf8');
-  var tmpFileName = fileToCompile.replace('.js', '.tmp.js');
-  var args = node.goog.utils.readSettingObject(fileToCompile);
 
-  var compiledFileName = tmpFileName.replace('.tmp.js', '.min.js');
-  var fileToCompileIgnore = fileToCompile.replace('.js', '.ignorejs');
+  /**
+  * @private
+  * @const
+  * @type {extern_fs}
+  */
+  this.fs_ = /** @type {extern_fs} */ (require('fs'));
+
+
+  /**
+  * @private
+  * @const
+  * @type {extern_path}
+  */
+  this.path_ = /** @type {extern_path} */ (require('path'));
+
+  /**
+   * @private
+   * @type {boolean}
+   */
+  this.quiet_ = false;
+
+  /**
+   * @private
+   * @type {boolean}
+   */
+  this.nodeps_ = false;
+
+  /**
+   * @private
+   * @type {string}
+   */
+  this.fileToCompile_;
+
+  /**
+   * @private
+   * @type {string}
+   */
+  this.tmpFileName_;
+
+  /**
+   * @private
+   * @type {string}
+   */
+  this.compiledFileName_;
+
+  /**
+   * @private
+   * @type {string}
+   */
+  this.fileToCompileIgnore_;
+
+  /**
+   * @private
+   * @type {node.goog.opts}
+   */
+  this.args_;
+
+  var cli = require('cli');
+  var options = cli.parse({
+    'quiet': ['q', 'Quit compilation, do not produce .min.js and deps.js ' +
+          'files.'],
+    'nodeps': ['n', 'Does not build the dependencies file.']
+  });
 
   var that = this;
-  try {
-    this.runCompilerOrDeps_(false, fileToCompile,
-        compiledFileName.substring(0, compiledFileName.lastIndexOf('/') + 1) +
-        'deps.js', '', args, function() {
-          var bashInst = that.createTmpFile_(tmpFileName, fileContents);
-          node.goog.googcompile.fs_.
-              renameSync(fileToCompile, fileToCompileIgnore);
-          try {
-            that.runCompilerOrDeps_(true, tmpFileName, compiledFileName,
-                bashInst, args, function() {
-                  that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
-                });
-          } catch (ex2) {
-            that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
-            throw ex2;
-          }
-        });
-  } catch (ex) {
-    that.onExit_(tmpFileName, fileToCompileIgnore, fileToCompile);
-    throw ex;
-  }
+  cli.main(function(args, options) { that.init_(args, options); });
 };
 
 
 /**
  * @private
- * @const
- * @type {extern_fs}
+ * @param {Array.<string>} cliArgs The command line args.
+ * @param {Object.<string>} options The parsed options.
  */
-node.goog.googcompile.fs_ = /** @type {extern_fs} */ (require('fs'));
+node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
+  var that = this;
+  process.on('exit', function() { that.onExit_.call(that); });
+  process.on('uncaughtException', function(err) {
+    that.onExit_.call(that, err);
+  });
+
+  this.quiet_ = options.quiet === true;
+  this.nodeps_ = options.nodeps === true;
+  this.fileToCompile_ = cliArgs[cliArgs.length - 1];
+
+  this.tmpFileName_ = this.fileToCompile_.replace('.js', '.tmp.js');
+  this.args_ = node.goog.utils.readSettingObject(this.fileToCompile_);
+
+  this.compiledFileName_ = this.tmpFileName_.replace('.tmp.js', '.min.js');
+  this.fileToCompileIgnore_ = this.fileToCompile_.replace('.js', '.ignorejs');
+
+  this.runCommands_();
+};
 
 
 /**
  * @private
- * @const
- * @type {extern_path}
  */
-node.goog.googcompile.path_ = /** @type {extern_path} */ (require('path'));
+node.goog.googcompile.prototype.runCommands_ = function() {
+  var command = this.quiet_ || this.nodeps_ ?
+      this.runCompilation_ : this.runDependencies_;
+  command.call(this);
+};
 
 
 /**
  * @private
- * @param {string} tmpFileName The temporary file name that needs to be deleted.
- * @param {string} fileToCompileIgnore The original file (renamed).  This file
- *    will be renamed back to its original name (fileToCompile).
- * @param {string} fileToCompile The original name of the file that was to be
- *    compiled.
+ */
+node.goog.googcompile.prototype.runDependencies_ = function() {
+  var that = this;
+  var fileDir = this.compiledFileName_.substring(0,
+      this.compiledFileName_.lastIndexOf('/') + 1);
+  var depsFile = node.goog.utils.getPath(fileDir, 'deps.js');
+  this.runCompilerOrDeps_(false, depsFile, '', function() {
+    that.runCompilation_();
+  });
+};
+
+
+/**
+ * @private
+ */
+node.goog.googcompile.prototype.runCompilation_ = function() {
+  var fileContents = this.fs_.
+      readFileSync(this.fileToCompile_, encoding = 'utf8');
+
+  var bashInst = this.createTmpFile_(fileContents);
+  this.fs_.
+      renameSync(this.fileToCompile_, this.fileToCompileIgnore_);
+  this.runCompilerOrDeps_(true, this.compiledFileName_, bashInst);
+};
+
+
+/**
+ * @private
+ * @param {Error=} err An optional error.
  */
 node.goog.googcompile.prototype.onExit_ =
-    function(tmpFileName, fileToCompileIgnore, fileToCompile) {
-  if (node.goog.googcompile.path_.existsSync(tmpFileName)) {
-    node.goog.googcompile.fs_.unlinkSync(tmpFileName);
+    function(err) {
+  if (this.path_.existsSync(this.tmpFileName_)) {
+    this.fs_.unlinkSync(this.tmpFileName_);
   }
-  if (node.goog.googcompile.path_.existsSync(fileToCompileIgnore)) {
-    node.goog.googcompile.fs_.renameSync(fileToCompileIgnore, fileToCompile);
+  if (this.path_.existsSync(this.fileToCompileIgnore_)) {
+    this.fs_.renameSync(this.fileToCompileIgnore_, this.fileToCompile_);
+  }
+  if (err) {
+    console.error(err.message + '\n' + err.stack);
+    throw err;
   }
 };
 
 
 /**
  * @private
- * @param {string} tmpFileName The name of the temporary file used to compile.
  * @param {string} contents The original file contents.
  * @return {string} Any bash shell instructions that need to be copied into
  *    the compiled file.
  */
 node.goog.googcompile.prototype.createTmpFile_ =
-    function(tmpFileName, contents) {
+    function(contents) {
   var bashInstIdx = contents.indexOf('#!');
   var hasInst = bashInstIdx === 0; // Must be top line
   var bashInst = '';
@@ -125,7 +208,7 @@ node.goog.googcompile.prototype.createTmpFile_ =
   var newCode = //'goog.require(\'node.goog\');' +
       (hasInst ? '\n' : '') +
       contents;
-  node.goog.googcompile.fs_.writeFileSync(tmpFileName, newCode,
+  this.fs_.writeFileSync(this.tmpFileName_, newCode,
       encoding = 'utf8');
   return bashInst;
 };
@@ -135,20 +218,18 @@ node.goog.googcompile.prototype.createTmpFile_ =
  * @private
  * @param {boolean} compiler Wether to run the compiler, other wise will
  *    generate a deps.js file (name specified in compiledFileName).
- * @param {string} tmpFileToCompile The file name to compile.
- * @param {string} compiledFileName The compiled (minified) file name.
- * @param {string} bashInstructions Any bash shell instructions that are
+ * @param {string} targetFile The name of the file to produce.
+  * @param {string} bashInstructions Any bash shell instructions that are
  *    required in the compiled file.
- * @param {node.goog.opts} args The closure.json settings for this compilation.
- * @param {function():undefined} callback The callback to call on exit.
+ * @param {function():undefined=} callback The callback to call on exit.
  */
 node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
-    tmpFileToCompile, compiledFileName, bashInstructions, args, callback) {
+    targetFile, bashInstructions, callback) {
   var clArgs = compiler ?
-      this.getCompilerClArgs_(tmpFileToCompile, compiledFileName, args) :
-      this.getDepsClArgs_(tmpFileToCompile, compiledFileName, args);
+      this.getCompilerClArgs_() :
+      this.getDepsClArgs_();
 
-  var exec = args.closureBasePath.replace('/closure/goog/',
+  var exec = this.args_.closureBasePath.replace('/closure/goog/',
       '/closure/bin/build/') + (compiler ? 'closurebuilder' : 'depswriter') +
       '.py';
   var cmd = require('child_process').spawn(exec, clArgs);
@@ -168,13 +249,15 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
     throw err;
   });
 
+  var that = this;
   cmd.on('exit', function(code) {
     if (callback) callback();
     err = err.replace(/\.tmp\.js/g, '.js');
-    if (code === 0) {
+    console.log('that.quiet_: ' + that.quiet_);
+    if (code === 0 && !that.quiet_) {
       output = (bashInstructions || '') + output;
-      node.goog.googcompile.fs_.
-          writeFileSync(compiledFileName, output, encoding = 'utf8');
+      that.fs_.
+          writeFileSync(targetFile, output, encoding = 'utf8');
 
     }
     console.log(
@@ -183,26 +266,23 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
         (code !== 0 ? '\nSTDOut:: ' + output : '') +
         (code === 0 ? '\nSuccessfully ' +
         (compiler ? 'compiled' : 'generated dependencies') + ' to: ' +
-            compiledFileName : ''));
+            that.compiledFileName_ : ''));
   });
 };
 
 
 /**
  * @private
- * @param {string} tmpFileToCompile The file name to compile.
- * @param {string} compiledFileName The compiled (minified) file name.
- * @param {node.goog.opts} args The closure.json settings for this compilation.
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   operation.
  */
 node.goog.googcompile.prototype.getCompilerClArgs_ =
-    function(tmpFileToCompile, compiledFileName, args) {
-  var path = this.getDirectory_(tmpFileToCompile);
+    function() {
+  var path = this.getDirectory_(this.tmpFileName_);
   var addedPaths = {};
   this.isPathInMap_(addedPaths, path);
   var clArgs = [
-    '--root=' + args.closureBasePath.replace('/closure/goog/', '/'),
+    '--root=' + this.args_.closureBasePath.replace('/closure/goog/', '/'),
     '--root=' + path
   ];
   var libPath = node.goog.utils.getPath(__dirname, '../lib');
@@ -213,16 +293,19 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   if (!this.isPathInMap_(addedPaths, binPath)) {
     clArgs.push('--root=' + binPath);
   }
-  clArgs.push('--input=' + tmpFileToCompile);
+  clArgs.push('--input=' + this.tmpFileName_);
   clArgs.push('--output_mode=compiled');
-  clArgs.push('--compiler_jar=' + (args.compiler_jar || 'lib/compiler.jar'));
+  clArgs.push('--compiler_jar=' + (this.args_.compiler_jar ||
+      node.goog.utils.getPath(libPath, 'compiler.jar')));
 
   clArgs.push(
       '--compiler_flags=--js=' +
-      node.goog.utils.getPath(args.closureBasePath, 'deps.js'),
+      node.goog.utils.getPath(this.args_.closureBasePath, 'deps.js'),
       '--compiler_flags=--compilation_level=ADVANCED_OPTIMIZATIONS',
-      '--compiler_flags=--externs=lib/node.externs.js',
-      '--compiler_flags=--externs=lib/node.static.externs.js',
+      '--compiler_flags=--externs=' +
+      node.goog.utils.getPath(libPath, 'node.externs.js'),
+      '--compiler_flags=--externs=' +
+      node.goog.utils.getPath(libPath, 'node.static.externs.js'),
       '--compiler_flags=--output_wrapper=' +
       '"(function() {this.window=this;%output%})();"',
       '--compiler_flags=--debug=true',
@@ -243,21 +326,21 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
       '--compiler_flags=--summary_detail_level=3'
   );
 
-  if (args.additionalCompileOptions) {
-    args.additionalCompileRoots.forEach(function(opt) {
+  if (this.args_.additionalCompileOptions) {
+    this.args_.additionalCompileRoots.forEach(function(opt) {
       clArgs.push('--compiler_flags=' + opt);
     });
   }
 
-  if (args.additionalCompileRoots) {
-    args.additionalCompileRoots.forEach(function(root) {
+  if (this.args_.additionalCompileRoots) {
+    this.args_.additionalCompileRoots.forEach(function(root) {
       if (!this.isPathInMap_(addedPaths, root)) {
         clArgs.push('--root=' + root);
       }
     });
-  } else if (args.additionalDeps) {
+  } else if (this.args_.additionalDeps) {
     // Only try to guess roots if additionalCompileRoots not specified
-    args.additionalDeps.forEach(function(dep) {
+    this.args_.additionalDeps.forEach(function(dep) {
       var path = dep.substring(0, dep.lastIndexOf('/'));
       if (!this.isPathInMap_(addedPaths, path)) {
         clArgs.push('--root=' + path);
@@ -270,18 +353,15 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
 
 /**
  * @private
- * @param {string} fileToCompile The file name to compile.
- * @param {string} compiledFileName The compiled (minified) file name.
- * @param {node.goog.opts} args The closure.json settings for this compilation.
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   dependency check operation.
  */
 node.goog.googcompile.prototype.getDepsClArgs_ =
-    function(fileToCompile, compiledFileName, args) {
-  var path = this.getDirectory_(fileToCompile);
+    function() {
+  var path = this.getDirectory_(this.fileToCompile_);
   return [
     '--root_with_prefix=' + path + ' ' +
-        node.goog.googcompile.fs_.realpathSync(path)
+        this.fs_.realpathSync(path)
   ];
 };
 
@@ -294,7 +374,7 @@ node.goog.googcompile.prototype.getDepsClArgs_ =
  *    then added to the specified map.
  */
 node.goog.googcompile.prototype.isPathInMap_ = function(map, s) {
-  var real = node.goog.googcompile.fs_.realpathSync(s);
+  var real = this.fs_.realpathSync(s);
   if (map[real]) return true;
   map[real] = 1;
   return false;

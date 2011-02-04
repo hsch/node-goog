@@ -3,11 +3,12 @@
   "description": "Server-side Google Closure with Node.js",
   "author": "Hendrik Schnepel <hendrik.schnepel@gmail.com>",
   "url":"https://github.com/hsch/node-goog",
-  "directories": { 
+  "directories": {
     "lib": "./lib",
-    "bin": "./bin",    
-    "example": "./examples" 
-  },    
+    "bin": "./bin",
+    "example": "./examples"
+  },
+  "dependencies":{"cli":"*"},
   "main": "./lib/goog",
   "version": "0.3.1",
   "engines": { "node": ">=0.3.0-pre" },

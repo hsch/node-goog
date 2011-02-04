@@ -1,5 +1,3 @@
 TODO
 ====
-- Add better command line support for compilation
-  - Do not generate deps.js or file.min.js option
-  - Do not compile dependencies
+googtests running weirdly running same test many times
