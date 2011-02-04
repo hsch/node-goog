@@ -1,3 +1,4 @@
 TODO
 ====
-EMPTY
+- closureBasePath needs to be more flexible. Not '.../closure/goog' as it
+currently must match
