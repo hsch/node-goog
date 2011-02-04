@@ -67,13 +67,14 @@ testCodeCheckAllFiles = function() {
 
 function doAllFiles(operation, files) {
   var tmpAllFiles = goog.array.clone(files);
-  doNextFile(tmpAllFiles, operation, function() {
-    console.log('Test Finnished');
-  });
+  doNextFile(tmpAllFiles, operation);
 };
 
 function doNextFile(files, operation, oncomplete) {
-  if (files.length === 0) { return oncomplete(); }
+  if (files.length === 0) {
+    if (oncomplete) oncomplete();
+    return;
+  }
   var file = files.pop();
   operation(file, function() {
     doNextFile(files, operation, oncomplete);

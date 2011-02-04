@@ -36,10 +36,15 @@ node.goog.googcodecheck = function() {
     dir = dir.substring(0, dir.lastIndexOf('/') + 1);
   }
   var that = this;
+  var onexit = function(err) {
+    that.fixBashInstructionsOnDir_.call(that, dir);
+  };
+  process.on('exit', onexit);
+  process.on('SIGINT', onexit);
+  process.on('uncaughtException', onexit);
+
   this.runFixStyle_(dir, function() {
-    that.runGSJLint_(dir, function() {
-      that.fixBashInstructionsOnDir_(dir);
-    });
+    that.runGSJLint_(dir);
   });
 };
 
@@ -102,7 +107,7 @@ node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
 /**
  * @private
  * @param {string} dir The directory to code check.
- * @param {function():undefined} callback The exit callback.
+ * @param {function():undefined=} callback The exit callback.
  */
 node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
   var excludes = this.getLinterExcludeFiles_(dir);
@@ -151,7 +156,7 @@ node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
  * @private
  * @param {string} command The command to execute.
  * @param {Array.<string>} args The arguments to pass to the command.
- * @param {function():undefined} callback The exit callback.
+ * @param {function():undefined=} callback The exit callback.
  */
 node.goog.googcodecheck.prototype.runProcess_ =
     function(command, args, callback) {

@@ -78,7 +78,6 @@ node.goog.googtest = function() {
    * @type {Array.<string>}
    */
   this.tests_ = this.getAllTestsInCurrentDirectory_();
-
   /**
    * All the results, populated as tests complete.
    *
@@ -152,36 +151,62 @@ node.goog.googtest.prototype.getTestFilesImpl_ = function(testFiles, dir) {
   return testFiles;
 };
 
+/**
+ * @type {function():goog.testing.AsyncTestCase}
+ */
+node.goog.googtest.originalCreateAndInstall =
+  goog.testing.AsyncTestCase.createAndInstall;
+
+/**
+ * @private
+ * @type {goog.testing.AsyncTestCase}
+ */
+node.goog.googtest.asyncTest_;
+
+/**
+ * @override
+ */
+goog.testing.AsyncTestCase.createAndInstall = function() {
+  return node.goog.googtest.asyncTest_ =
+    node.goog.googtest.originalCreateAndInstall();
+};
 
 /**
  * @private
  * @param {string} testFile The test file to run.
  */
 node.goog.googtest.prototype.runTest_ = function(testFile) {
-  var script_ = process.binding('evals').Script;
+  var shortName = testFile.substring(testFile.lastIndexOf('/') + 1);
+  console.log('\nRunning Test: ' + shortName);
+
+  var script = process.binding('evals').Script;
   var code = this.fs_.readFileSync(testFile, 'utf-8').
       replace(/^#![^\n]+/, '');
-  var shortName = testFile.substring(0, testFile.lastIndexOf('/') + 1);
-
-  var test;
-  var orig = goog.testing.AsyncTestCase.createAndInstall;
-  goog.testing.AsyncTestCase.createAndInstall = function() {
-    return test = orig();
-  };
-
-  script_.runInThisContext.call(global, code, shortName);
   var async = code.indexOf('AsyncTestCase') >= 0;
-  var tr = global['G_testRunner'];
 
-  if (!test) {
-    test = new goog.testing.TestCase(shortName);
+  this.clearGlobalScopeOfTests_();
+  script.runInThisContext.call(global, code, shortName);
+
+  var tr = global['G_testRunner'];
+  if (!async) {
+    var test = new goog.testing.TestCase(shortName);
     test.autoDiscoverTests();
   }
-
-  tr.initialize(test);
+  tr.initialize(async ? node.goog.googtest.asyncTest_ : test);
   tr.execute();
 };
 
+/**
+ * @private
+ */
+node.goog.googtest.prototype.clearGlobalScopeOfTests_ = function() {
+  for (var i in global) {
+    if (i.indexOf('test') === 0 || i.indexOf('setUp') === 0 ||
+        i.indexOf('tearDown') === 0) {
+      delete global[i];
+    }
+  };
+};
 
 /**
  * @private

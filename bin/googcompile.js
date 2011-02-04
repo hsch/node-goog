@@ -112,10 +112,10 @@ node.goog.googcompile = function() {
  */
 node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
   var that = this;
-  process.on('exit', function() { that.onExit_.call(that); });
-  process.on('uncaughtException', function(err) {
-    that.onExit_.call(that, err);
-  });
+  var onexit = function(err) { that.onExit_.call(that, err); };
+  process.on('exit', onexit);
+  process.on('SIGINT', onexit);
+  process.on('uncaughtException', onexit);
 
   this.quiet_ = options.quiet === true;
   this.nodeps_ = options.nodeps === true;
@@ -253,7 +253,6 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
   cmd.on('exit', function(code) {
     if (callback) callback();
     err = err.replace(/\.tmp\.js/g, '.js');
-    console.log('that.quiet_: ' + that.quiet_);
     if (code === 0 && !that.quiet_) {
       output = (bashInstructions || '') + output;
       that.fs_.

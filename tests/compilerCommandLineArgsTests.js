@@ -45,7 +45,7 @@ testCompileWithQuietArg = function() {
 };
 
 function runImpl(cmd, compiledMinFile, depsFile) {
-  console.log('running: ' + cmd);
+  console.log(cmd);
 
   asyncTestCase.stepTimeout = 5000;
   asyncTestCase.waitForAsync();
