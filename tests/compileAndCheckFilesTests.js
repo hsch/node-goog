@@ -14,7 +14,7 @@ var compileDirs = ['lib/', 'bin/']
 var checkDirs = ['lib/', 'bin/', 'examples/simple', 'examples/animals'];
 var additionalFiles = ['examples/animals/example.js', 'examples/simple/example.js'];
 var ignoreable = ['.min.js', 'deps.js', '.externs.js', '.tmp.js', 'utils.js'];
-var doNotDelete = ['simple/deps.js'];
+var doNotDelete = ['simple/deps.js', 'animals/deps.js'];
 
 var allTestableFiles = getAllTestableFiles();
 

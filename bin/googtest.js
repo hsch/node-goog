@@ -151,11 +151,13 @@ node.goog.googtest.prototype.getTestFilesImpl_ = function(testFiles, dir) {
   return testFiles;
 };
 
+
 /**
  * @type {function():goog.testing.AsyncTestCase}
  */
 node.goog.googtest.originalCreateAndInstall =
-  goog.testing.AsyncTestCase.createAndInstall;
+    goog.testing.AsyncTestCase.createAndInstall;
+
 
 /**
  * @private
@@ -163,13 +165,15 @@ node.goog.googtest.originalCreateAndInstall =
  */
 node.goog.googtest.asyncTest_;
 
+
 /**
  * @override
  */
 goog.testing.AsyncTestCase.createAndInstall = function() {
   return node.goog.googtest.asyncTest_ =
-    node.goog.googtest.originalCreateAndInstall();
+      node.goog.googtest.originalCreateAndInstall();
 };
+
 
 /**
  * @private
@@ -196,6 +200,7 @@ node.goog.googtest.prototype.runTest_ = function(testFile) {
   tr.execute();
 };
 
+
 /**
  * @private
  */
@@ -205,8 +210,9 @@ node.goog.googtest.prototype.clearGlobalScopeOfTests_ = function() {
         i.indexOf('tearDown') === 0) {
       delete global[i];
     }
-  };
+  }
 };
+
 
 /**
  * @private

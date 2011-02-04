@@ -1,3 +1,4 @@
+
 goog.provide('node.goog.examples.animals.Cat');
 
 goog.require('node.goog.examples.animals.CatLike');

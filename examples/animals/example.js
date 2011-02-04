@@ -1,4 +1,4 @@
-#!node
+#!/usr/local/bin/node
 
 /**
  * @fileoverview  This example will try to showcase some of the great features

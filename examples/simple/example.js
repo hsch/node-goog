@@ -1,4 +1,4 @@
-#!node
+#!/usr/local/bin/node
 
 /**
  * @fileoverview  To get started with node-goog you will need to do the
