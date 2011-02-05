@@ -2,9 +2,10 @@
 
 ## Overview
 
-The [Google Closure Tools](http://code.google.com/closure/) are a powerful set 
-of utilities that aim to make large scale JavaScript development more 
-manageable.  This project brings the power of the closure tools to the [node](http://www.nodejs.org)
+The [Google Closure Tools](http://code.google.com/closure/) are a powerful set
+of utilities that aim to make large scale JavaScript development more
+manageable.  This project brings the power of the closure tools to the
+[node](http://www.nodejs.org)
 platform. The closure tools gives developers the utilities required to improve
 code design and maintainability by providing support for:
 
@@ -22,41 +23,31 @@ code design and maintainability by providing support for:
 	* Events
 	* Internationalisation
 	* Locale
-	* Math	
+	* Math
 	* String
 	* Structs
 	* [More...](http://closure-library.googlecode.com/svn/docs/index.html)
-	
+
 
 ## Installation (core)
-
-* Download the  [Closure Library](http://code.google.com/closure/library/docs/gettingstarted.html). The
-easiest way of downloading the latest version of the closure library is by 
-doing an `svn checkout` of the repo.
-
-		svn checkout http://closure-library.googlecode.com/svn/trunk/
 
 * Install `node-goog`.  By either:
 
 			npm install goog
-		
+
 	or get the source (recommended so you can help out):
-		
+
 			git clone git://github.com/hsch/node-goog.git
 			cd node-goog
 			npm link
 
-* Edit the `node-goog/bin/closure.json` and change the `closureBasePath` to point to the
-closure library you just downloaded.
+## Closure Library
 
-## Usage (Library)
-	
-Once the core package is installed you can start leveraging the vast number of 
-utilities provided by the closure library.  For full details on utilities 
-provided in the closure library refer to the [official docs](http://closure-library.googlecode.com/svn/docs/index.html). To use any utility provided in the
-closure library just:
+For full details on utilities provided in the closure library refer to the
+[official docs](http://closure-library.googlecode.com/svn/docs/index.html).
+To use any utility provided in the closure library just:
 
-1. Include `node-goog` in your application by `require`(ing) it and initialising 
+1. Include `node-goog` in your application by `require`(ing) it and initialising
 it.
 
 		require('goog').goog.init();
@@ -68,11 +59,11 @@ it.
 3. That's it, use the imported namespaces anywhere in your file.
 
         var trie = new goog.structs.Trie();
-        
-## Usage (Compiler)
 
-Using the [Closure Compiler](http://code.google.com/closure/compiler/) requires 
-a small investment in learning but once you have worked your way through the 
+## Closure Compiler
+
+Using the [Closure Compiler](http://code.google.com/closure/compiler/) requires
+a small investment in learning but once you have worked your way through the
 [docs](http://code.google.com/closure/compiler/) you can take advantage of the
 compiler's support for:
 
@@ -83,7 +74,8 @@ compiler's support for:
 * Enhanced Inheritance and Interfaces
 * Scalability
 
-Once your source code is [annotated](http://code.google.com/closure/compiler/docs/js-for-compiler.html) 
+Once your source code is
+[annotated](http://code.google.com/closure/compiler/docs/js-for-compiler.html)
 and ready for compilation just run the following command:
 
 		googcompile source.js
@@ -94,85 +86,77 @@ The `googcompile` command accepts various arguments:
 dependencies (deps.js) file.
 * -n: nodeps - Does not generate the dependencies file (deps.js).
 
-## Usage (Linter)
+## JSDoc Documentation
+
+To run `node-goog`'s documentation tool simply run:
+
+    googdoc <directory or source file>
+
+For full documentation details please read the
+[official jsdoc-toolkit docs](://code.google.com/p/jsdoc-toolkit/).
+
+## Closure Testing
+
+`node-goog` supports testing using Closure's 'goog.testing.jsunit' test tools.
+To set up a unit test simply create a test file like:
+
+    #!/usr/local/bin/node
+    require('goog').goog.init();
+
+    goog.require('goog.testing.jsunit');
+    // Import the code you are testing
+    goog.require('node.goog.examples.simple.Example');
+
+    goog.provide('node.goog.examples.simple.tests.syncTests');
+
+    // Any testXXX function are auto-discovered and run
+    testFunction1 = function() {
+      assertNotEquals(typeof(example_), 'undefined');
+    };
+
+If the tests are not in the same directory as your code you will have to
+ensure that the deps.js file of the code you are testing
+is declared in the closure.json file of the tests directory or passed in to the
+call to `goog.init();` like:
+
+    require('goog').goog.init({additionalDeps:['/pathToDeps/deps.js']});
+
+Note: Due to the internals of global scoping in Node you must declare your
+tests like this:
+
+    testFunctionName = function() { ....
+
+You **cannot** declare tests like this:
+
+    var testName = function() { ...
+or
+
+    function testName() { ...
+
+To run a single test just execute:
+
+    ./testSourceFile.js
+
+To run all tests in a single directory run the following command:
+
+      googtest <dirname>
+
+## Closure Linter
 
 For detailed code style checking you can also use `node-goog`'s
 linter support.  To use linter you will need to download and install
 [Closure Linter](http://code.google.com/closure/utilities/index.html).
 
-Closure Linter checks your code against Google's own [JavaScript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) 
+Closure Linter checks your code against Google's own
+[JavaScript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml)
 which is a mature and highly scalable framework for developing JavaScript code.
 
-To install Closure Linter read the following [page]( http://code.google.com/closure/utilities/docs/linter_howto.html).
+To install Closure Linter read the following
+[page]( http://code.google.com/closure/utilities/docs/linter_howto.html).
 
 Once installed simply run the following command to `linter` your code.
 
 		googcodecheck <directory>
-
-## Usage (Documentation)
-
-If you want to use `node-goog` to generate documentation for your
-code then you will also need to download 
-[jsdoc-toolkit](http://code.google.com/p/jsdoc-toolkit/).  The best way 
-to get your hands on the jsdoc-toolkit is by running the following 
-command in an appropriate folder:
-
-		svn checkout http://jsdoc-toolkit.googlecode.com/svn/trunk/
-
-You will then need to add the installation location in the 
-`node-goog/bin/closure.json` settings file.
-
-To run `node-goog`'s documentation tool simply run:
-
-		googdoc source.js
-
-For full documentation details please read the [official jsdoc-toolkit docs](://code.google.com/p/jsdoc-toolkit/).
-
-## Usage (Testing)
-
-`node-goog` supports testing using Closure's 'goog.testing.jsunit' test tools. 
-To set up a unit test simply create a test file like:
-
-		#!/usr/local/bin/node        
-		require('goog').goog.init();
-		
-		goog.require('goog.testing.jsunit');
-		// Import the code you are testing
-		goog.require('node.goog.examples.simple.Example');
-		
-		goog.provide('node.goog.examples.simple.tests.syncTests');
-		
-		// Any testXXX function are auto-discovered and run
-		testFunction1 = function() {
-		  assertNotEquals(typeof(example_), 'undefined');
-		};
-
-If the tests are not in the same directory as your code you will have to 
-ensure that the deps.js file of the code you are testing
-is declared in the closure.json file of the tests directory or passed in to the
-call to `goog.init();` like:
-
-		require('goog').goog.init({additionalDeps:['/pathToDeps/deps.js']});
-
-Note: Due to the internals of global scoping in Node you must declare your
-tests like this:
-
-		testFunctionName = function() { ....
-
-You **cannot** declare tests like this:
-
-		var testName = function() { ...
-or
-
-		function testName() { ...
-
-To run a single test just execute:
-
-		./testSourceFile.js
-		
-To run all tests in a single directory run the following command:
-
-      googtest <dirname>
 
 ## Advanced Configuration
 
@@ -191,7 +175,7 @@ All configuration files and configuration objects take the following format:
               directory
           additionalDeps: Any additional dependency files required to run your
               code.  These files generally point to other closure libraries.
-              Note these deps files must have paths relative to this setting 
+              Note these deps files must have paths relative to this setting
               file or be absolute.
           compiler_jar: Path to the compiler jar you want to use.  This defaults
             to the included compiler.jar file so only change this if you want
@@ -210,7 +194,7 @@ All configuration files and configuration objects take the following format:
             update your node-extern files.
         }
 
-Note: All paths can be absolute or relative to the location of the current 
+Note: All paths can be absolute or relative to the location of the current
 settings file.
 
 ## License

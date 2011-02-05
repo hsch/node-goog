@@ -35,6 +35,7 @@ function readFilesInDir(d, allFiles) {
   var files = fs_.readdirSync(d);
   goog.array.forEach(files, function(f) {
     if (fs_.statSync(d + f).isDirectory()) {
+      if (f === 'docs') { return; }
       return readFilesInDir(d + f + '/', allFiles);
     } else if (isValidTestableFile(f)) {
       allFiles.push(d + f);

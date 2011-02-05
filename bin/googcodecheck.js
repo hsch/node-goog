@@ -31,7 +31,7 @@ goog.require('node.goog.utils');
  */
 node.goog.googcodecheck = function() {
   var dir = process.argv[2];
-  var isDir = node.goog.googcodecheck.fs_.statSync(dir).isDirectory();
+  var isDir = node.goog.googcodecheck.isDir_(dir);
   if (!isDir) {
     dir = dir.substring(0, dir.lastIndexOf('/') + 1);
   }
@@ -59,6 +59,16 @@ node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
 
 /**
  * @private
+ * @param {string} f The file or directory path.
+ * @return {boolean} Wether the specified path is a directory.
+ */
+node.goog.googcodecheck.isDir_ = function(f) {
+  return node.goog.googcodecheck.fs_.statSync(f)['isDirectory']();
+};
+
+
+/**
+ * @private
  * @param {string} dir The directory to recursively fix the bash instructions
  *    on.
  */
@@ -66,7 +76,7 @@ node.goog.googcodecheck.prototype.fixBashInstructionsOnDir_ = function(dir) {
   goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
       function(f) {
         var path = node.goog.utils.getPath(dir, f);
-        if (node.goog.googcodecheck.fs_.statSync(path).isDirectory()) {
+        if (node.goog.googcodecheck.isDir_(path)) {
           return this.fixBashInstructionsOnDir_(path);
         }
         this.fixBashInstructions_(dir, f);
@@ -111,8 +121,10 @@ node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
  */
 node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
   var excludes = this.getLinterExcludeFiles_(dir);
+  var excludesDir = this.getLinterExcludeDir_(dir);
   this.runProcess_('gjslint', ['--strict',
-    '-x ' + excludes.join(','), '-r', dir], callback);
+    '-x ' + excludes.join(','), '-e ' + excludesDir.join(','),
+    '-r', dir], callback);
 };
 
 
@@ -132,11 +144,28 @@ node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
 
 /**
  * @private
+ * @param {string} dir The directory to code check.
+ * @return {Array.<string>} An array of all directories to ignore.
+ */
+node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
+  var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
+      function(f) { return this.isIgnorableDir_(dir, f); }, this);
+  return goog.array.map(excludes, function(f) {
+    return node.goog.utils.getPath(dir, f);
+  });
+};
+
+
+/**
+ * @private
  * @param {string} dir The directory of the files we are checking.
  * @param {string} f If this file can be ignored from the checks.
  * @return {boolean} Wether the specified file can be safely ignored.
  */
 node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
+  if (node.goog.googcodecheck.isDir_(
+      node.goog.utils.getPath(dir, f))) return false;
+
   var ignore =
       f === 'goog.js' ||
       f.indexOf('.min.js') >= 0 ||
@@ -144,11 +173,23 @@ node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
       f.indexOf('_') === 0 ||
       f.indexOf('deps.js') >= 0 ||
       f.indexOf('.extern.js') >= 0 ||
-      f.indexOf('.externs.js') >= 0 ||
-      node.goog.googcodecheck.fs_.statSync(
-      node.goog.utils.getPath(dir, f)).isDirectory();
+      f.indexOf('.externs.js') >= 0;
 
   return ignore;
+};
+
+
+/**
+ * @private
+ * @param {string} dir The directory of the files we are checking.
+ * @param {string} d If this directory can be ignored from the checks.
+ * @return {boolean} Wether the specified file can be safely ignored.
+ */
+node.goog.googcodecheck.prototype.isIgnorableDir_ = function(dir, d) {
+  if (!node.goog.googcodecheck.isDir_(
+      node.goog.utils.getPath(dir, d))) return false;
+
+  return d === 'docs';
 };
 
 
@@ -166,9 +207,9 @@ node.goog.googcodecheck.prototype.runProcess_ =
   cmd.stdout.on('data', function(data) { output += data; });
   cmd.stderr.on('data', function(data) { err += data; });
 
-  cmd.on('uncaughtException', function(err) {
+  cmd.on('uncaughtException', function(error) {
     if (callback) callback();
-    throw err;
+    throw error;
   });
 
   cmd.on('exit', function(code) {

@@ -56,7 +56,7 @@ node.goog.utils.path_ = /** @type {extern_path} */ (require('path'));
  * @param {string=} file The file to try to parse settings out of.  It is also
  *    used to determine which directory to look for the closure.json settings
  *    file.
- * @return {node.goog.opts} The correct options object in the current context.
+ * @return {node.goog.opts?} The correct options object in the current context.
  */
 node.goog.utils.readSettingObject = function(file) {
   var contents = null, fileSettings = null;
@@ -73,7 +73,7 @@ node.goog.utils.readSettingObject = function(file) {
       node.goog.utils.readArgsFromJSONFile(process.cwd(),
       node.goog.utils.getPath(process.cwd(), '/closure.json'));
 
-  var settings = globalSettings || /** @type {node.goog.opts} */ ({});
+  var settings = globalSettings || /** @type {!node.goog.opts} */ ({});
   node.goog.utils.extendObject_(settings, codeDirSettings);
   node.goog.utils.extendObject_(settings, currentDirSettings);
   node.goog.utils.extendObject_(settings, fileSettings);

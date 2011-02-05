@@ -89,7 +89,7 @@ node.goog.googcompile = function() {
 
   /**
    * @private
-   * @type {node.goog.opts}
+   * @type {?node.goog.opts}
    */
   this.args_;
 
@@ -295,7 +295,7 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   clArgs.push('--input=' + this.tmpFileName_);
   clArgs.push('--output_mode=compiled');
   clArgs.push('--compiler_jar=' + (this.args_.compiler_jar ||
-      node.goog.utils.getPath(libPath, 'compiler.jar')));
+      node.goog.utils.getPath(__dirname, '../third_party/ignoregoogcompiler.jar')));
 
   clArgs.push(
       '--compiler_flags=--js=' +

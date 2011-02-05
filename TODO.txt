@@ -1,4 +1,6 @@
 TODO
 ====
 - closureBasePath needs to be more flexible. Not '.../closure/goog' as it
-currently must match
+  currently must match
+- Add all additional compiler options to the default ./bin/closure.json
+- Add all jsdoc-toolkit options to the default ./bin/closure.json

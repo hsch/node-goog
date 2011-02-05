@@ -48,6 +48,8 @@ node.goog.googdoc = function() {
  */
 node.goog.googdoc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
+  var title = entryPointDirIdx > 0 ?
+      entryPoint.substring(entryPointDirIdx + 1) : entryPoint;
   var entryPointDir = entryPointDirIdx > 0 ?
       entryPoint.substring(0, entryPointDirIdx) : '.';
 
@@ -57,11 +59,17 @@ node.goog.googdoc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
     node.goog.utils.getPath(jsDocToolkitDir, 'jsrun.jar'),
     node.goog.utils.getPath(jsDocToolkitDir, 'app/run.js'),
     '-a',
-    '-t=' + node.goog.utils.getPath(jsDocToolkitDir, 'templates/jsdoc/'),
+    '-t=' +
+        node.goog.utils.getPath(jsDocToolkitDir, 'templates/codeview'),
+    '-p', '-v',
     '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
     '-r=10',
+    '-D="title:' + title + '"',
+    '-D="noGlobal:true"',
+    '-D="index:files"',
     '-E=\.min\.js',
     '-E=deps\.js',
+    '-E=/docs',
     entryPointDir
   ]);
 
