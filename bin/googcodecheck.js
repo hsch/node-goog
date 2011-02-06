@@ -108,9 +108,7 @@ node.goog.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
  * @param {function():undefined} callback The exit callback.
  */
 node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
-  var excludes = this.getLinterExcludeFiles_(dir);
-  this.runProcess_('fixjsstyle', ['--strict',
-    '-x ' + excludes.join(','), '-r', dir], callback);
+  this.runProcess_('fixjsstyle', this.getLinterArgs_(dir), callback);
 };
 
 
@@ -120,11 +118,39 @@ node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
  * @param {function():undefined=} callback The exit callback.
  */
 node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
+  this.runProcess_('gjslint', this.getLinterArgs_(dir), callback);
+};
+
+
+/**
+ * @private
+ * @type {node.goog.opts}
+ */
+node.goog.googcodecheck.prototype.settings_;
+
+
+/**
+ * @private
+ * @param {string} dir The directory to codecheck.
+ * @return {Array.<string>} The array of arguments for the gjslint and
+ *    fixjsstyle calls.
+ */
+node.goog.googcodecheck.prototype.getLinterArgs_ = function(dir) {
+  if (!this.settings_) {
+    this.settings_ = /** @type {node.goog.opts} */
+        (node.goog.utils.readSettingObject());
+  }
   var excludes = this.getLinterExcludeFiles_(dir);
   var excludesDir = this.getLinterExcludeDir_(dir);
-  this.runProcess_('gjslint', ['--strict',
-    '-x ' + excludes.join(','), '-e ' + excludesDir.join(','),
-    '-r', dir], callback);
+  var args = [];
+  if (excludes.length) args.push('-x ' + excludes.join(','));
+  if (excludesDir.length) args.push('-e ' + excludesDir.join(','));
+
+  if (this.settings_.additionalLinterOptions) {
+    args = goog.array.concat(args, this.settings_.additionalLinterOptions);
+  }
+  args.push(dir);
+  return args;
 };
 
 
@@ -201,26 +227,14 @@ node.goog.googcodecheck.prototype.isIgnorableDir_ = function(dir, d) {
  */
 node.goog.googcodecheck.prototype.runProcess_ =
     function(command, args, callback) {
-  var cmd = require('child_process').spawn(command, args);
-
-  var output = '', err = '';
-  cmd.stdout.on('data', function(data) { output += data; });
-  cmd.stderr.on('data', function(data) { err += data; });
-
-  cmd.on('uncaughtException', function(error) {
-    if (callback) callback();
-    throw error;
-  });
-
-  cmd.on('exit', function(code) {
-    if (callback) callback();
-
-
-    console.log('\nSuccessfully executed ' + command +
-        (code ? '\n\tcode:' + code : '') +
-        (err ? '\n\tstderr:' + err : '') +
-        '\n\tstdout: ' + output);
-  });
+  var cmd = require('child_process').exec(command + ' ' + args.join(' '),
+      function(err, stdout, stderr) {
+        if (callback) callback();
+        if (err) throw err;
+        console.log('\nSuccessfully Executed ' + command +
+            (stderr ? '\n\tstderr:' + stderr : '') +
+            (stdout ? '\n\tstdout: ' + stdout : ''));
+      });
 };
 
 new node.goog.googcodecheck();

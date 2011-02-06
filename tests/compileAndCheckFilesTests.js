@@ -92,8 +92,7 @@ function compileFileImpl(file, callback) {
     var shortFile = file.substring(file.lastIndexOf('/') + 1);
 
     assertNull(err);
-
-    var match = /([\d]+) error\(s\), ([\d]+) warning\(s\)/.exec(stdout);
+    var match = /([\d]+) error\(s\), ([\d]+) warning\(s\)/.exec(stderr);
     assertNotNull(stdout, match);
     var errors = parseInt(match[1], 10);
     var warnings = parseInt(match[2], 10);

@@ -57,3 +57,11 @@ testValidateOpsObject_DirectoriesMadeAbsolute = function() {
   assertEquals('additionalCompileRoots', '/absolute/dir2', settings.additionalCompileRoots[1]);
   assertEquals('closureBasePath', '/root/relDir1', settings.closureBasePath);
 };
+
+testParseClosureBasePath_ = function() {
+  var alias = node.goog.utils.parseClosureBasePath_;
+  assertEquals('1', '/test1/test2/closure-library', alias('/test1/test2/closure-library/test3/test4'));
+  assertEquals('2', 'test1/test2/closure-library', alias('test1/test2/closure-library/test3/test4'));
+  assertEquals('3', '/test1/test2/closure-library', alias('\\test1/test2\\closure-library\\test3/test4'));
+  assertEquals('4', 'test1/test2/closure-library', alias('test1/test2\\closure-library\\test3/test4'));
+};

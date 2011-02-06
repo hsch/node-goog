@@ -229,44 +229,22 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
       this.getCompilerClArgs_() :
       this.getDepsClArgs_();
 
-  var exec = this.args_.closureBasePath.replace('/closure/goog/',
-      '/closure/bin/build/') + (compiler ? 'closurebuilder' : 'depswriter') +
-      '.py';
-  var cmd = require('child_process').spawn(exec, clArgs);
-
-  var output = '';
-  var err = '';
-  cmd.stdout.on('data', function(data) {
-    output += data;
-  });
-
-  cmd.stderr.on('data', function(data) {
-    err += data;
-  });
-
-  cmd.on('uncaughtException', function(err) {
-    if (callback) callback();
-    throw err;
-  });
-
+  var exec = node.goog.utils.getPath(this.args_.closureBasePath,
+      'closure/bin/build/' +
+      (compiler ? 'closurebuilder.py ' : 'depswriter.py '));
   var that = this;
-  cmd.on('exit', function(code) {
-    if (callback) callback();
-    err = err.replace(/\.tmp\.js/g, '.js');
-    if (code === 0 && !that.quiet_) {
-      output = (bashInstructions || '') + output;
-      that.fs_.
-          writeFileSync(targetFile, output, encoding = 'utf8');
-
-    }
-    console.log(
-        (code ? 'exit code: ' + code : '') +
-        (err ? '\nSTDError: ' + err : '') +
-        (code !== 0 ? '\nSTDOut:: ' + output : '') +
-        (code === 0 ? '\nSuccessfully ' +
-        (compiler ? 'compiled' : 'generated dependencies') + ' to: ' +
-            that.compiledFileName_ : ''));
-  });
+  var cmd = require('child_process').exec(exec + clArgs.join(' '),
+      function(err, stdout, stderr) {
+        if (callback) callback();
+        if (err) throw err;
+        stderr = stderr.replace(/\.tmp\.js/g, '.js');
+        stdout = stdout.replace(/\.tmp\.js/g, '.js');
+        if (stderr) console.error(stderr);
+        if (stdout && !that.quiet_) {
+          stdout = (bashInstructions || '') + stdout;
+          that.fs_.writeFileSync(targetFile, stdout, encoding = 'utf8');
+        }
+      });
 };
 
 
@@ -281,7 +259,7 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   var addedPaths = {};
   this.isPathInMap_(addedPaths, path);
   var clArgs = [
-    '--root=' + this.args_.closureBasePath.replace('/closure/goog/', '/'),
+    '--root=' + this.args_.closureBasePath,
     '--root=' + path
   ];
   var libPath = node.goog.utils.getPath(__dirname, '../lib');
@@ -295,38 +273,24 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   clArgs.push('--input=' + this.tmpFileName_);
   clArgs.push('--output_mode=compiled');
   clArgs.push('--compiler_jar=' + (this.args_.compiler_jar ||
-      node.goog.utils.getPath(__dirname, '../third_party/ignoregoogcompiler.jar')));
+      node.goog.utils.getPath(__dirname,
+      '../third_party/ignoregoogcompiler.jar')));
 
   clArgs.push(
       '--compiler_flags=--js=' +
-      node.goog.utils.getPath(this.args_.closureBasePath, 'deps.js'),
+      node.goog.utils.getPath(this.args_.closureBasePath,
+      'closure/goog/deps.js'),
       '--compiler_flags=--compilation_level=ADVANCED_OPTIMIZATIONS',
       '--compiler_flags=--externs=' +
       node.goog.utils.getPath(libPath, 'node.externs.js'),
       '--compiler_flags=--externs=' +
       node.goog.utils.getPath(libPath, 'node.static.externs.js'),
       '--compiler_flags=--output_wrapper=' +
-      '"(function() {this.window=this;%output%})();"',
-      '--compiler_flags=--debug=true',
-      '--compiler_flags=--process_closure_primitives=true',
-      '--compiler_flags=--warning_level=VERBOSE',
-      '--compiler_flags=--jscomp_warning=accessControls',
-      '--compiler_flags=--jscomp_warning=checkRegExp',
-      '--compiler_flags=--jscomp_warning=checkTypes',
-      '--compiler_flags=--jscomp_warning=checkVars',
-      '--compiler_flags=--jscomp_warning=deprecated',
-      '--compiler_flags=--jscomp_warning=fileoverviewTags',
-      '--compiler_flags=--jscomp_warning=invalidCasts',
-      '--compiler_flags=--jscomp_warning=missingProperties',
-      '--compiler_flags=--jscomp_warning=nonStandardJsDocs',
-      '--compiler_flags=--jscomp_warning=strictModuleDepCheck',
-      '--compiler_flags=--jscomp_warning=undefinedVars',
-      '--compiler_flags=--jscomp_warning=unknownDefines',
-      '--compiler_flags=--summary_detail_level=3'
+      '"(function() {this.window=this;%output%})();"'
   );
 
   if (this.args_.additionalCompileOptions) {
-    this.args_.additionalCompileRoots.forEach(function(opt) {
+    this.args_.additionalCompileOptions.forEach(function(opt) {
       clArgs.push('--compiler_flags=' + opt);
     });
   }
@@ -358,10 +322,8 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
 node.goog.googcompile.prototype.getDepsClArgs_ =
     function() {
   var path = this.getDirectory_(this.fileToCompile_);
-  return [
-    '--root_with_prefix=' + path + ' ' +
-        this.fs_.realpathSync(path)
-  ];
+  return ['"--root_with_prefix=' + path + ' ' +
+        this.fs_.realpathSync(path) + '"'];
 };
 
 

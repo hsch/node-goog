@@ -181,7 +181,7 @@ All configuration files and configuration objects take the following format:
             to the included compiler.jar file so only change this if you want
             to use a custom compiler.
           additionalCompileOptions: Additional compiler options,
-            e.g.: "--jscomp_warning=newWarningType"
+            e.g.: "['--jscomp_warning=newWarningType']"
           additionalCompileRoots: These are directories containing source code
             that needs to be included in the compilation.  If this is not
             included then additionalDeps is used to try to guess any additional
@@ -189,6 +189,10 @@ All configuration files and configuration objects take the following format:
             of the source directory).
           jsdocToolkitDir: The location of jsdoc-toolkit.  This is only required
             if you want to use jsdoc-toolkit to document your source code.
+          additionalJSDocToolkitOptions: Additional jsdoc-toolkit options,
+            e.g.: "['-D="noGlobal:true"']"
+          additionalLinterOptions: Additional gjslint and fixjsstyle options,
+            e.g.: "['--summary=true']"
           nodeDir: The location of the node source code.  This is only required
             if you are contributing to the node-goog project or would like to
             update your node-extern files.

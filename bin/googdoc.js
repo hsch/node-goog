@@ -20,6 +20,8 @@ require('goog').goog.init();
 
 goog.provide('node.goog.googdoc');
 
+goog.require('goog.array');
+
 goog.require('node.goog.utils');
 
 
@@ -29,70 +31,51 @@ goog.require('node.goog.utils');
  */
 node.goog.googdoc = function() {
   var args = node.goog.utils.readSettingObject();
-  var jsDocToolkitDir = args.jsdocToolkitDir;
-  if (!jsDocToolkitDir) {
+  if (!args.jsdocToolkitDir) {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
         'specify a jsdocToolkitDir property pointing to the jsdoc-toolkit ' +
         'root directory.  This setting can reside in the global closure.json ' +
         'settings file or the closure.json file in the code root dir');
   }
 
-  this.init_(jsDocToolkitDir, process.argv[2]);
+  this.init_(args, process.argv[2]);
 };
 
 
 /**
  * @private
- * @param {string} jsDocToolkitDir The directory of the jsdoc-toolkit lib.
+ * @param {node.goog.opts} args The settings object.
  * @param {string} entryPoint The file/directory to document.
  */
-node.goog.googdoc.prototype.init_ = function(jsDocToolkitDir, entryPoint) {
+node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var title = entryPointDirIdx > 0 ?
       entryPoint.substring(entryPointDirIdx + 1) : entryPoint;
   var entryPointDir = entryPointDirIdx > 0 ?
       entryPoint.substring(0, entryPointDirIdx) : '.';
+  var jsDocToolkitDir = args.jsdocToolkitDir;
 
-  /** @type {extern_process} */
-  var jsdoc = require('child_process').spawn('java', [
+  var javaArgs = [
     '-jar',
     node.goog.utils.getPath(jsDocToolkitDir, 'jsrun.jar'),
     node.goog.utils.getPath(jsDocToolkitDir, 'app/run.js'),
-    '-a',
     '-t=' +
         node.goog.utils.getPath(jsDocToolkitDir, 'templates/codeview'),
-    '-p', '-v',
     '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
-    '-r=10',
-    '-D="title:' + title + '"',
-    '-D="noGlobal:true"',
-    '-D="index:files"',
-    '-E=\.min\.js',
-    '-E=deps\.js',
-    '-E=/docs',
-    entryPointDir
-  ]);
+    '-E=\.min\.js', '-E=deps\.js', '-E=/docs', '-D="title:' + title + '"'
+  ];
+  if (args.additionalJSDocToolkitOptions) {
+    javaArgs = goog.array.concat(javaArgs, args.additionalJSDocToolkitOptions);
+  }
+  javaArgs.push(entryPoint);
 
-  var output = '';
-  var err = '';
-
-  jsdoc.stdout.on('data', function(data) {
-    output += data;
-  });
-
-  jsdoc.stderr.on('data', function(data) {
-    err += data;
-  });
-
-  jsdoc.on('exit', function(code) {
-
-    if (code !== 0) {
-      console.log('CODE: ' + code + ' ERROR: ' + err +
-          '\n\n\nOUTPUT: ' + output);
-    } else {
-      console.log(err + '\nSuccessfully js-doc\'ed\n' + output);
-    }
-  });
+  /** @type {extern_process} */
+  var jsdoc = require('child_process').exec('java ' + javaArgs.join(' '),
+      function(err, stdout, stderr) {
+        if (err) throw err;
+        if (stderr) console.error(stderr);
+        if (stdout) console.log(stdout);
+      });
 };
 
 new node.goog.googdoc();

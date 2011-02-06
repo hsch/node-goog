@@ -10,18 +10,20 @@
 
 
 
-if (typeof(wbos) == 'undefined') {
+if (typeof(wbos) == "undefined") {
 	/**
 	 * @namespace Standard code of Wouter Bos (wbos)
 	 */
-	wbos = {};
+	wbos = {}
 }
-if (typeof(wbos.CssTools) == 'undefined') {
+if (typeof(wbos.CssTools) == "undefined") {
 	/**
 	 * @namespace Namespace for CSS-related functionality
 	 */
-	wbos.CssTools = {};
+	wbos.CssTools = {}
 }
+
+
 
 
 /**
@@ -30,31 +32,31 @@ if (typeof(wbos.CssTools) == 'undefined') {
  * @since 1.0 - 2010-09-10
  * @version 1.0 - 2010-09-10
  */
-wbos.CssTools.MediaQueryFallBack = (function() {
+wbos.CssTools.MediaQueryFallBack = ( function() {
 	var config = {
-		cssScreen: '/css/screen.css',
-		cssHandheld: '/css/handheld.css',
+		cssScreen: "/css/screen.css",
+		cssHandheld: "/css/handheld.css",
 		mobileMaxWidth: 660,
-		testDivClass: 'cssLoadCheck',
-		dynamicCssLinkId: 'DynCssLink',
+		testDivClass: "cssLoadCheck",
+		dynamicCssLinkId: "DynCssLink",
 		resizeDelay: 30
-	};
+	}
 	var noMediaQuery = false;
 	var delay;
 	var currentCssMediaType;
 
 	// Adding events to elements in the DOM without overwriting it
 	function addEvent(element, newFunction, eventType) {
-		var oldEvent = eval('element.' + eventType);
-		var eventContentType = eval('typeof element.' + eventType);
-
-		if (eventContentType != 'function') {
-			eval('element.' + eventType + ' = newFunction');
+		var oldEvent = eval("element." + eventType);
+		var eventContentType = eval("typeof element." + eventType)
+		
+		if ( eventContentType != 'function' ) {
+			eval("element." + eventType + " = newFunction")
 		} else {
-			eval('element.' + eventType + ' = function(e) { oldEvent(e); newFunction(e); }');
+			eval("element." + eventType + " = function(e) { oldEvent(e); newFunction(e); }")
 		}
 	}
-
+	
 	// Get the the inner width of the browser window
 	function getWindowWidth() {
 		if (window.innerWidth) {
@@ -63,11 +65,11 @@ wbos.CssTools.MediaQueryFallBack = (function() {
 			return document.documentElement.clientWidth;
 		} else if (document.body.clientWidth) {
 			return document.body.clientWidth;
-		} else {
-			return 0;
+		} else{
+			return 0;	
 		}
 	}
-
+	
 	function addCssLink(cssHref) {
 		var cssNode = document.createElement('link');
 		var windowWidth;
@@ -75,9 +77,9 @@ wbos.CssTools.MediaQueryFallBack = (function() {
 		cssNode.rel = 'stylesheet';
 		cssNode.media = 'screen, handheld, fallback';
 		cssNode.href = cssHref;
-		document.getElementsByTagName('head')[0].appendChild(cssNode);
+		document.getElementsByTagName("head")[0].appendChild(cssNode);
 	}
-
+	
 
 
 	/* Start public */
@@ -87,83 +89,83 @@ wbos.CssTools.MediaQueryFallBack = (function() {
 		 *
 		 * @since 1.0 - 2010-08-21
 		 * @version 1.0 - 2010-08-21
-		 * @param {String|Object} cssScreen URL to CSS file for larger screens.
-		 * @param {String|Object} cssHandheld URL to CSS file for smaller screens.
-		 * @param {Number} mobileMaxWidth Maximum  width for handheld devices.
+		 * @param {String|Object} cssScreen URL to CSS file for larger screens
+		 * @param {String|Object} cssHandheld URL to CSS file for smaller screens
+		 * @param {Number} mobileMaxWidth Maximum  width for handheld devices
 		 * @example
 		 * wbos.CssTools.MediaQueryFallBack.LoadCss(['screen.css', 'screen2.css'], 'mobile.css', 480)
 		 */
 		LoadCss: function(cssScreen, cssHandheld, mobileMaxWidth) {
 			// Set config values
-			if (typeof(cssScreen) != 'undefined') {
-				config.cssScreen = cssScreen;
+			if (typeof(cssScreen) != "undefined") {
+				config.cssScreen = cssScreen;	
 			}
-			if (typeof(cssHandheld) != 'undefined') {
-				config.cssHandheld = cssHandheld;
+			if (typeof(cssHandheld) != "undefined") {
+				config.cssHandheld = cssHandheld;	
 			}
-			if (typeof(mobileMaxWidth) != 'undefined') {
-				config.mobileMaxWidth = mobileMaxWidth;
+			if (typeof(mobileMaxWidth) != "undefined") {
+				config.mobileMaxWidth = mobileMaxWidth;	
 			}
-
+			
 			// Check if CSS is loaded
 			var cssloadCheckNode = document.createElement('div');
 			cssloadCheckNode.className = config.testDivClass;
-			document.getElementsByTagName('body')[0].appendChild(cssloadCheckNode);
+			document.getElementsByTagName("body")[0].appendChild(cssloadCheckNode);
 			if (cssloadCheckNode.offsetWidth != 100 && noMediaQuery == false) {
 				noMediaQuery = true;
 			}
-			cssloadCheckNode.parentNode.removeChild(cssloadCheckNode);
-
+			cssloadCheckNode.parentNode.removeChild(cssloadCheckNode)
+			
 			if (noMediaQuery == true) {
-				// Browser does not support Media Queries, so JavaScript will supply a fallback
-				var cssHref = '';
-
+				// Browser does not support Media Queries, so JavaScript will supply a fallback 
+				var cssHref = "";
+				
 				// Determines what CSS file to load
 				if (getWindowWidth() <= config.mobileMaxWidth) {
 					cssHref = config.cssHandheld;
-					newCssMediaType = 'handheld';
+					newCssMediaType = "handheld";
 				} else {
 					cssHref = config.cssScreen;
-					newCssMediaType = 'screen';
+					newCssMediaType = "screen";
 				}
-
+				
 				// Add CSS link to <head> of page
-				if (cssHref != '' && currentCssMediaType != newCssMediaType) {
-					var currentCssLinks = document.styleSheets;
+				if (cssHref != "" && currentCssMediaType != newCssMediaType) {
+					var currentCssLinks = document.styleSheets
 					for (var i = 0; i < currentCssLinks.length; i++) {
 						for (var ii = 0; ii < currentCssLinks[i].media.length; ii++) {
-							if (typeof(currentCssLinks[i].media) == 'object') {
-								if (currentCssLinks[i].media.item(ii) == 'fallback') {
-									currentCssLinks[i].ownerNode.parentNode.removeChild(currentCssLinks[i].ownerNode);
-									i--;
+							if (typeof(currentCssLinks[i].media) == "object") {
+								if (currentCssLinks[i].media.item(ii) == "fallback") {
+									currentCssLinks[i].ownerNode.parentNode.removeChild(currentCssLinks[i].ownerNode)
+									i--
 									break;
 								}
 							} else {
-								if (currentCssLinks[i].media.indexOf('fallback') >= 0) {
-									currentCssLinks[i].owningElement.parentNode.removeChild(currentCssLinks[i].owningElement);
-									i--;
+								if (currentCssLinks[i].media.indexOf("fallback") >= 0) {
+									currentCssLinks[i].owningElement.parentNode.removeChild(currentCssLinks[i].owningElement)
+									i--
 									break;
 								}
 							}
 						}
 					}
-					if (typeof(cssHref) == 'object') {
+					if (typeof(cssHref) == "object") {
 						for (var i = 0; i < cssHref.length; i++) {
-							addCssLink(cssHref[i]);
+							addCssLink(cssHref[i])
 						}
 					} else {
-						addCssLink(cssHref);
+						addCssLink(cssHref)
 					}
-
+										
 					currentCssMediaType = newCssMediaType;
 				}
 
-
-				// Check screen size again if user resizes window
-				addEvent(window, wbos.CssTools.MediaQueryFallBack.LoadCssDelayed, 'onresize');
+				
+				// Check screen size again if user resizes window 
+				addEvent(window, wbos.CssTools.MediaQueryFallBack.LoadCssDelayed, 'onresize')
 			}
 		},
-
+		
   		/**
 		 * Runs LoadCSS after a short delay
 		 *
@@ -174,12 +176,16 @@ wbos.CssTools.MediaQueryFallBack = (function() {
 		 */
 		LoadCssDelayed: function() {
 			clearTimeout(delay);
-			delay = setTimeout('wbos.CssTools.MediaQueryFallBack.LoadCss()', config.resizeDelay);
+			delay = setTimeout( "wbos.CssTools.MediaQueryFallBack.LoadCss()", config.resizeDelay)
 		}
-
-	};
+		
+	}
 	/* End public */
 })();
+
+
+
+
 
 
 /**
@@ -189,7 +195,7 @@ wbos.CssTools.MediaQueryFallBack = (function() {
  * @since 1.0 - 2010-02-23
  * @version 1.0 - 2010-02-23
  */
-wbos.Events = (function() {
+wbos.Events = ( function() {
 	/* Start public */
 	return {
   		/**
@@ -197,23 +203,23 @@ wbos.Events = (function() {
 		 *
 		 * @since 1.0 - 2010-02-23
 		 * @version 1.0 - 2010-02-23
-		 * @param {Object} element The element on which the event is placed.
-		 * @param {Function} newFunction The function that has to be linked to the event.
-		 * @param {String} eventType Name of the event.
+		 * @param {Object} element The element on which the event is placed
+		 * @param {Function} newFunction The function that has to be linked to the event
+		 * @param {String} eventType Name of the event
 		 * @example
 		 * wbos.Events.AddEvent( document.getElementById('elementId'), functionName, "onclick" )
 		 */
-		AddEvent: function(element, newFunction, eventType ) {
-			var oldEvent = eval('element.' + eventType);
-			var eventContentType = eval('typeof element.' + eventType);
-
-			if (eventContentType != 'function') {
-				eval('element.' + eventType + ' = newFunction');
+		AddEvent: function( element, newFunction, eventType ) {
+			var oldEvent = eval("element." + eventType);
+			var eventContentType = eval("typeof element." + eventType)
+			
+			if ( eventContentType != 'function' ) {
+				eval("element." + eventType + " = newFunction")
 			} else {
-				eval('element.' + eventType + ' = function(e) { oldEvent(e); newFunction(e); }');
+				eval("element." + eventType + " = function(e) { oldEvent(e); newFunction(e); }")
 			}
 		}
-	};
+	}
 	/* End public */
 })();
 
@@ -222,12 +228,17 @@ wbos.Events = (function() {
 
 
 
-if (typeof(codeview) == 'undefined') {
+if (typeof(codeview) == "undefined") {
 	/**
 	 * @namespace Code written for the Codeview template
 	 */
-	codeview = {};
+	codeview = {}
 }
+
+
+
+
+
 
 
 /**
@@ -236,80 +247,80 @@ if (typeof(codeview) == 'undefined') {
  * @since 1.0 - 2010-11-08
  * @version 1.0 - 2010-11-08
  */
-codeview.classFilter = (function() {
+codeview.classFilter = ( function() {
 	function onkeyup_ClassFilter() {
-		var listItems;
-		var search = document.getElementById('ClassFilter').value;
-		search = search.toLowerCase();
+		var listItems
+		var search = document.getElementById('ClassFilter').value
+		search = search.toLowerCase()
 		if (document.getElementById('ClassList')) {
-			listItems = document.getElementById('ClassList').getElementsByTagName('li');
-			filterList(listItems, search);
+			listItems = document.getElementById('ClassList').getElementsByTagName('li')
+			filterList(listItems, search)
 		}
 		if (document.getElementById('ClassList2')) {
-			listItems = document.getElementById('ClassList2').getElementsByTagName('li');
-			filterList(listItems, search);
+			listItems = document.getElementById('ClassList2').getElementsByTagName('li')
+			filterList(listItems, search)
 		}
 		if (document.getElementById('FileList')) {
-			listItems = document.getElementById('FileList').getElementsByTagName('li');
-			filterList(listItems, search);
+			listItems = document.getElementById('FileList').getElementsByTagName('li')
+			filterList(listItems, search)
 		}
 		if (document.getElementById('MethodsListInherited')) {
-			var links = document.getElementById('MethodsListInherited').getElementsByTagName('a');
-			var linksSelected = new Array();
-			for (var i = 0; i < links.length; i++) {
-				if (links[i].parentNode.parentNode.tagName == 'DD') {
-					linksSelected.push(links[i]);
+			var links = document.getElementById('MethodsListInherited').getElementsByTagName('a')
+			var linksSelected = new Array()
+			for (var i=0; i < links.length; i++) {
+				if (links[i].parentNode.parentNode.tagName == "DD") {
+					linksSelected.push(links[i])
 				}
 			}
-			filterList(linksSelected, search);
+			filterList(linksSelected, search)
 		}
 		if (document.getElementById('MethodsList')) {
-			listItems = document.getElementById('MethodsList').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-			filterList(listItems, search, document.getElementById('MethodDetail').getElementsByTagName('li'));
+			listItems = document.getElementById('MethodsList').getElementsByTagName('tbody')[0].getElementsByTagName('tr')
+			filterList(listItems, search, document.getElementById('MethodDetail').getElementsByTagName('li'))
 		}
 	}
-
+	
 	function filterList(listItems, search, relatedElements) {
-		var itemContent = '';
-		for (var i = 0; i < listItems.length; i++) {
-			itemContent = listItems[i].textContent || listItems[i].innerText;
+		var itemContent = ""
+		for (var i=0; i < listItems.length; i++) {
+			itemContent = listItems[i].textContent||listItems[i].innerText
 			if (itemContent != undefined) {
-				itemContent = itemContent.toLowerCase();
-				itemContent = itemContent.replace(/\s/g, '');
-				if (itemContent.indexOf(search) >= 0 || itemContent == '') {
-					listItems[i].style.display = '';
+				itemContent = itemContent.toLowerCase()
+				itemContent = itemContent.replace(/\s/g, "")
+				if (itemContent.indexOf(search) >= 0 || itemContent == "") {
+					listItems[i].style.display = ""
 				} else {
-					listItems[i].style.display = 'none';
+					listItems[i].style.display = "none"
 				}
 				if (relatedElements != null) {
-					filterRelatedList(listItems[i], search, relatedElements);
+					filterRelatedList(listItems[i], search, relatedElements)
 				}
 			}
 		}
 	}
-
+	
 	function filterRelatedList(listItem, search, relatedElements) {
-		var itemIndex = parseInt(listItem.className.replace('item', ''));
+		var itemIndex = parseInt(listItem.className.replace('item', ''))
 		if (itemIndex <= relatedElements.length) {
-			if (relatedElements[itemIndex].className == 'item'+ itemIndex) {
-				relatedElements[itemIndex].style.display = listItem.style.display;
+			if (relatedElements[itemIndex].className == "item"+ itemIndex) {
+				relatedElements[itemIndex].style.display = listItem.style.display
 			}
 		}
 	}
-
-
-
-
-
+	
+	
+	
+	
+	
 	/* Start public */
 	return {
 		Init: function() {
 			wbos.Events.AddEvent(
 				document.getElementById('ClassFilter'),
 				onkeyup_ClassFilter,
-				'onkeyup'
-			);
+				"onkeyup"
+			)					
 		}
-	};
+	}
 	/* End public */
 })();

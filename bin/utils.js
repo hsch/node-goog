@@ -148,13 +148,30 @@ node.goog.utils.extendObject_ = function(target, newData) {
     if (orig && newprop && typeof(newprop) !== 'string' &&
         typeof (newprop.length) === 'number') {
       for (var i = 0, len = newprop.length; i < len; i++) {
-        orig.push(newprop[i]);
+        if (!node.goog.utils.arrayContains_(orig, newprop[i])) {
+          orig.push(newprop[i]);
+        }
       }
     } else {
       target[i] = newprop;
     }
   }
   return target;
+};
+
+
+/**
+ * @private
+ * @param {Array} arr The array to check.
+ * @param {*} o The value to check for in the specified array.  Note this uses
+ *    === comparison so only ref matches are found.
+ * @return {boolean} Wether the specified array contains the specified value.
+ */
+node.goog.utils.arrayContains_ = function(arr, o) {
+  for (var i = 0, len = arr.length; i < len; i++) {
+    if (arr[i] === o) return true;
+  }
+  return false;
 };
 
 
@@ -215,8 +232,9 @@ node.goog.utils.getOptsObject_ = function(currentDir, optsString) {
 node.goog.utils.validateOpsObject_ =
     function(currentDir, opts, allowNullMandatories) {
   if (opts.closureBasePath)
-    opts.closureBasePath = node.goog.utils.validateDir_(currentDir,
-        'closureBasePath', opts.closureBasePath, allowNullMandatories);
+    opts.closureBasePath = node.goog.utils.parseClosureBasePath_(
+        node.goog.utils.validateDir_(currentDir,
+        'closureBasePath', opts.closureBasePath, allowNullMandatories));
   if (opts.jsdocToolkitDir)
     opts.jsdocToolkitDir = node.goog.utils.validateDir_(currentDir,
         'jsdocToolkitDir', opts.jsdocToolkitDir, true);
@@ -245,6 +263,30 @@ node.goog.utils.validateOpsObject_ =
 
 /**
  * @private
+ * @param {string} dir The directory specified as the closure base path.
+ *    This allows any directory below or including the closure-library/
+ *    directory.
+ * @return {string} The /closure-library directory.
+ */
+node.goog.utils.parseClosureBasePath_ = function(dir) {
+  var tokens = dir.split(/[\/\\]/);
+  var pathToClosure = [];
+  for (var i = 0, len = tokens.length; i < len; i++) {
+    var t = tokens[i];
+    if (t === '..') {
+      pathToClosure.pop();
+      continue;
+    }
+    pathToClosure.push(t);
+    if (t.toLowerCase() === 'closure-library') { break; }
+  }
+  var path = node.goog.utils.path_.normalize(pathToClosure.join('/'));
+  return path;
+};
+
+
+/**
+ * @private
  * @param {string?} currentDir The directory of the current settings file or
  *    executing javascript file.
  * @param {string} name The name or description of the directory.
@@ -260,6 +302,7 @@ node.goog.utils.validateDir_ = function(currentDir, name, dir, allowNull) {
   if (dir.charAt(0) !== '/' && dir.charAt(0) !== '\\' && currentDir) {
     dir = node.goog.utils.getPath(currentDir, dir);
   }
+  dir = node.goog.utils.path_.normalize(dir);
   if (!node.goog.utils.checkDirExists_(dir)) {
     throw new Error('The directories/files specified in node-goog ' +
         'configuration could not be found: ' + dir);

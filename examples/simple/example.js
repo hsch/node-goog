@@ -16,7 +16,7 @@
  *    </p>
  *    <pre>
  *    {
- *       // Location of the closure-library/closure/goog/ directory
+ *       // Location of the closure-library directory
  *       closureBasePath:{string},
  *       // Any additional dependency files required to run your code.  These
  *       // files generally point to other closure libraries.  Note these deps
