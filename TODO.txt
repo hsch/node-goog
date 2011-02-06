@@ -1,16 +1,16 @@
 TODO
 ====
-- Add a reference to codeview website in read me, perhaps a thank you section
 - googtest stops at first failure it should run all tests and give summary of
   failures.
 - gootest failure stack traces are empty
 - Display test results better, perhaps implement a console test runner that
 shows progress? and green / red style ui?
+- jsdoc uses jsrun.jar perhaps we can remove java alltogether and run it in
+  node?
 
 GOOG HACKS THAT NEED ATTENTION
 ==============================
 - Include GJSLINT and FIXJSSTYLE in distribution
-- Sort out licensing for compiler, do we need to include the license file
 - goog.js has lots of hacks to integrate into the libs, clean this up
 - Testing code is horrible fix this up, perhaps implement own version of
   MultiTestRunner optimised for console

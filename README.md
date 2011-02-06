@@ -201,6 +201,12 @@ All configuration files and configuration objects take the following format:
 Note: All paths can be absolute or relative to the location of the current
 settings file.
 
+## Acknoledgements
+My sincerest appreciation to Google for open sourcing this awesome toolset.
+Thanks to the jsdoc-toolkit guys (Michael Mathews + co) and to Wouter Bos for
+  his awesome jsdoc-toolkit template.
+
+
 ## License
 
 Copyright 2010 Hendrik Schnepel (hendrik.schnepel@gmail.com)
