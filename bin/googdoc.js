@@ -38,6 +38,14 @@ node.goog.googdoc = function() {
         'settings file or the closure.json file in the code root dir');
   }
 
+  /**
+   * @private
+   * @const
+   * @type {{init:function(Array.<string>)}}
+   */
+  this.jsdoc_toolkit_ =
+    require('../third_party/node-jsdoc-toolkit/app/noderun').jsdoctoolkit;
+
   this.init_(args, process.argv[2]);
 };
 
@@ -56,7 +64,6 @@ node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
   var jsDocToolkitDir = args.jsdocToolkitDir;
 
   var clArgs = [
-    node.goog.utils.getPath(jsDocToolkitDir, 'app/run.js'),
     '-t=' +
         node.goog.utils.getPath(jsDocToolkitDir, 'templates/codeview'),
     '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
@@ -68,13 +75,8 @@ node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
   }
   clArgs.push(entryPoint);
 
-  /** @type {extern_process} */
-  var jsdoc = require('child_process').exec('node ' + clArgs.join(' '),
-      function(err, stdout, stderr) {
-        if (err) throw err;
-        if (stderr) console.error(stderr);
-        if (stdout) console.log(stdout);
-      });
+  // Run node-jsdoc-toolkit
+  this.jsdoc_toolkit_.init(clArgs);
 };
 
 new node.goog.googdoc();
