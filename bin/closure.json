@@ -1,6 +1,6 @@
 {
   closureBasePath:'../third_party/closure-library/closure/goog/',
-  jsdocToolkitDir: '../third_party/jsdoc-toolkit/',
+  jsdocToolkitDir: '../third_party/node-jsdoc-toolkit/',
   nodeDir: '../../../lib/node',
   additionalCompileOptions: [
     '--debug=true',
@@ -22,7 +22,7 @@
   ],
   additionalJSDocToolkitOptions: [
     '-a',
-    '-p', '-v',
+    '-p',
     '-r=10',
     '-D="noGlobal:true"',
     '-D="index:files"'

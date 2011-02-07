@@ -55,22 +55,21 @@ node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
       entryPoint.substring(0, entryPointDirIdx) : '.';
   var jsDocToolkitDir = args.jsdocToolkitDir;
 
-  var javaArgs = [
-    '-jar',
-    node.goog.utils.getPath(jsDocToolkitDir, 'jsrun.jar'),
+  var clArgs = [
     node.goog.utils.getPath(jsDocToolkitDir, 'app/run.js'),
     '-t=' +
         node.goog.utils.getPath(jsDocToolkitDir, 'templates/codeview'),
     '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
-    '-E=\.min\.js', '-E=deps\.js', '-E=/docs', '-D="title:' + title + '"'
+    '-E=\.min\.js', '-E=deps\.js', '-E=/docs', '-E=/tests', '-D="title:' +
+        title + '"'
   ];
   if (args.additionalJSDocToolkitOptions) {
-    javaArgs = goog.array.concat(javaArgs, args.additionalJSDocToolkitOptions);
+    clArgs = goog.array.concat(clArgs, args.additionalJSDocToolkitOptions);
   }
-  javaArgs.push(entryPoint);
+  clArgs.push(entryPoint);
 
   /** @type {extern_process} */
-  var jsdoc = require('child_process').exec('java ' + javaArgs.join(' '),
+  var jsdoc = require('child_process').exec('node ' + clArgs.join(' '),
       function(err, stdout, stderr) {
         if (err) throw err;
         if (stderr) console.error(stderr);

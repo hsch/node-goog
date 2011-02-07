@@ -336,25 +336,6 @@ var testCases = [
 		is('symbols.getSymbol("myProject.myModule-myPrivateMethod").name', 'myPrivateMethod', 'A private method in the scope of a function wrapped in parens can be recognized.');
 		is('symbols.getSymbol("myProject.myModule-myPrivateVar").name', 'myPrivateVar', 'A private member in the scope of a function wrapped in parens can be recognized.');
 	}
-	,
-	function() {
-		symbolize({p:true, a:true, _: [SYS.pwd+"test/quoted_name.js"]});
-		is('symbols.getSymbol("ns.name1").name', 'name1', 'A quoted name can be used.');
-		is('symbols.getSymbol("ns.name2").name', 'name2', 'A non-quoted name can be used.');
-	}
-	,
-	function() {
-		symbolize({p:true, a:true, _: [SYS.pwd+"test/params_dash.js"]});
-		is('symbols.getSymbol("Document").params[0].name', "pages", 'Name of param with no dash is found.');
-		is('symbols.getSymbol("Document").params[0].desc', "One or more pages.", 'Desc of param with no dash is found.');
-		
-		is('symbols.getSymbol("Document").params[1].name', "id", 'Name of param with spaced dash is found.');
-		is('symbols.getSymbol("Document").params[1].desc', "Specifies the id.", 'Desc of param with spaced dash is found.');
-		
-		is('symbols.getSymbol("Document").params[2].name', "title", 'Name of param with nonspaced dash is found.');
-		is('symbols.getSymbol("Document").params[2].desc', "Specifies the title.", 'Desc of param with non-spaced dash is found.');
-		
-	}
 ];
 
 //// run and print results

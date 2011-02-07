@@ -1,5 +1,8 @@
 TODO
 ====
+
+- Add test to ensure examples are still running (checking output)
+
 - googtest stops at first failure it should run all tests and give summary of
   failures.
 - gootest failure stack traces are empty

@@ -1,10 +1,24 @@
+#!/usr/bin/node
 /**
  * @fileOverview
  * A bootstrap script that creates some basic required objects
- * for loading other scripts.
- * @author Michael Mathews, micmath@gmail.com
- * @version $Id: run.js 756 2009-01-07 21:32:58Z micmath $
+ * for loading other scripts.  This variant provides the glue
+ * to run on top of Node.js rather than Java+Rhino.
+ * @author Aaron Wirtz, me@awirtz.com
  */
+
+// load the node.js libraries to be abstracted
+var fs = require('fs');
+var path = require('path');
+var Script = process.binding('evals').Script;
+
+// define a few globals to be compatible with jsrun.jar
+global.arguments = process.argv.slice(2);
+load = function(file) {
+	Script.runInThisContext(fs.readFileSync(file), file);
+};
+print = console.log;
+quit = process.exit;
 
 /**
  * @namespace Keep track of any messages from the running script.
@@ -13,7 +27,7 @@ LOG = {
 	warn: function(msg, e) {
 		if (JSDOC.opt.q) return;
 		if (e) msg = e.fileName+", line "+e.lineNumber+": "+msg;
-		
+
 		msg = ">> WARNING: "+msg;
 		LOG.warnings.push(msg);
 		if (LOG.out) LOG.out.write(msg+"\n");
@@ -28,25 +42,25 @@ LOG = {
 	}
 };
 LOG.warnings = [];
-LOG.verbose = false
+LOG.verbose = false;
 LOG.out = undefined;
 
 /**
  *	@class Manipulate a filepath.
  */
-function FilePath(absPath, separator) {
-	this.slash =  separator || "/"; 
+FilePath = function(absPath, separator) {
+	this.slash =  separator || "/";
 	this.root = this.slash;
 	this.path = [];
 	this.file = "";
-	
+
 	var parts = absPath.split(/[\\\/]/);
 	if (parts) {
 		if (parts.length) this.root = parts.shift() + this.slash;
-		if (parts.length) this.file =  parts.pop()
+		if (parts.length) this.file = parts.pop();
 		if (parts.length) this.path = parts;
 	}
-	
+
 	this.path = this.resolvePath();
 }
 
@@ -104,64 +118,21 @@ FilePath.dir = function(path) {
 }
 
 
-importClass(java.lang.System);
-
 /**
  * @namespace A collection of information about your system.
  */
-SYS = {
-	/**
-	 * Information about your operating system: arch, name, version.
-	 * @type string
-	 */
-	os: [
-		new String(System.getProperty("os.arch")),
-		new String(System.getProperty("os.name")),
-		new String(System.getProperty("os.version"))
-	].join(", "),
-	
-	/**
-	 * Which way does your slash lean.
-	 * @type string
-	 */
-	slash: System.getProperty("file.separator")||"/",
-	
-	/**
-	 * The path to the working directory where you ran java.
-	 * @type string
-	 */
-	userDir: new String(System.getProperty("user.dir")),
-	
-	/**
-	 * Where is Java's home folder.
-	 * @type string
-	 */
-	javaHome: new String(System.getProperty("java.home")),
-	
-	/**
-	 * The absolute path to the directory containing this script.
-	 * @type string
-	 */
-	pwd: undefined
-};
+SYS = {}
+/**
+ * Which way does your slash lean.
+ * @type string
+ */
+SYS.slash = "/";
+/**
+ * The absolute path to the directory containing this script.
+ * @type string
+ */
+SYS.pwd = __dirname+SYS.slash;
 
-// jsrun appends an argument, with the path to here.
-if (arguments[arguments.length-1].match(/^-j=(.+)/)) {
-	if (RegExp.$1.charAt(0) == SYS.slash || RegExp.$1.charAt(1) == ":") { // absolute path to here
-		SYS.pwd = new FilePath(RegExp.$1).toDir().toString();
-	}
-	else { // relative path to here
-		SYS.pwd = new FilePath(SYS.userDir + SYS.slash + RegExp.$1).toDir().toString();
-	}
-	arguments.pop();
-}
-else {
-	print("The run.js script requires you use jsrun.jar.");
-	quit();
-}
-
-// shortcut
-var File = Packages.java.io.File;
 
 /**
  * @namespace A collection of functions that deal with reading a writing to disk.
@@ -172,46 +143,31 @@ IO = {
 	 * Create a new file in the given directory, with the given name and contents.
 	 */
 	saveFile: function(/**string*/ outDir, /**string*/ fileName, /**string*/ content) {
-		var out = new Packages.java.io.PrintWriter(
-			new Packages.java.io.OutputStreamWriter(
-				new Packages.java.io.FileOutputStream(outDir+SYS.slash+fileName),
-				IO.encoding
-			)
-		);
-		out.write(content);
-		out.flush();
-		out.close();
+		fs.writeFileSync(outDir + "/" + fileName, content, IO.encoding);
 	},
-	
+
 	/**
 	 * @type string
 	 */
 	readFile: function(/**string*/ path) {
-		if (!IO.exists(path)) {
-			throw "File doesn't exist there: "+path;
-		}
-		return readFile(path, IO.encoding);
+		return fs.readFileSync(path, IO.encoding);
 	},
 
 	/**
-	 * @param inFile 
+	 * @param inFile
 	 * @param outDir
 	 * @param [fileName=The original filename]
 	 */
 	copyFile: function(/**string*/ inFile, /**string*/ outDir, /**string*/ fileName) {
 		if (fileName == null) fileName = FilePath.fileName(inFile);
-	
-		var inFile = new File(inFile);
-		var outFile = new File(outDir+SYS.slash+fileName);
-		
-		var bis = new Packages.java.io.BufferedInputStream(new Packages.java.io.FileInputStream(inFile), 4096);
-		var bos = new Packages.java.io.BufferedOutputStream(new Packages.java.io.FileOutputStream(outFile), 4096);
-		var theChar;
-		while ((theChar = bis.read()) != -1) {
-			bos.write(theChar);
-		}
-		bos.close();
-		bis.close();
+    inFile = path.normalize(inFile);
+    outFile = path.normalize(outDir + "/" + fileName);
+    if (!path.existsSync(inFile)) {
+      // Could not find file to copy, ignoring: ' + inFile
+      // Should we log or safe to ignore?
+      return;
+    };
+    fs.createReadStream(inFile).pipe(fs.createWriteStream(outFile));
 	},
 
 	/**
@@ -227,12 +183,12 @@ IO = {
 			}
 		}
 	},
-	
+
 	/**
 	 * Creates a directory at the given path.
 	 */
 	makeDir: function(/**string*/ path) {
-		(new File(path)).mkdir();
+		fs.mkdirSync(path, 0777);
 	},
 
 	/**
@@ -248,25 +204,25 @@ IO = {
 		}
 		if (_path.length == 0) return _allFiles;
 		if (recurse === undefined) recurse = 1;
-		
-		dir = new File(dir);
-		if (!dir.directory) return [String(dir)];
-		var files = dir.list();
-		
+
+		var s = fs.statSync(dir);
+		if (!s.isDirectory()) return [dir];
+		var files = fs.readdirSync(dir);
+
 		for (var f = 0; f < files.length; f++) {
-			var file = String(files[f]);
+			var file = files[f];
 			if (file.match(/^\.[^\.\/\\]/)) continue; // skip dot files
-	
-			if ((new File(_path.join(SYS.slash)+SYS.slash+file)).list()) { // it's a directory
+
+			if ((fs.statSync(_path.join("/")+"/"+file).isDirectory())) { // it's a directory
 				_path.push(file);
-				if (_path.length-1 < recurse) IO.ls(_path.join(SYS.slash), recurse, _allFiles, _path);
+				if (_path.length-1 < recurse) IO.ls(_path.join("/"), recurse, _allFiles, _path);
 				_path.pop();
 			}
 			else {
-				_allFiles.push((_path.join(SYS.slash)+SYS.slash+file).replace(SYS.slash+SYS.slash, SYS.slash));
+				_allFiles.push((_path.join("/")+"/"+file).replace("//", "/"));
 			}
 		}
-	
+
 		return _allFiles;
 	},
 
@@ -274,33 +230,20 @@ IO = {
 	 * @type boolean
 	 */
 	exists: function(/**string*/ path) {
-		file = new File(path);
-	
-		if (file.isDirectory()){
+		try {
+			fs.statSync(path);
 			return true;
-		}
-		if (!file.exists()){
+		} catch(e) {
 			return false;
 		}
-		if (!file.canRead()){
-			return false;
-		}
-		return true;
 	},
 
 	/**
-	 * 
+	 *
 	 */
-	open: function(/**string*/ path, /**string*/ append) {
-		var append = true;
-		var outFile = new File(path);
-		var out = new Packages.java.io.PrintWriter(
-			new Packages.java.io.OutputStreamWriter(
-				new Packages.java.io.FileOutputStream(outFile, append),
-				IO.encoding
-			)
-		);
-		return out;
+	open: function(/**string*/ path, /**boolean*/ append) {
+		if(append == null) append = true;
+		return fs.createWriteStream(path, {flags: (append ? "a" : "w")});
 	},
 
 	/**
@@ -309,34 +252,37 @@ IO = {
 	 * and in the meta tags of HTML output.
 	 */
 	setEncoding: function(/**string*/ encoding) {
-		if (/ISO-8859-([0-9]+)/i.test(encoding)) {
-			IO.encoding = "ISO8859_"+RegExp.$1;
+		if (/UTF-8/i.test(encoding)) {
+			IO.encoding = "utf8";
+		}
+		else if (/ASCII/i.test(encoding)) {
+			IO.encoding = "ascii";
 		}
 		else {
-			IO.encoding = encoding;
+			throw("Unsupported encoding: "+encoding+" - perhaps you can use UTF-8?");
 		}
 	},
 
 	/**
-	 * @default "utf-8"
+	 * @default "utf8"
 	 * @private
 	 */
-	encoding: "utf-8",
-	
+	encoding: "utf8",
+
 	/**
 	 * Load the given script.
 	 */
 	include: function(relativePath) {
 		load(SYS.pwd+relativePath);
 	},
-	
+
 	/**
 	 * Loads all scripts from the given directory path.
 	 */
 	includeDir: function(path) {
 		if (!path) return;
-		
-		for (var lib = IO.ls(SYS.pwd+path), i = 0; i < lib.length; i++) 
+
+		for (var lib = IO.ls(SYS.pwd+path), i = 0; i < lib.length; i++)
 			if (/\.js$/i.test(lib[i])) load(lib[i]);
 	}
 }

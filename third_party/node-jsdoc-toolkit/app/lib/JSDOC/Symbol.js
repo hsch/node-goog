@@ -499,7 +499,7 @@ JSDOC.Symbol.prototype.setTags = function() {
 	var inherits = this.comment.getTag("inherits");
 	if (inherits.length) {
 		for (var i = 0; i < inherits.length; i++) {
-			if (/^\s*([a-z$0-9_.#:-^]+)(?:\s+as\s+([a-z$0-9_.#:-^]+))?/i.test(inherits[i].desc)) {
+			if (/^\s*([a-z$0-9_.#:-]+)(?:\s+as\s+([a-z$0-9_.#:-]+))?/i.test(inherits[i].desc)) {
 				var inAlias = RegExp.$1;
 				var inAs = RegExp.$2 || inAlias;
 

@@ -1,5 +1,5 @@
 /**
- * @version $Id: main.js 847 2010-07-03 08:03:44Z micmath $
+ * @version $Id: main.js 818 2009-11-08 14:51:41Z micmath $
  */
 
 function main() {
@@ -30,21 +30,6 @@ function main() {
 		}
 	}
 	
-	// hat tip: jeff from metrocat.org
-	if (JSDOC.opt.plugins) {
-	    //  Can't use IO.includeDir because it assumes relative paths
-		if (SYS.slash != JSDOC.opt.plugins.slice(-1))
-			JSDOC.opt.plugins += SYS.slash;
-
-	    var pluginFiles= IO.ls(JSDOC.opt.plugins);
-	    var len = pluginFiles.length;
-	    
-		for (var i = 0; i < len; ++i) {
-		    if ('.js'!==pluginFiles[i].slice(-3)) continue;
-		    load(pluginFiles[i]);
-        }
-	}
-	    
 	// be verbose
 	if (JSDOC.opt.v) LOG.verbose = true;
 	
@@ -58,13 +43,6 @@ function main() {
 		IO.include("test.js");
 	}
 	else {
-		// a common error, caused by -t mytemplate, instead of -t=mytemplate
-		if (typeof JSDOC.opt.t !== 'string') {
-			LOG.warn("No template given. Might as well read the usage notes.");
-			JSDOC.usage();
-			quit();
-		}
-		
 		// a template must be defined and must be a directory path
 		if (!JSDOC.opt.t && System.getProperty("jsdoc.template.dir")) {
 			JSDOC.opt.t = System.getProperty("jsdoc.template.dir");

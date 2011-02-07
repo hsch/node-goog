@@ -63,7 +63,7 @@ JSDOC.SymbolSet.prototype.resolveBorrows = function() {
 		
 		var borrows = symbol.inherits;
 		for (var i = 0; i < borrows.length; i++) {
-	
+		
 if (/#$/.test(borrows[i].alias)) {
 	LOG.warn("Attempted to borrow entire instance of "+borrows[i].alias+" but that feature is not yet implemented.");
 	return;

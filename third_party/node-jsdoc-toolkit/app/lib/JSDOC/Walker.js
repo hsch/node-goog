@@ -122,17 +122,12 @@ JSDOC.Walker.prototype.step = function() {
 	}
 	else if (!JSDOC.Parser.conf.ignoreCode) { // it's code
 		if (this.token.is("NAME")) { // it's the name of something
-
 			var symbol;
 			var name = this.token.data;
 			var doc = null; if (this.lastDoc) doc = this.lastDoc;
 			var params = [];
-			
-			// it's subscripted like foo[1]
-			if (this.ts.look(1).is("LEFT_BRACKET")) {
-				name += JSDOC.TokenStream.tokensToString(this.ts.balance("LEFT_BRACKET"));
-			}
-			
+		
+			// it's inside an anonymous object
 			if (this.ts.look(1).is("COLON") && this.ts.look(-1).is("LEFT_CURLY") && !(this.ts.look(-2).is("JSDOC") || this.namescope.last().comment.getTag("lends").length || this.ts.look(-2).is("ASSIGN") || this.ts.look(-2).is("COLON"))) {
 				name = "$anonymous";
 				name = this.namescope.last().alias+"-"+name

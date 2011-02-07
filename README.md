@@ -204,7 +204,8 @@ settings file.
 ## Acknoledgements
 My sincerest appreciation to Google for open sourcing this awesome toolset.
 Thanks to the jsdoc-toolkit guys (Michael Mathews + co) and to Wouter Bos for
-  his awesome jsdoc-toolkit template.
+his awesome jsdoc-toolkit template.  Thanks also to Aaron Wirtz for his
+[node-jsdoc-toolkit](https://github.com/p120ph37/node-jsdoc-toolkit) project.
 
 
 ## License
