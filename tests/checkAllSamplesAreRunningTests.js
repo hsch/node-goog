@@ -10,20 +10,20 @@ goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.array');
 
 var baseDir = '../';
-var testsDir = ['examples/simple/tests/'];
+var samplesDir = ['examples/'];
 
-var testFiles = getAllTestFiles();
+var sampleFiles = getAllTestFiles();
 
 setUp = function() {
   asyncTestCase.stepTimeout = 10000;
 };
 
 function getAllTestFiles() {
-  var testFiles = [];
-  goog.array.forEach(testsDir, function(d) {
-    readFilesInDir(__dirname + '/' + baseDir + d, testFiles);
+  var sampleFiles = [];
+  goog.array.forEach(samplesDir, function(d) {
+    readFilesInDir(__dirname + '/' + baseDir + d, sampleFiles);
   });
-  return testFiles;
+  return sampleFiles;
 }
 
 function readFilesInDir(d, list) {
@@ -31,36 +31,35 @@ function readFilesInDir(d, list) {
   goog.array.forEach(files, function(f) {
     if (fs_.statSync(d + f).isDirectory()) {
       return readFilesInDir(d + f + '/', list);
-    } else if (f.toLowerCase().indexOf('test') >= 0 && f.indexOf('.js') > 0) {
+    } else if (f.toLowerCase() === 'example.js') {
       list.push(d + f);
     }
   });
   return list;
 };
 
-testPassingTests = function() {
-  console.log('testPassingTests:\n\t' + testFiles.join('\n\t'));
-  runNextTest();
+testRunningExamples = function() {
+  console.log('testRunningExamples:\n\t' + sampleFiles.join('\n\t'));
+  runNextExample();
 };
 
-function runNextTest() {
-    if (testFiles.length === 0) { return console.log('All tests finnished.'); }
-    var test = testFiles.pop();
-    runTestImpl(test, function() {
-      runNextTest();
+function runNextExample() {
+    if (sampleFiles.length === 0) { return console.log('All tests finnished.'); }
+    var test = sampleFiles.pop();
+    runExampleImpl(test, function() {
+      runNextExample();
     });
 };
 
-function runTestImpl(file, callback) {
+function runExampleImpl(file, callback) {
   console.log('running test ' + file);
   asyncTestCase.waitForAsync();
   require('child_process').exec(file,
       function(err, stdout, stderr) {
     var shortFile = file.substring(file.lastIndexOf('/') + 1);
-    assertNull('There were errors trying to run test: ' + shortFile, err);
-
+    assertNull('There were errors trying to run exsample: ' + shortFile, err);
     assertTrue('Some tests in file[' + shortFile + '] failed.',
-      stdout.indexOf(', 0 failed') > 0);
+      stdout.indexOf('Bye!') > 0);
     asyncTestCase.continueTesting();
     callback();
   });

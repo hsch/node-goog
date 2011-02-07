@@ -50,6 +50,7 @@ node.goog.examples.animals.Example = function() {
    */
   this.animals_ = this.initRandomAnimals_();
   this.makeAnimalsTalk_();
+  console.log('Bye!');
 };
 
 
