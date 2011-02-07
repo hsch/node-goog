@@ -120,14 +120,14 @@ node.goog.utils.getPath = function(baseDir, file) {
 
 
 /**
- * @param {string} currentDir The directory of the current settings file or
+ * @param {string?} currentDir The directory of the current settings file or
  *    executing javascript file.
- * @param {string} file The settings (JSON) file to read.
+ * @param {string?} file The settings (JSON) file to read.
  * @return {node.goog.opts?} The options object represented in the
  *    specified file.
  */
 node.goog.utils.readArgsFromJSONFile = function(currentDir, file) {
-  if (!node.goog.utils.path_.existsSync(file)) return null;
+  if (!file || !node.goog.utils.path_.existsSync(file)) return null;
   var json = node.goog.utils.fs_.readFileSync(file,
       encoding = 'utf8');
   return node.goog.utils.getOptsObject_(currentDir, json);
@@ -205,7 +205,7 @@ node.goog.utils.parseCompilerArgsFromFile_ = function(file, code) {
 
 /**
  * @private
- * @param {string} currentDir The directory of the current settings file or
+ * @param {string?} currentDir The directory of the current settings file or
  *    executing javascript file.
  * @param {string} optsString JSON string representation of an options object.
  * @return {node.goog.opts} The options object.

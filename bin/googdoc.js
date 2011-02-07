@@ -44,7 +44,7 @@ node.goog.googdoc = function() {
    * @type {{init:function(Array.<string>)}}
    */
   this.jsdoc_toolkit_ =
-    require('../third_party/node-jsdoc-toolkit/app/noderun').jsdoctoolkit;
+      require('../third_party/node-jsdoc-toolkit/app/noderun').jsdoctoolkit;
 
   this.init_(args, process.argv[2]);
 };
