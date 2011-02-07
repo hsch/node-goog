@@ -1,7 +1,8 @@
 {
+  // nodeDir is only required for development
+  // nodeDir: '../../../lib/node',
   closureBasePath:'../third_party/closure-library/closure/goog/',
   jsdocToolkitDir: '../third_party/node-jsdoc-toolkit/',
-  nodeDir: '../../../lib/node',
   additionalCompileOptions: [
     '--debug=true',
     '--process_closure_primitives=true',

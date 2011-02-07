@@ -1,5 +1,8 @@
 TODO
 ====
+- Not working on cygwin (running through the linked npm commands is not
+  working, actually running the js files in bin manually works if we update
+  the paths to be all relative).
 - googtest stops at first failure it should run all tests and give summary of
   failures.
 - gootest failure stack traces are empty
