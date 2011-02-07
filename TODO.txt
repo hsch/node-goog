@@ -5,11 +5,8 @@ TODO
   the paths to be all relative).
 - googtest stops at first failure it should run all tests and give summary of
   failures.
-- gootest failure stack traces are empty
 - Display test results better, perhaps implement a console test runner that
 shows progress? and green / red style ui?
-- jsdoc uses jsrun.jar perhaps we can remove java alltogether and run it in
-  node?
 
 GOOG HACKS THAT NEED ATTENTION
 ==============================

@@ -135,7 +135,7 @@ or
 
 To run a single test just execute:
 
-    ./testSourceFile.js
+    ./testSourceFile.js <optionalTestName>
 
 To run all tests in a single directory run the following command:
 
