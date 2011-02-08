@@ -4,6 +4,5 @@ goog.addDependency('/home/ubuntu/Dev/projects/node-goog/examples/simple/deps.js'
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/examples/simple/docs/javascript/all.js', [], []);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/examples/simple/docs/javascript/html5.js', [], []);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/examples/simple/example.js', ['node.goog.examples.simple.Example'], ['goog.async.Delay', 'goog.structs.Trie', 'node.goog.external.Utils']);
-goog.addDependency('/home/ubuntu/Dev/projects/node-goog/examples/simple/example.min.js', [], []);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/examples/simple/tests/async/asyncTests.js', ['node.goog.examples.simple.tests.asyncTests'], ['goog.testing.AsyncTestCase', 'goog.testing.jsunit', 'node.goog.examples.simple.Example']);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/examples/simple/tests/syncTests.js', ['node.goog.examples.simple.tests.syncTests'], ['goog.testing.jsunit', 'node.goog.examples.simple.Example']);

@@ -115,9 +115,11 @@ node.goog.googtest.prototype.runNextTest_ = function() {
  */
 node.goog.googtest.prototype.displayResults_ = function() {
   console.log('\nRESULTS\n=======');
+  var first = true;
   goog.array.forEach(this.results_, function(tc) {
-    console.log(tc.getReport(false));
-  });
+    console.log((first ? '' : '\n') + ng_.colorizeReport(tc.getReport(false)));
+    first = false;
+  }, this);
 };
 
 
@@ -170,8 +172,9 @@ node.goog.googtest.asyncTest_;
  * @override
  */
 goog.testing.AsyncTestCase.createAndInstall = function() {
-  return node.goog.googtest.asyncTest_ =
+  node.goog.googtest.asyncTest_ =
       node.goog.googtest.originalCreateAndInstall();
+  return node.goog.googtest.asyncTest_;
 };
 
 
@@ -195,6 +198,8 @@ node.goog.googtest.prototype.runTest_ = function(testFile) {
   if (!async) {
     var test = new goog.testing.TestCase(shortName);
     test.autoDiscoverTests();
+  } else {
+    node.goog.googtest.asyncTest_['name_'] = shortName;
   }
   tr.initialize(async ? node.goog.googtest.asyncTest_ : test);
   tr.execute();
