@@ -181,10 +181,7 @@ node.goog.googcompile.prototype.onExit_ =
   if (this.path_.existsSync(this.fileToCompileIgnore_)) {
     this.fs_.renameSync(this.fileToCompileIgnore_, this.fileToCompile_);
   }
-  if (err) {
-    console.error(err.stack);
-    throw err;
-  }
+  if (err) { console.error(err.stack); }
 };
 
 

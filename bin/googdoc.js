@@ -46,9 +46,26 @@ node.goog.googdoc = function() {
   this.jsdoc_toolkit_ =
       require('../third_party/node-jsdoc-toolkit/app/noderun').jsdoctoolkit;
 
+  /**
+   * @private
+   * @type {Array.<string>}
+   */
+  this.clArgs;
+
+  this.init_(args);
+};
+
+/**
+ * @private
+ * @param {node.goog.opts} args The settings object.
+ */
+node.goog.googdoc.prototype.init_ = function(args) {
   // _dirToDoc is for testing so tests can set this global before calling
   // goog.require('node.goog.googdoc')
-  this.init_(args, global._dirToDoc || process.argv[2]);
+  this.createJSDocArgs_(args, global._dirToDoc || process.argv[2]);
+
+  // Run node-jsdoc-toolkit
+  this.runJSDocToolkit_();
 };
 
 /**
@@ -56,7 +73,7 @@ node.goog.googdoc = function() {
  * @param {node.goog.opts} args The settings object.
  * @param {string} entryPoint The file/directory to document.
  */
-node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
+node.goog.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var title = entryPointDirIdx > 0 ?
       entryPoint.substring(entryPointDirIdx + 1) : entryPoint;
@@ -64,7 +81,7 @@ node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
       entryPoint.substring(0, entryPointDirIdx) : '.';
   var jsDocToolkitDir = args.jsdocToolkitDir;
 
-  var clArgs = [
+  this.clArgs = [
     '-t=' +
         node.goog.utils.getPath(jsDocToolkitDir, 'templates/codeview'),
     '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
@@ -72,12 +89,18 @@ node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
         title + '"'
   ];
   if (args.additionalJSDocToolkitOptions) {
-    clArgs = goog.array.concat(clArgs, args.additionalJSDocToolkitOptions);
+    this.clArgs = goog.array.concat(this.clArgs,
+      args.additionalJSDocToolkitOptions);
   }
-  clArgs.push(entryPoint);
-
-  // Run node-jsdoc-toolkit
-  this.jsdoc_toolkit_.init(clArgs);
+  this.clArgs.push(entryPoint);
 };
 
-new node.goog.googdoc();
+/**
+ * @private
+ */
+node.goog.googdoc.prototype.runJSDocToolkit_ = function() {
+  this.jsdoc_toolkit_.init(this.clArgs);
+};
+
+/** @type {node.goog.googdoc} */
+exports.googDoc = new node.goog.googdoc();

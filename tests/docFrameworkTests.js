@@ -4,37 +4,22 @@ require('goog').goog.init();
 
 var fs_ = require('fs');
 var path_ = require('path');
+var googDoc;
 
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.array');
 goog.require('node.goog.utils');
 
-var testDir = getDirectory();
-
 var tearDownPage = clearDir;
-var setUp = function() {
-  var jsdto = node.goog.utils.opts.additionalJSDocToolkitOptions;
-  jsdto = goog.array.filter(jsdto, function(o) {
-    return o.indexOf('/tests') < 0 && o.indexOf('-d=') < 0;
-  });
-  jsdto.push('-d=' + node.goog.utils.getPath(testDir, 'docs'));
-  console.log('updated opts');
-  node.goog.utils.opts.additionalJSDocToolkitOptions = jsdto;
-  node.goog.utils.useCachedOpts = true;
-};
-
-function clearDir(callback) {
-  if (!path_.existsSync(testDir)) {
-    if (callback) callback();
-    return
-  }
-  //require('child_process').exec('rm -rf ' + testDir, callback);
-  if (callback) callback();
-};
 
 
-function testSimpleDocs() {
+function testSimpleDocs() { runImpl(getDirectory()); };
+function testDocsInExternalDirectory() { runImpl('/tmp/_docTests'); };
+
+function runImpl(dir) {
+  testDir = dir;
+  setJSDOCOpts();
   asyncTestCase.waitForAsync();
   clearDir(function() {
     writeOutFile('simplefile.js', [
@@ -42,16 +27,29 @@ function testSimpleDocs() {
       '/** @constructor\nThis is the constructor */',
       'var Constt = function() {}',
     ]);
-    runDoc(function(stdout, stderr) {
-      assertFilesInIndex(['simplefile.js']);
-      asyncTestCase.continueTesting();
-    });
+    runDoc();
+    assertFilesInIndex(['simplefile.js']);
+    clearDir(function() { asyncTestCase.continueTesting() }); // Clean up
   });
 };
 
+var setJSDOCOpts = function() {
+ var jsdto = node.goog.utils.opts.additionalJSDocToolkitOptions;
+  jsdto = goog.array.filter(jsdto, function(o) {
+    return o.indexOf('/tests') < 0 && o.indexOf('-d=') < 0;
+  });
+  jsdto.push('-d=' + node.goog.utils.getPath(testDir, 'docs'));
+  node.goog.utils.opts.additionalJSDocToolkitOptions = jsdto;
+  node.goog.utils.useCachedOpts = true;
+};
+
+
 function assertFilesInIndex(files) {
   var indexContents = fs_.readFileSync(
-    node.goog.utils.getPath(testDir, 'docs') + '/index.html');
+    node.goog.utils.getPath(testDir, 'docs') + '/index.html').toString();
+  goog.array.forEach(files, function(f) {
+    assertTrue(indexContents.indexOf('>' + f + '<') > 0);
+  });
 };
 
 function writeOutFile(file, contents) {
@@ -60,9 +58,13 @@ function writeOutFile(file, contents) {
   fs_.writeFileSync(path, contents.join('\n'), encoding = 'utf8');
 };
 
-function runDoc(callback) {
+function runDoc() {
   global._dirToDoc = testDir;
-  require('../bin/googdoc');
+  if (googDoc) {
+    googDoc.init_(node.goog.utils.readSettingObject());
+  } else {
+    googDoc = require('../bin/googdoc').googDoc;
+  }
 };
 
 function getDirectory() {
@@ -72,5 +74,13 @@ function getDirectory() {
   return d;
 };
 
+function clearDir(callback) {
+  if (!path_.existsSync(testDir)) {
+    if (callback) callback();
+    return
+  }
+  require('child_process').exec('rm -rf ' + testDir, callback);
+};
+
 var asyncTestCase = goog.testing.AsyncTestCase.createAndInstall();
-asyncTestCase.stepTimeout = 10000;
+asyncTestCase.stepTimeout = 2000;
