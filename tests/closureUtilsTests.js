@@ -86,7 +86,7 @@ testParseStackFrame = function() {
 };
 
 function validateStackLine(line, frame) {
-  var expVals = nodeGoog.parseStackFrameLine_(line);
+  var expVals = node.goog.googtest.prototype.parseStackFrameLine_(line);
 
   if (!expVals) {
     assertNull('Line: ' + line + ' exptected null frame', frame);

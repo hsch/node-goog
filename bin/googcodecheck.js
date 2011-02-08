@@ -38,6 +38,7 @@ node.goog.googcodecheck = function() {
   var that = this;
   var onexit = function(err) {
     that.fixBashInstructionsOnDir_.call(that, dir);
+    if (err) { console.error(err.stack); }
   };
   process.on('exit', onexit);
   process.on('SIGINT', onexit);
@@ -227,10 +228,17 @@ node.goog.googcodecheck.prototype.isIgnorableDir_ = function(dir, d) {
  */
 node.goog.googcodecheck.prototype.runProcess_ =
     function(command, args, callback) {
-  var cmd = require('child_process').exec(command + ' ' + args.join(' '),
+  command += ' ' + args.join(' ');
+
+  var cmd = require('child_process').exec(command,
       function(err, stdout, stderr) {
-        if (callback) callback();
-        if (err) throw err;
+        if (callback) { callback(); }
+        if (err) {
+          if (stderr) console.error(stderr);
+          if (stdout) console.log(stdout);
+          throw err;
+        }
+
         console.log('\nSuccessfully Executed ' + command +
             (stderr ? '\n\tstderr:' + stderr : '') +
             (stdout ? '\n\tstdout: ' + stdout : ''));

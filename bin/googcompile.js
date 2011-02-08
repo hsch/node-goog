@@ -182,7 +182,7 @@ node.goog.googcompile.prototype.onExit_ =
     this.fs_.renameSync(this.fileToCompileIgnore_, this.fileToCompile_);
   }
   if (err) {
-    console.error(err.message + '\n' + err.stack);
+    console.error(err.stack);
     throw err;
   }
 };

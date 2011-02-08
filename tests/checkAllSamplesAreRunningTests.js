@@ -5,14 +5,15 @@ require('goog').goog.init();
 var fs_ = require('fs');
 var path_ = require('path');
 
-goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
+goog.require('goog.testing.jsunit');
 goog.require('goog.array');
 
 var baseDir = '../';
 var samplesDir = ['examples/'];
 
 var sampleFiles = getAllTestFiles();
+
 
 setUp = function() {
   asyncTestCase.stepTimeout = 10000;
