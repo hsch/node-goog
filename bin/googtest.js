@@ -174,8 +174,7 @@ node.goog.googtest.prototype.mockRequiredGoogFrameworkStuff_ = function() {
     if (ex.message === 'AsyncTestCase.ControlBreakingException') {
       return;
     }
-    console.error(ex.message);
-    console.error(ex.stack);
+    if (ex.stack) console.error(ex.stack);
   });
 };
 
