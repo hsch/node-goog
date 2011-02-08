@@ -22,7 +22,11 @@
     '--summary_detail_level=3'
   ],
   additionalJSDocToolkitOptions: [
-    '-a',
+    '-a', '-v',
+    '-E=\.min\.js',
+    '-E=deps\.js',
+    '-E=/docs',
+    '-E=/tests',
     '-p',
     '-r=10',
     '-D="noGlobal:true"',

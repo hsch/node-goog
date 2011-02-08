@@ -168,7 +168,7 @@ node.goog.googtest.prototype.mockRequiredGoogFrameworkStuff_ = function() {
     that.results_.push(this.testCase);
     that.runNextTest_();
   };
-
+/*
   process.on('uncaughtException', function(ex) {
     // Ignore any exception that the async framework threw on purpose
     if (ex.message === 'AsyncTestCase.ControlBreakingException') {
@@ -176,6 +176,7 @@ node.goog.googtest.prototype.mockRequiredGoogFrameworkStuff_ = function() {
     }
     if (ex.stack) console.error(ex.stack);
   });
+  */
 };
 
 

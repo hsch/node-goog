@@ -46,9 +46,10 @@ node.goog.googdoc = function() {
   this.jsdoc_toolkit_ =
       require('../third_party/node-jsdoc-toolkit/app/noderun').jsdoctoolkit;
 
-  this.init_(args, process.argv[2]);
+  // _dirToDoc is for testing so tests can set this global before calling
+  // goog.require('node.goog.googdoc')
+  this.init_(args, global._dirToDoc || process.argv[2]);
 };
-
 
 /**
  * @private
@@ -67,7 +68,7 @@ node.goog.googdoc.prototype.init_ = function(args, entryPoint) {
     '-t=' +
         node.goog.utils.getPath(jsDocToolkitDir, 'templates/codeview'),
     '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
-    '-E=\.min\.js', '-E=deps\.js', '-E=/docs', '-E=/tests', '-D="title:' +
+    '-D="title:' +
         title + '"'
   ];
   if (args.additionalJSDocToolkitOptions) {

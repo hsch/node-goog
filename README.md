@@ -110,9 +110,13 @@ To set up a unit test simply create a test file like:
     goog.provide('node.goog.examples.simple.tests.syncTests');
 
     // Any testXXX function are auto-discovered and run
-    testFunction1 = function() {
+    var testFunction1 = function() {
       assertNotEquals(typeof(example_), 'undefined');
     };
+
+    function testFunction2() {
+      assertTrue(false);
+    }
 
 If the tests are not in the same directory as your code you will have to
 ensure that the deps.js file of the code you are testing
@@ -120,18 +124,6 @@ is declared in the closure.json file of the tests directory or passed in to the
 call to `goog.init();` like:
 
     require('goog').goog.init({additionalDeps:['/pathToDeps/deps.js']});
-
-Note: Due to the internals of global scoping in Node you must declare your
-tests like this:
-
-    testFunctionName = function() { ....
-
-You **cannot** declare tests like this:
-
-    var testName = function() { ...
-or
-
-    function testName() { ...
 
 To run a single test just execute:
 
