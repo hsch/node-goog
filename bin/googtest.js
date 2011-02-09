@@ -85,9 +85,15 @@ node.goog.googtest = function() {
   this.results_ = [];
 
   this.init_();
-  this.runNextTest_();
 };
 
+
+/**
+ * Startes the tests
+ */
+node.goog.googtest.prototype.run = function() {
+  this.runNextTest_();
+};
 
 /**
  * @private
@@ -104,9 +110,12 @@ node.goog.googtest.prototype.init_ = function() {
 node.goog.googtest.prototype.loadAdditionalSettingsAndTestingDeps_ =
     function() {
   var dir = process.argv[2];
-  if (!dir) {
-    throw new Error('No directory or file specified.  ' +
+  if (!dir || !this.path_.existsSync(dir)) {
+    throw new Error('No valid directory or file specified.  ' +
         'USAGE: googtest <dirname or filename>');
+  }
+  if (!this.fs_.statSync(dir).isDirectory()) {
+    dir = dir.substring(0, dir.lastIndexOf('/'));
   }
   global.__filename = global.__filename || __filename;
   global.__dirname = global.__dirname || __dirname;
@@ -390,12 +399,20 @@ goog.testing.AsyncTestCase.createAndInstall = function() {
  * @param {string} testFile The test file to run.
  */
 node.goog.googtest.prototype.runTest_ = function(testFile) {
-  var shortName = testFile.substring(testFile.lastIndexOf('/') + 1);
-  console.log('\nRunning Test: ' + shortName);
+  console.log('\nRunning Test: ' + testFile);
+  var code = this.fs_.readFileSync(testFile, 'utf-8');
+  this.runTestContents_(code, testFile);
+};
 
+/**
+ * @private
+ * @param {string} code The JS code to run
+ * @param {string} filename The filename of the test to run
+ */
+node.goog.googtest.prototype.runTestContents_ = function(code, filename) {
+  var shortName = filename.substring(filename.lastIndexOf('/') + 1);
   var script = process.binding('evals').Script;
-  var code = this.fs_.readFileSync(testFile, 'utf-8').
-      replace(/^#![^\n]+/, '');
+  code = code.replace(/^#![^\n]+/, '');
   var async = code.indexOf('AsyncTestCase') >= 0;
 
   this.clearGlobalScopeOfTests_();
@@ -412,7 +429,6 @@ node.goog.googtest.prototype.runTest_ = function(testFile) {
   tr.execute();
 };
 
-
 /**
  * @private
  */
@@ -425,4 +441,6 @@ node.goog.googtest.prototype.clearGlobalScopeOfTests_ = function() {
   }
 };
 
-new node.goog.googtest();
+
+node.goog.googtest.instance = new node.goog.googtest();
+node.goog.googtest.instance.run();

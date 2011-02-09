@@ -9,19 +9,24 @@ goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.array');
 
+goog.require('node.goog.tests');
+
 var baseDir = '../';
-var testsDir = ['examples/simple/tests/'];
+var testsDirs = ['examples/simple/tests/'];
 
-var testFiles = getAllTestFiles();
+var testFiles = getAllTestFiles_();
 
-setUp = function() {
-  asyncTestCase.stepTimeout = 10000;
-};
+setUpPage = function() { asyncTestCase.stepTimeout = 10000;};
 
-function getAllTestFiles() {
+function getAllTestFiles_() {
   var testFiles = [];
-  goog.array.forEach(testsDir, function(d) {
-    readFilesInDir(__dirname + '/' + baseDir + d, testFiles);
+
+  var pattern = /test[\w_\d]+\.js/gi;
+  goog.array.forEach(testsDirs, function(d) {
+    var files = node.goog.tests.readDirRecursiveSync(
+      node.goog.utils.getPath(
+        node.goog.utils.getPath(__dirname, baseDir), d), pattern);
+    testFiles = goog.array.concat(testFiles, files);
   });
   return testFiles;
 }
@@ -29,16 +34,18 @@ function getAllTestFiles() {
 function readFilesInDir(d, list) {
   var files = fs_.readdirSync(d);
   goog.array.forEach(files, function(f) {
-    if (fs_.statSync(d + f).isDirectory()) {
-      return readFilesInDir(d + f + '/', list);
+    var path = node.goog.utils.getPath(d, f);
+    if (fs_.statSync(path).isDirectory()) {
+      return readFilesInDir(path, list);
     } else if (f.toLowerCase().indexOf('test') >= 0 && f.indexOf('.js') > 0) {
-      list.push(d + f);
+      list.push(path);
     }
   });
   return list;
 };
 
 testPassingTests = function() {
+  assertEquals('Did not find all tests', 2, testFiles.length);
   console.log('testPassingTests:\n\t' + testFiles.join('\n\t'));
   runNextTest();
 };

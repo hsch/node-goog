@@ -55,7 +55,7 @@ node.goog.googcompile = function() {
    * @private
    * @type {boolean}
    */
-  this.quiet_ = false;
+  this.noCompileFile_ = false;
 
   /**
    * @private
@@ -97,7 +97,9 @@ node.goog.googcompile = function() {
   var options = cli.parse({
     'quiet': ['q', 'Quit compilation, do not produce .min.js and deps.js ' +
           'files.'],
-    'nodeps': ['n', 'Does not build the dependencies file.']
+    'nodeps': ['n', 'Does not build the dependencies file.'],
+    'depsonly': ['d', 'Does not save the compiled min.js file but DOES save ' +
+          'the deps.js file.']
   });
 
   var that = this;
@@ -117,8 +119,8 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
   process.on('SIGINT', onexit);
   process.on('uncaughtException', onexit);
 
-  this.quiet_ = options.quiet === true;
-  this.nodeps_ = options.nodeps === true;
+  this.noCompileFile_ = options.quiet === true || options.depsonly === true;
+  this.nodeps_ = options.quiet === true || options.nodeps === true;
   this.fileToCompile_ = cliArgs[cliArgs.length - 1];
 
   this.tmpFileName_ = this.fileToCompile_.replace('.js', '.tmp.js');
@@ -135,8 +137,7 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
  * @private
  */
 node.goog.googcompile.prototype.runCommands_ = function() {
-  var command = this.quiet_ || this.nodeps_ ?
-      this.runCompilation_ : this.runDependencies_;
+  var command = this.nodeps_ ? this.runCompilation_ : this.runDependencies_;
   command.call(this);
 };
 
@@ -237,7 +238,7 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
         stderr = stderr.replace(/\.tmp\.js/g, '.js');
         stdout = stdout.replace(/\.tmp\.js/g, '.js');
         if (stderr) console.error(stderr);
-        if (stdout && !that.quiet_) {
+        if (stdout && !that.noCompileFile_) {
           stdout = (bashInstructions || '') + stdout;
           that.fs_.writeFileSync(targetFile, stdout, encoding = 'utf8');
         }

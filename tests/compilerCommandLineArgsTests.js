@@ -44,6 +44,10 @@ testCompileWithQuietArg = function() {
   runImpl('googcompile -q ' + __filename, false, false);
 };
 
+testCompileWithDepsOnlyArg = function() {
+  runImpl('googcompile -d ' + __filename, false, false);
+};
+
 function runImpl(cmd, compiledMinFile, depsFile) {
   console.log(cmd);
 
