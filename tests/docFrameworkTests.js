@@ -4,6 +4,7 @@ require('goog').goog.init();
 
 var fs_ = require('fs');
 var path_ = require('path');
+var testDir;
 var googDoc;
 
 goog.require('goog.testing.jsunit');
@@ -69,13 +70,14 @@ function runDoc() {
 
 function getDirectory() {
   var file = process.argv[2];
-  var d = node.goog.utils.getPath(file.substring(0, file.lastIndexOf('/')),
-      '_docTests');;
+  var idx = file.lastIndexOf('/');
+  var dir = idx > 0 ? file.substring(0, idx) : file;
+  var d = node.goog.utils.getPath(dir, '_docTests');;
   return d;
 };
 
 function clearDir(callback) {
-  if (!path_.existsSync(testDir)) {
+  if (!testDir || !path_.existsSync(testDir)) {
     if (callback) callback();
     return
   }

@@ -23,7 +23,6 @@
  * @author guido@tapia.com.au (Guido Tapia)
  */
 
-
 /**
  * @private
  * @type {*}
@@ -32,10 +31,9 @@ var ng_ = require('goog').goog.init();
 
 goog.provide('node.goog.googtest');
 
-
-// goog/testing/testcase.js Reads this property as soon as it's 'required' so
-// set it now before the goog.requires below
 /**
+ * goog/testing/testcase.js Reads this property as soon as it's 'required' so
+ * set it now before the goog.requires below
  * @type {{userAgent:string}}
  */
 global.navigator = { userAgent: 'node.js' };
@@ -94,6 +92,7 @@ node.goog.googtest = function() {
 node.goog.googtest.prototype.run = function() {
   this.runNextTest_();
 };
+
 
 /**
  * @private
@@ -169,7 +168,10 @@ node.goog.googtest.prototype.mockRequiredGoogFrameworkStuff_ = function() {
 
   var tc = goog.testing.TestCase.prototype;
   tc['countNumFilesLoaded_'] = function() { return 1; };
-  tc.log = function(msg) {};
+  tc.log = function(msg) {
+    // This is needed to print out async failures
+    if (msg.stack) console.error(msg.stack);
+  };
 
   goog.testing.stacktrace.parseStackFrame_ = this.parseStackFrameLine_;
   goog.testing.stacktrace.framesToString_ = this.stackFramesToString_;
@@ -177,6 +179,7 @@ node.goog.googtest.prototype.mockRequiredGoogFrameworkStuff_ = function() {
     that.results_.push(this.testCase);
     that.runNextTest_();
   };
+  // This is required for other kinds of exceptions
   process.on('uncaughtException', function(ex) {
     // Ignore any exception that the async framework threw on purpose
     if (ex.message === 'AsyncTestCase.ControlBreakingException') {
@@ -399,15 +402,16 @@ goog.testing.AsyncTestCase.createAndInstall = function() {
  * @param {string} testFile The test file to run.
  */
 node.goog.googtest.prototype.runTest_ = function(testFile) {
-  console.log('\nRunning Test: ' + testFile);
+  console.error('\nRunning Test: ' + testFile + ' CWD: ' + process.cwd());
   var code = this.fs_.readFileSync(testFile, 'utf-8');
   this.runTestContents_(code, testFile);
 };
 
+
 /**
  * @private
- * @param {string} code The JS code to run
- * @param {string} filename The filename of the test to run
+ * @param {string} code The JS code to run.
+ * @param {string} filename The filename of the test to run.
  */
 node.goog.googtest.prototype.runTestContents_ = function(code, filename) {
   var shortName = filename.substring(filename.lastIndexOf('/') + 1);
@@ -429,6 +433,7 @@ node.goog.googtest.prototype.runTestContents_ = function(code, filename) {
   tr.execute();
 };
 
+
 /**
  * @private
  */
@@ -442,5 +447,11 @@ node.goog.googtest.prototype.clearGlobalScopeOfTests_ = function() {
 };
 
 
+/**
+ * In case tests want to get access to their googtest context
+ *
+ * @type {node.goog.googtest}
+ */
 node.goog.googtest.instance = new node.goog.googtest();
+
 node.goog.googtest.instance.run();

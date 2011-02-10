@@ -2,14 +2,14 @@
 
 require('goog').goog.init();
 
-var fs_ = require('fs');
-var path_ = require('path');
-
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.array');
 
 goog.require('node.goog.tests');
+
+var fs_ = require('fs');
+var path_ = require('path');
 
 var baseDir = '../';
 var testsDirs = ['examples/simple/tests/'];
@@ -46,12 +46,11 @@ function readFilesInDir(d, list) {
 
 testPassingTests = function() {
   assertEquals('Did not find all tests', 2, testFiles.length);
-  console.log('testPassingTests:\n\t' + testFiles.join('\n\t'));
   runNextTest();
 };
 
 function runNextTest() {
-    if (testFiles.length === 0) { return console.log('All tests finnished.'); }
+    if (testFiles.length === 0) { return; }
     var test = testFiles.pop();
     runTestImpl(test, function() {
       runNextTest();
@@ -59,7 +58,6 @@ function runNextTest() {
 };
 
 function runTestImpl(file, callback) {
-  console.log('running test ' + file);
   asyncTestCase.waitForAsync();
   require('child_process').exec(file,
       function(err, stdout, stderr) {

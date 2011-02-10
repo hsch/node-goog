@@ -40,12 +40,13 @@ function readFilesInDir(d, list) {
 };
 
 testRunningExamples = function() {
-  console.log('testRunningExamples:\n\t' + sampleFiles.join('\n\t'));
+  assertEquals('Expected 2 examples (simple and animals)',
+    2, sampleFiles.length);
   runNextExample();
 };
 
 function runNextExample() {
-    if (sampleFiles.length === 0) { return console.log('All tests finnished.'); }
+    if (sampleFiles.length === 0) { return; }
     var test = sampleFiles.pop();
     runExampleImpl(test, function() {
       runNextExample();
@@ -53,7 +54,6 @@ function runNextExample() {
 };
 
 function runExampleImpl(file, callback) {
-  console.log('running test ' + file);
   asyncTestCase.waitForAsync();
   require('child_process').exec(file,
       function(err, stdout, stderr) {

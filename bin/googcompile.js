@@ -234,7 +234,10 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
   var cmd = require('child_process').exec(exec + clArgs.join(' '),
       function(err, stdout, stderr) {
         if (callback) callback();
-        if (err) throw err;
+        if (err) {
+          console.error(err.stack);
+          throw err;
+        }
         stderr = stderr.replace(/\.tmp\.js/g, '.js');
         stdout = stdout.replace(/\.tmp\.js/g, '.js');
         if (stderr) console.error(stderr);

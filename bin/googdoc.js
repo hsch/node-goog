@@ -55,6 +55,7 @@ node.goog.googdoc = function() {
   this.init_(args);
 };
 
+
 /**
  * @private
  * @param {node.goog.opts} args The settings object.
@@ -62,11 +63,12 @@ node.goog.googdoc = function() {
 node.goog.googdoc.prototype.init_ = function(args) {
   // _dirToDoc is for testing so tests can set this global before calling
   // goog.require('node.goog.googdoc')
-  this.createJSDocArgs_(args, global._dirToDoc || process.argv[2]);
+  this.createJSDocArgs_(args, global['_dirToDoc'] || process.argv[2]);
 
   // Run node-jsdoc-toolkit
   this.runJSDocToolkit_();
 };
+
 
 /**
  * @private
@@ -90,10 +92,11 @@ node.goog.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
   ];
   if (args.additionalJSDocToolkitOptions) {
     this.clArgs = goog.array.concat(this.clArgs,
-      args.additionalJSDocToolkitOptions);
+        args.additionalJSDocToolkitOptions);
   }
   this.clArgs.push(entryPoint);
 };
+
 
 /**
  * @private
@@ -101,6 +104,7 @@ node.goog.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
 node.goog.googdoc.prototype.runJSDocToolkit_ = function() {
   this.jsdoc_toolkit_.init(this.clArgs);
 };
+
 
 /** @type {node.goog.googdoc} */
 exports.googDoc = new node.goog.googdoc();

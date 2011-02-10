@@ -51,17 +51,20 @@ node.goog.utils.fs_ = /** @type {extern_fs} */ (require('fs'));
  */
 node.goog.utils.path_ = /** @type {extern_path} */ (require('path'));
 
+
 /**
  * The last opts obejct read by readSettingObject
  * @type {node.goog.opts}
  */
 node.goog.utils.opts;
 
+
 /**
  * Wether to return the cached opts next time we call readSettingObject
  * @type {boolean}
  */
 node.goog.utils.useCachedOpts = false;
+
 
 /**
  * @param {string=} file The file to try to parse settings out of.  It is also
@@ -93,7 +96,7 @@ node.goog.utils.readSettingObject = function(file) {
   node.goog.utils.extendObject_(settings, currentDirSettings);
   node.goog.utils.extendObject_(settings, fileSettings);
   return node.goog.utils.opts =
-    node.goog.utils.validateOpsObject_(null, settings, false);
+      node.goog.utils.validateOpsObject_(null, settings, false);
 };
 
 

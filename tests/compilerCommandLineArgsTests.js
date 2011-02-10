@@ -7,8 +7,6 @@
  */
 var ng_ = require('goog').goog.init();
 
-goog.provide('node.goog.tests.compilerCommandLineArgsTests');
-
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
 
@@ -19,38 +17,31 @@ var path = require('path');
 var deps = node.goog.utils.getPath(__dirname, 'deps.js');
 var min = __filename.replace('.js', '.min.js');
 
-setUp = function() {
-  clearDepsAndCompiledFile();
-};
-
-tearDown = function() {
-  clearDepsAndCompiledFile();
-};
+function setUp() { clearDepsAndCompiledFile(); };
+function tearDownPage() { clearDepsAndCompiledFile(); };
 
 function clearDepsAndCompiledFile() {
   if (path.existsSync(deps)) { fs.unlinkSync(deps); }
   if (path.existsSync(min)) { fs.unlinkSync(min); }
 };
 
-testCompileWithNoArgs = function() {
-  runImpl('googcompile ' + __filename, true, true);
+function testCompileWithNoArgs() {
+  runCompilerWithCommandImpl('googcompile ' + __filename, true, true);
 };
 
-testCompileWithNoDepsArg = function() {
-  runImpl('googcompile -n ' + __filename, true, false);
+function testCompileWithNoDepsArg() {
+  runCompilerWithCommandImpl('googcompile -n ' + __filename, true, false);
 };
 
-testCompileWithQuietArg = function() {
-  runImpl('googcompile -q ' + __filename, false, false);
+function testCompileWithQuietArg() {
+  runCompilerWithCommandImpl('googcompile -q ' + __filename, false, false);
 };
 
-testCompileWithDepsOnlyArg = function() {
-  runImpl('googcompile -d ' + __filename, false, false);
+function testCompileWithDepsOnlyArg() {
+  runCompilerWithCommandImpl('googcompile -d ' + __filename, false, false);
 };
 
-function runImpl(cmd, compiledMinFile, depsFile) {
-  console.log(cmd);
-
+function runCompilerWithCommandImpl(cmd, compiledMinFile, depsFile) {
   asyncTestCase.stepTimeout = 10000;
   asyncTestCase.waitForAsync();
 

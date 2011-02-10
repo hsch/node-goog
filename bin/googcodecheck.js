@@ -236,6 +236,7 @@ node.goog.googcodecheck.prototype.runProcess_ =
         if (err) {
           if (stderr) console.error(stderr);
           if (stdout) console.log(stdout);
+          console.error(err.stack);
           throw err;
         }
 

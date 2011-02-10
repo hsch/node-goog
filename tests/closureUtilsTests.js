@@ -100,7 +100,3 @@ function validateStackLine(line, frame) {
   assertEquals('Line: ' + line + ' args', undefined, frame.args_);
   assertEquals('Line: ' + line + ' path', expVals[2], frame.path_);
 }
-
-te__stFailure = function() {
-  assertEquals(true, false);
-};
