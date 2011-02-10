@@ -6,6 +6,7 @@ goog.require('goog.array');
 
 node.goog.tests.fs_ = require('fs');
 node.goog.tests.path_ = require('path');
+node.goog.tests.child_process_ = require('child_process');
 
 /**
  * @param {string} dir The directory to read all files for
@@ -39,4 +40,74 @@ node.goog.tests.readDirRecursiveSyncImpl_ = function(dir, allFiles) {
       allFiles.push(path);
     }
   });
+};
+
+/**
+ * Removes a specified directory and all its contents.
+ */
+node.goog.tests.rmRfDir = function (dir, callback) {
+  node.goog.tests.child_process_.exec('rm -rf ' + dir, callback);
+};
+
+/**
+ * @param {Array.<string>} execCommands Commands to execute
+ * @param {function(string, Exception, string, string):undefined} callback
+ *    The callback to call when the exec command completes this command. The
+ *    Arguments are: command, Error, stderr and stdout
+ * @param {function():undefined} oncomplete Called when all commands are
+ *    finnished
+ * @param {number=} max The maximum number of separate processes to create
+ */
+node.goog.tests.paralleliseExecs =
+    function(execCommands, callback, oncomplete, max) {
+  if (!max || max <= 0 || max >= execCommands.length) {
+    var remaining = execCommands.length;
+    goog.array.forEach(execCommands, function(c) {
+      node.goog.tests.child_process_.exec(c, function(err, stderr, stdout) {
+        if (callback) callback(c, err, stderr, stdout);
+        if (--remaining === 0) oncomplete();
+      });
+    });
+  } else {
+    var commands = goog.array.clone(execCommands);
+    node.goog.tests.runNextCommandImpl_(commands, callback, oncomplete, max);
+  }
+};
+
+/**
+ * @private
+ * @type {number}
+ */
+node.goog.tests.runningCommands_ = 0;
+
+/**
+ * @private
+ * @param {Array.<string>} execCommands Commands to execute
+ * @param {function(string, Exception, string, string):undefined} callback
+ *    The callback to call when the exec command completes this command. The
+ *    Arguments are: command, Error, stderr and stdout
+ * @param {function():undefined} oncomplete Called when all commands are
+ *    finnished
+ * @param {number=} max The maximum number of separate processes to create
+ */
+node.goog.tests.runNextCommandImpl_ =
+    function(execCommands, callback, oncomplete, max) {
+  if (execCommands.length <= 0 || node.goog.tests.runningCommands_ >= max) return;
+
+  node.goog.tests.runningCommands_++;
+  var command = execCommands.pop();
+  node.goog.tests.child_process_.exec(command, function(err, stderr, stdout) {
+    node.goog.tests.runningCommands_--;
+    node.goog.tests.runNextCommandImpl_(
+        execCommands, callback, oncomplete, max);
+    if (callback) callback(command, err, stderr, stdout);
+    if (node.goog.tests.runningCommands_ === 0 && execCommands.length === 0) {
+      return oncomplete();
+    }
+  });
+
+  if (node.goog.tests.runningCommands_ < max - 1) {
+    node.goog.tests.runNextCommandImpl_(
+        execCommands, callback, oncomplete, max);
+  }
 };
