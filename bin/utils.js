@@ -77,14 +77,14 @@ node.goog.utils.readSettingObject = function(fileOrOpts) {
     return node.goog.utils.opts;
   }
 
-  var file = typeof(fileOrOpts) === 'string' ? fileOrOpts : null;
+  var file = typeof(fileOrOpts) === 'string' ? fileOrOpts : undefined;
   var contents = null, fileSettings = null;
   if (file) {
     contents = node.goog.utils.fs_.readFileSync(file, encoding = 'utf8');
     fileSettings = node.goog.utils.parseCompilerArgsFromFile_(file, contents);
   } else if (fileOrOpts) {
     fileSettings = node.goog.utils.validateOpsObject_(
-        __dirname, fileOrOpts, true);
+        __dirname, /** @type {node.goog.opts} */ (fileOrOpts), true);
   }
 
   var globalSettings =
@@ -231,7 +231,7 @@ node.goog.utils.parseCompilerArgsFromFile_ = function(file, code) {
   var dirIdx = file.lastIndexOf('/');
   var dir = dirIdx < 0 ? '.' : file.substring(0, dirIdx);
   return node.goog.utils.validateOpsObject_(
-      node.goog.utils.getPath(process.cwd(), dir), opts, true);
+      node.goog.utils.getPath(process.cwd(), dir), opts || {}, true);
 };
 
 

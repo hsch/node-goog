@@ -44,16 +44,8 @@ global.navigator = { userAgent: 'node.js' };
 goog.require('goog.array');
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
-goog.require('goog.testing.TestRunner');
-goog.require('goog.testing.jsunit');
-
+goog.require('node.goog.NodeTestsRunner');
 goog.require('node.goog.utils');
-
-// TODO: This does not work as node.goog.tests uses node.require.
-// The require, deps mechanism in goog.js is a mess.  bin/utils.js is also
-// a mess
-// goog.require('node.goog.tests');
-
 
 
 /**
@@ -63,6 +55,7 @@ goog.require('node.goog.utils');
  * @constructor
  */
 node.goog.googtest = function() {
+
   /**
    * @private
    * @type {extern_fs}
@@ -76,31 +69,21 @@ node.goog.googtest = function() {
   this.path_ = /** @type {extern_path} */ (require('path'));
 
   /**
-   * All test files found in the specified directory.
-   *
    * @private
-   * @type {Array.<string>}
+   * @type {node.goog.NodeTestsRunner}
    */
-  this.tests_ = this.getAllTestsInCurrentDirectory_();
-
-  /**
-   * These are the messages from the child nodeTestRunner that are the results
-   * of the tests, it ignores everything before results to allow the tests to
-   * do their own console logging.
-   * @private
-   * @type {Array.<string>}
-   */
-  this.results_ = [];
-
-  this.runNextTest_();
+  this.tr_ = new node.goog.NodeTestsRunner(this.getAllTestFiles_());
+  process.on('uncaughtException', goog.bind(this.onException_, this));
+  this.tr_.execute();
 };
+
 
 
 /**
  * @private
  * @return {Array.<string>} All tests files in this directory (recursive).
  */
-node.goog.googtest.prototype.getAllTestsInCurrentDirectory_ = function() {
+node.goog.googtest.prototype.getAllTestFiles_ = function() {
   var dirOrFile = process.argv[2];
   if (!this.fs_.statSync(dirOrFile).isDirectory()) { return [dirOrFile]; }
 
@@ -111,12 +94,13 @@ node.goog.googtest.prototype.getAllTestsInCurrentDirectory_ = function() {
 /**
  * @private
  */
-node.goog.googtest.prototype.readDirRecursiveSyncImpl_ = function(dir, allFiles) {
+node.goog.googtest.prototype.readDirRecursiveSyncImpl_ =
+    function(dir, allFiles) {
   var files = this.fs_.readdirSync(dir);
   goog.array.forEach(files, function(f) {
     var path = node.goog.utils.getPath(dir, f);
     if (this.fs_.statSync(path).isDirectory()) {
-      return node.goog.tests.readDirRecursiveSyncImpl_(path, allFiles);
+      return this.readDirRecursiveSyncImpl_(path, allFiles);
     } else if (f.toLowerCase().indexOf('test') >= 0) {
       allFiles.push(path);
     }
@@ -124,64 +108,10 @@ node.goog.googtest.prototype.readDirRecursiveSyncImpl_ = function(dir, allFiles)
   return allFiles;
 };
 
-
-/**
- * Runs the next test ibn the tests queue.
- * @param {number} errcode The error code returned by nodeTestsRunner below.
- * @private
- */
-node.goog.googtest.prototype.runNextTest_ = function(errcode) {
-  if (errcode) { console.error('nodeTestsRunner returned errorcode: ' +
-      errcode + ' on last invocation.'); }
-  if (this.tests_.length === 0) { this.displayFinalResults_(); return; }
-  var file = this.tests_.pop();
-  this.runTest_(file);
-};
-
-
 /**
  * @private
- * @param {string} testFile The test file to run.
+ * @param {Error} err The exception thrown by tests
  */
-node.goog.googtest.prototype.runTest_ = function(testFile) {
-  console.error('\nRunning Test: ' + testFile);
-  var test = require('child_process').
-      spawn('nodeTestRunner', [testFile]);
-
-  var inResults = false;
-  var that = this;
-  var printMsg = function(data) {
-    var lines = data.toString().split('\n');
-    goog.array.forEach(lines, function(l) {
-      if (l.charAt(l.length - 1) === '\n') { l = l.substring(0, l.length - 1); }
-
-      if (!inResults &&
-          (l.indexOf('[PASSED]') >= 0 || l.indexOf('[FAILED]') >= 0)) {
-        inResults = true;
-      }
-
-      if (inResults) { that.results_.push(l); }
-      else { console.error(l); }
-      if (inResults && l.indexOf(' files loaded.') >= 0) { inResults = false; }
-    });
-  };
-  test.stdout.on('data', printMsg);
-  test.stderr.on('data', printMsg);
-
-  test.on('uncaughtException', function(err) {
-    console.error(err.stack);
-  });
-  test.on('exit', goog.bind(this.runNextTest_, this));
+node.goog.googtest.prototype.onException_ = function(err) {
+  console.error(err.stack);
 };
-
-
-/**
- * @private
- */
-node.goog.googtest.prototype.displayFinalResults_ = function() {
-  console.log('RESULTS\n=======');
-  console.log(this.results_.join('\n'));
-};
-
-new node.goog.googtest();
-

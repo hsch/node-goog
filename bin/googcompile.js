@@ -150,7 +150,8 @@ node.goog.googcompile.prototype.runDependencies_ = function() {
   var fileDir = this.compiledFileName_.substring(0,
       this.compiledFileName_.lastIndexOf('/') + 1);
   var depsFile = node.goog.utils.getPath(fileDir, 'deps.js');
-  this.runCompilerOrDeps_(false, depsFile, '', function() {
+  this.runCompilerOrDeps_(false, depsFile, '', function(err) {
+    if (err) throw err;
     that.runCompilation_();
   });
 };
@@ -233,15 +234,11 @@ node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
   var that = this;
   var cmd = require('child_process').exec(exec + clArgs.join(' '),
       function(err, stdout, stderr) {
-        if (callback) callback();
-        if (err) {
-          console.error(err.stack);
-          throw err;
-        }
-        stderr = stderr.replace(/\.tmp\.js/g, '.js');
-        stdout = stdout.replace(/\.tmp\.js/g, '.js');
-        if (stderr) console.error(stderr);
+        if (callback) callback(err);
+        if (err) { console.error(err.stack.replace(/\.tmp\.js/g, '.js')); }
+        if (stderr) { console.error(stderr.replace(/\.tmp\.js/g, '.js')); }
         if (stdout && !that.noCompileFile_) {
+          stdout = stdout.replace(/\.tmp\.js/g, '.js');
           stdout = (bashInstructions || '') + stdout;
           that.fs_.writeFileSync(targetFile, stdout, encoding = 'utf8');
         }
