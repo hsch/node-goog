@@ -51,7 +51,7 @@ node.goog.tests.rmRfDir = function (dir, callback) {
 
 /**
  * @param {Array.<string>} execCommands Commands to execute
- * @param {function(string, Exception, string, string):undefined} callback
+ * @param {function(string, Error, string, string):undefined} callback
  *    The callback to call when the exec command completes this command. The
  *    Arguments are: command, Error, stderr and stdout
  * @param {function():undefined} oncomplete Called when all commands are
@@ -83,7 +83,7 @@ node.goog.tests.runningCommands_ = 0;
 /**
  * @private
  * @param {Array.<string>} execCommands Commands to execute
- * @param {function(string, Exception, string, string):undefined} callback
+ * @param {function(string, Error, string, string):undefined} callback
  *    The callback to call when the exec command completes this command. The
  *    Arguments are: command, Error, stderr and stdout
  * @param {function():undefined} oncomplete Called when all commands are

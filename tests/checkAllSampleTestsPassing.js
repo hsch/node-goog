@@ -44,7 +44,7 @@ function readFilesInDir(d, list) {
   return list;
 };
 
-testPassingTests = function() {
+function testPassingTests() {
   assertEquals('Did not find all tests', 2, testFiles.length);
   runNextTest();
 };
@@ -61,11 +61,14 @@ function runTestImpl(file, callback) {
   asyncTestCase.waitForAsync();
   require('child_process').exec(file,
       function(err, stdout, stderr) {
+    if (err) console.error(err.stack);
+    if (stderr) console.error(stderr);
+
     var shortFile = file.substring(file.lastIndexOf('/') + 1);
     assertNull('There were errors trying to run test: ' + shortFile, err);
 
     assertTrue('Some tests in file[' + shortFile + '] failed.',
-      stdout.indexOf(', 0 failed') > 0);
+      stderr.indexOf(', 0 failed') > 0);
     asyncTestCase.continueTesting();
     callback();
   });

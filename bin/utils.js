@@ -67,20 +67,24 @@ node.goog.utils.useCachedOpts = false;
 
 
 /**
- * @param {string=} file The file to try to parse settings out of.  It is also
- *    used to determine which directory to look for the closure.json settings
- *    file.
+ * @param {string|node.goog.opts=} fileOrOpts The file to try to parse settings
+ *    out of.  It is also used to determine which directory to look for the
+ *    closure.json settings file.
  * @return {node.goog.opts?} The correct options object in the current context.
  */
-node.goog.utils.readSettingObject = function(file) {
+node.goog.utils.readSettingObject = function(fileOrOpts) {
   if (node.goog.utils.useCachedOpts) {
     return node.goog.utils.opts;
   }
 
+  var file = typeof(fileOrOpts) === 'string' ? fileOrOpts : null;
   var contents = null, fileSettings = null;
   if (file) {
     contents = node.goog.utils.fs_.readFileSync(file, encoding = 'utf8');
     fileSettings = node.goog.utils.parseCompilerArgsFromFile_(file, contents);
+  } else if (fileOrOpts) {
+    fileSettings = node.goog.utils.validateOpsObject_(
+        __dirname, fileOrOpts, true);
   }
 
   var globalSettings =
@@ -95,8 +99,10 @@ node.goog.utils.readSettingObject = function(file) {
   node.goog.utils.extendObject_(settings, codeDirSettings);
   node.goog.utils.extendObject_(settings, currentDirSettings);
   node.goog.utils.extendObject_(settings, fileSettings);
-  return node.goog.utils.opts =
+  node.goog.utils.opts =
       node.goog.utils.validateOpsObject_(null, settings, false);
+
+  return node.goog.utils.opts;
 };
 
 
@@ -112,6 +118,7 @@ node.goog.utils.readArgsFromSourceDir_ = function(file) {
     if (file.indexOf('googcompile') >= 0 ||
         file.indexOf('googdoc') >= 0 ||
         file.indexOf('googtest') >= 0 ||
+        file.indexOf('nodeTestRunner') >= 0 ||
         file.indexOf('googcodecheck') >= 0) {
       file = process.argv[2];
     }
@@ -205,20 +212,26 @@ node.goog.utils.arrayContains_ = function(arr, o) {
  *    specified javascript code.
  */
 node.goog.utils.parseCompilerArgsFromFile_ = function(file, code) {
-  var regex =
-      /var\s+([\w\d^=\s]+)\s*=\s*require\(\s*['"]goog['"]\s*\)\s*\.\s*goog/gm;
-  var m = regex.exec(code);
-  var err = 'Could not find a call to goog.init in the specified file.';
-  if (!m) return null;
-  var varName = m[1].trim();
-  var regespStr = varName + '\\s*\\.\\s*init\\s*\\(\\s*({[^}]*})';
-  regex = new RegExp(regespStr, 'gm');
-  m = regex.exec(code);
-  if (!m) return null;
-  var optsString = m[1];
-  var dir = file.substring(0, file.lastIndexOf('/'));
-
-  return node.goog.utils.getOptsObject_(dir, optsString);
+  var opts;
+  var ctx = {
+    require: function(moduleName) {
+      return {
+        goog: {
+          init: function(innerOpts) {
+            opts = innerOpts;
+            throw new Error('intentional exit');
+          }
+        }
+      };
+    }
+  };
+  code = code.replace(/^#![^\n]+/, '\n');
+  try { process.binding('evals').Script.runInNewContext(code, ctx, file); }
+  catch (e) {}
+  var dirIdx = file.lastIndexOf('/');
+  var dir = dirIdx < 0 ? '.' : file.substring(0, dirIdx);
+  return node.goog.utils.validateOpsObject_(
+      node.goog.utils.getPath(process.cwd(), dir), opts, true);
 };
 
 

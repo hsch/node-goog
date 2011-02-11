@@ -4,10 +4,13 @@ TODO
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
 
+GOOGTEST
+=========
 - googtest needs more work its quite buggy
-- googtest should run (exec) tests in parallel?
-- googtests are stepping on each others toes.  They can overwrite their
-  functions?!?!?!
+  - Running sungle tests does not log anything to stderr or stdout
+  - googtest should run (exec) tests in parallel?
+  - googtests are stepping on each others toes.  They can overwrite their
+    functions?!?!?!
 
 GOOG HACKS THAT NEED ATTENTION
 ==============================
