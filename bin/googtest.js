@@ -143,7 +143,10 @@ node.goog.googtest.prototype.readDirRecursiveSyncImpl_ =
  * @param {Error} err The exception thrown by tests.
  */
 node.goog.googtest.prototype.onException_ = function(err) {
-  console.error(err.stack);
+  if (!err) return;
+  if (err.stack) console.error(err.stack);
+  else if (err.message) console.error(err.message);
+  else if (typeof(err) === 'string') console.error(err);
 };
 
 new node.goog.googtest();

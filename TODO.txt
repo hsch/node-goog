@@ -10,8 +10,7 @@ TODO
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
 
-- When running googtest tests/compilerCommandLineArgsTests.js we get 2
-  'undefined's printed to console
+- Failing async tests (control breaking exceptions are stopping all tests)
 
 GOOGTEST
 =========
