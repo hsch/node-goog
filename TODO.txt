@@ -13,6 +13,9 @@ TODO
 - When running googtest tests/compilerCommandLineArgsTests.js we get 2
   'undefined's printed to console
 
+- Is there any use in generating the .min.js files by default? Perhaps add
+  a command line arg for this
+
 GOOGTEST
 =========
 - googtest needs more work its quite buggy

@@ -174,7 +174,6 @@ node.goog.googcompile.prototype.runCompilation_ = function() {
   this.fs_.
       renameSync(this.fileToCompile_, this.fileToCompileIgnore_);
   var clArgs = this.getCompilerClArgs_();
-  console.dir(clArgs);
   this.runCommand_(clArgs, 'closurebuilder.py',
                    this.noCompileFile_ ? '' : this.compiledFileName_, bashInst);
 };
