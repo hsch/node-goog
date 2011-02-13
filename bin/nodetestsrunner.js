@@ -83,18 +83,20 @@ node.goog.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
  * Spits the results to the console
  */
 node.goog.NodeTestsRunner.prototype.displayResults_ = function() {
-  console.log('RESULTS\n=======');
-  goog.array.forEach(this.completedTestCases_,
+  console.log('\x1B[0;34m\n=======\nRESULTS\n=======');
+  var results = goog.array.map(this.completedTestCases_,
     node.goog.NodeTestsRunner.renderTestCase_, this);
+  console.log(results.join('\n\n'));
 };
 
 /**
  * @private
  * Renders the test case to the console.
  * @param {goog.testing.TestCase} tc The test case to render results.
+ * @return {string} A string representation of this test case
  */
 node.goog.NodeTestsRunner.renderTestCase_ = function(tc) {
-  console.log(node.goog.NodeTestsRunner.colorizeReport(tc.getReport(false)));
+  return node.goog.NodeTestsRunner.colorizeReport(tc.getReport(false));
 };
 
 /**

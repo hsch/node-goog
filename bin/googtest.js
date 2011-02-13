@@ -86,8 +86,7 @@ node.goog.googtest.prototype.loadAdditionalTestingDependencies_ = function() {
   var dirOrFile = process.argv[2];
   var dir = this.fs_.statSync(dirOrFile).isDirectory() ? dirOrFile : null;
   if (!dir) { dir = dirOrFile.substring(0, dirOrFile.lastIndexOf('/'));  }
-  ng_.parseCompilerArgsFromFile(
-    ng_.getPath(dir, 'deps.js'));
+  var opts = ng_.loadAditionalDependenciesInSettingsFile(ng_.getPath(dir, 'closure.json'));
 };
 
 /**

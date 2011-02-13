@@ -93,7 +93,7 @@ node.goog.googcompile = function() {
 
   var cli = require('cli');
   var options = cli.parse({
-    'quiet': ['q', 'Quit compilation, do not produce .min.js and deps.js ' +
+    'quiet': ['q', 'Quit compilation, does not produce .min.js and deps.js ' +
           'files.'],
     'compileonly': ['c', 'Compiles only, Does not build the '+
           'dependencies file.'],
@@ -131,6 +131,9 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
   this.compiledFileName_ = this.tmpFileName_.replace('.tmp.js', '.min.js');
   this.fileToCompileIgnore_ = this.fileToCompile_.replace('.js', '.ignorejs');
 
+  var additionalSettingsFile = ng_.getPath(
+    ng_.getFileDirectory(this.fileToCompile_), 'closure.json');
+  ng_.loadAditionalDependenciesInSettingsFile(additionalSettingsFile);
   this.runCommands_();
 };
 
@@ -151,8 +154,9 @@ node.goog.googcompile.prototype.runDependencies_ = function() {
   var that = this;
   var fileDir = this.compiledFileName_.substring(0,
       this.compiledFileName_.lastIndexOf('/') + 1);
-  var depsFile = ng_.getPath(fileDir, 'deps.js');
-  this.runCompilerOrDeps_(false, depsFile, '', function(err) {
+  var depsFile = that.compileonly_ ? '' :ng_.getPath(fileDir, 'deps.js');
+  this.runCommand_(this.getDepsClArgs_(), 'depswriter.py',
+      depsFile, '', function(err) {
     if (err) throw err;
     that.runCompilation_();
   });
@@ -169,7 +173,10 @@ node.goog.googcompile.prototype.runCompilation_ = function() {
   var bashInst = this.createTmpFile_(fileContents);
   this.fs_.
       renameSync(this.fileToCompile_, this.fileToCompileIgnore_);
-  this.runCompilerOrDeps_(true, this.compiledFileName_, bashInst);
+  var clArgs = this.getCompilerClArgs_();
+  console.dir(clArgs);
+  this.runCommand_(clArgs, 'closurebuilder.py',
+                   this.noCompileFile_ ? '' : this.compiledFileName_, bashInst);
 };
 
 
@@ -217,30 +224,30 @@ node.goog.googcompile.prototype.createTmpFile_ =
 
 /**
  * @private
- * @param {boolean} compiler Wether to run the compiler, other wise will
- *    generate a deps.js file (name specified in compiledFileName).
+ * @param {string} command The command to run
+ * @param {Array.<string>} clArgs Any additional arguments to the command
  * @param {string} targetFile The name of the file to produce.
-  * @param {string} bashInstructions Any bash shell instructions that are
+ * @param {string} bashInstructions Any bash shell instructions that are
  *    required in the compiled file.
  * @param {function(Error=):undefined=} callback The callback to call on exit.
  */
-node.goog.googcompile.prototype.runCompilerOrDeps_ = function(compiler,
+node.goog.googcompile.prototype.runCommand_ = function(clArgs, command,
     targetFile, bashInstructions, callback) {
-  var clArgs = compiler ?
-      this.getCompilerClArgs_() :
-      this.getDepsClArgs_();
 
   var exec = ng_.getPath(ng_.args.closureBasePath,
-      'closure/bin/build/' +
-      (compiler ? 'closurebuilder.py ' : 'depswriter.py '));
+                         'closure/bin/build/' + command);
+  exec += ' ' + clArgs.join(' ');
   var that = this;
-  var cmd = require('child_process').exec(exec + clArgs.join(' '),
+  var cmd = require('child_process').exec(exec,
       function(err, stdout, stderr) {
+        if (err) {
+          console.error('\nError in command:\n' + exec);
+          err.stack = err.stack.replace(/\.tmp\.js/g, '.js');
+        }
         if (callback) callback(err);
-        if (err) { console.error(err.stack.replace(/\.tmp\.js/g, '.js')); }
+
         if (stderr) { console.error(stderr.replace(/\.tmp\.js/g, '.js')); }
-        var writeOutput = compiler ? !that.noCompileFile_ : !that.compileonly_;
-        if (stdout && writeOutput) {
+        if (stdout && targetFile) {
           stdout = stdout.replace(/\.tmp\.js/g, '.js');
           stdout = (bashInstructions || '') + stdout;
           that.fs_.writeFileSync(targetFile, stdout, encoding = 'utf8');
@@ -258,19 +265,15 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
     function() {
   var path = this.getDirectory_(this.tmpFileName_);
   var addedPaths = {};
-  this.isPathInMap_(addedPaths, path);
-  var clArgs = [
-    '--root=' + ng_.args.closureBasePath,
-    '--root=' + path
-  ];
+  var clArgs = [];
+  this.addRoot_(addedPaths, clArgs, ng_.args.closureBasePath, false);
+  this.addRoot_(addedPaths, clArgs, path, false);
   var libPath = ng_.getPath(__dirname, '../lib');
   var binPath = ng_.getPath(__dirname, '../bin');
-  if (!this.isPathInMap_(addedPaths, libPath)) {
-    clArgs.push('--root=' + libPath);
-  }
-  if (!this.isPathInMap_(addedPaths, binPath)) {
-    clArgs.push('--root=' + binPath);
-  }
+  this.addRoot_(addedPaths, clArgs, libPath, false);
+  this.addRoot_(addedPaths, clArgs, binPath, false);
+  this.addAdditionalRoots_(addedPaths, clArgs, false);
+
   clArgs.push('--input=' + this.tmpFileName_);
   clArgs.push('--output_mode=compiled');
   clArgs.push('--compiler_jar=' + (ng_.args.compiler_jar ||
@@ -296,22 +299,49 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
     });
   }
 
+
+  return clArgs;
+};
+
+/**
+ * @private
+ * @param {Object.<number>} addedPaths A cache of all loaded files, for
+ *    duplicate checking
+ * @param {Array.<string>} clArgs The array to add any additional deps to
+ * @param {boolean}  wPrefix Wether to use root_with_prefix
+ */
+node.goog.googcompile.prototype.addAdditionalRoots_ =
+    function(addedPaths, clArgs, wPrefix) {
+
   if (ng_.args.additionalCompileRoots) {
     ng_.args.additionalCompileRoots.forEach(function(root) {
-      if (!this.isPathInMap_(addedPaths, root)) {
-        clArgs.push('--root=' + root);
-      }
+      this.addRoot_(addedPaths, clArgs, root, wPrefix);
     });
   } else if (ng_.args.additionalDeps) {
     // Only try to guess roots if additionalCompileRoots not specified
     ng_.args.additionalDeps.forEach(function(dep) {
       var path = dep.substring(0, dep.lastIndexOf('/'));
-      if (!this.isPathInMap_(addedPaths, path)) {
-        clArgs.push('--root=' + path);
-      }
+      this.addRoot_(addedPaths, clArgs, path, wPrefix);
     }, this);
   }
-  return clArgs;
+};
+
+/**
+ * @private
+ * @param {Object.<number>} addedPaths A cache of all loaded files, for
+ *    duplicate checking
+ * @param {Array.<string>} clArgs The array to add any additional deps to
+ * @param {boolean}  wPrefix Wether to use root_with_prefix
+ */
+node.goog.googcompile.prototype.addRoot_ =
+    function(addedPaths, clArgs, path, wPrefix) {
+  var realpath = this.isPathInMap_(addedPaths, path);
+  if (!goog.isDefAndNotNull(realpath)) { return; }
+
+  var root = wPrefix ?
+    ('"--root_with_prefix=' + path + ' ' + realpath + '"') :
+    ('--root=' + realpath);
+  clArgs.push(root);
 };
 
 
@@ -320,11 +350,13 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   dependency check operation.
  */
-node.goog.googcompile.prototype.getDepsClArgs_ =
-    function() {
+node.goog.googcompile.prototype.getDepsClArgs_ = function() {
   var path = this.getDirectory_(this.fileToCompile_);
-  return ['"--root_with_prefix=' + path + ' ' +
-        this.fs_.realpathSync(path) + '"'];
+  var addedPaths = {};
+  var clArgs = [];
+  this.addRoot_(addedPaths, clArgs, path, true);
+  this.addAdditionalRoots_(addedPaths, clArgs, true);
+  return clArgs;
 };
 
 
@@ -332,14 +364,14 @@ node.goog.googcompile.prototype.getDepsClArgs_ =
  * @private
  * @param {Object.<number>} map The map to check.
  * @param {string} s The string to check in the map.
- * @return {boolean} Wether the string was already in the map.  If not it is
- *    then added to the specified map.
+ * @return {string} null if the string is already in the map.  If not it is
+ *    then added to the specified map and we return the real path of the file;
  */
 node.goog.googcompile.prototype.isPathInMap_ = function(map, s) {
   var real = this.fs_.realpathSync(s);
-  if (map[real]) return true;
+  if (map[real]) return null;
   map[real] = 1;
-  return false;
+  return real;
 };
 
 
