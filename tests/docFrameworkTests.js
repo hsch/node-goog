@@ -39,12 +39,12 @@ function runImpl(dir) {
 };
 
 var setJSDOCOpts = function() {
- var jsdto = node.goog.utils.opts.additionalJSDocToolkitOptions;
+ var jsdto = ng_.args.additionalJSDocToolkitOptions;
   jsdto = goog.array.filter(jsdto, function(o) {
     return o.indexOf('/tests') < 0 && o.indexOf('-d=') < 0;
   });
   jsdto.push('-d=' + ng_.getPath(testDir, 'docs'));
-  node.goog.utils.opts.additionalJSDocToolkitOptions = jsdto;
+  ng_.args.additionalJSDocToolkitOptions = jsdto;
 };
 
 
@@ -65,8 +65,7 @@ function writeOutFile(file, contents) {
 function runDoc() {
   global._dirToDoc = testDir;
   if (googDoc) {
-    // TODO: Reimplement this (re initialise the node.goog object
-    googDoc.init_(ng_.readSettingObject());
+    googDoc.init_(ng_.args);
   } else {
     googDoc = require('../bin/googdoc').googDoc;
   }

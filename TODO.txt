@@ -6,7 +6,12 @@ TODO
 
 - Remove the require('goog').goog.init() make it require('goog').init()
   i.e. remove the redundant intermediate goog.
-- Add a script to update all third_party libraries
+
+- Add a script to update all third_party libraries and to fix all required
+  deps in the source code
+
+- When running googtest tests/compilerCommandLineArgsTests.js we get 2
+  'undefined's printed to console
 
 GOOGTEST
 =========
