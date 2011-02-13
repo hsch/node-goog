@@ -170,10 +170,11 @@ node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
   return this.getAllIgnoreableFilesIn_([], dir);
 };
 
+
 /**
  * @private
  * @param {Array.<string>} allFiles The array containing all files
- *    to exclude
+ *    to exclude.
  * @param {string} dir The directory to parse recursiverly for other
  *  ignoreable files.
  * @return {Array.<string>} An array of all ignoreable files to in the
@@ -182,14 +183,14 @@ node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
 node.goog.googcodecheck.prototype.getAllIgnoreableFilesIn_ =
     function(allFiles, dir) {
   goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
-    function(f) {
-      var path = ng_.getPath(dir, f);
-      if (!node.goog.googcodecheck.isDir_(path)) {
-        if (this.isIgnorableFile_(dir, f)) { allFiles.push(path); }
-      } else {
-        this.getAllIgnoreableFilesIn_(allFiles, path);
-      }
-    }, this);
+      function(f) {
+        var path = ng_.getPath(dir, f);
+        if (!node.goog.googcodecheck.isDir_(path)) {
+          if (this.isIgnorableFile_(dir, f)) { allFiles.push(path); }
+        } else {
+          this.getAllIgnoreableFilesIn_(allFiles, path);
+        }
+      }, this);
   return allFiles;
 };
 
@@ -227,10 +228,11 @@ node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
   return this.getAllIgnoreableDirectoriesIn_([], dir);
 };
 
+
 /**
  * @private
  * @param {Array.<string>} allDirs The array containing all directories
- *    to exclude
+ *    to exclude.
  * @param {string} dir The directory to parse recursiverly for other
  *  ignoreable directories.
  * @return {Array.<string>} An array of all ignoreable directories to in the
@@ -239,14 +241,15 @@ node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
 node.goog.googcodecheck.prototype.getAllIgnoreableDirectoriesIn_ =
     function(allDirs, dir) {
   goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
-    function(d) {
-      var path = ng_.getPath(dir, d);
-      if (!node.goog.googcodecheck.isDir_(path)) return;
-      if (d === 'docs' || d === 'tests') { allDirs.push(path); return; }
-      this.getAllIgnoreableDirectoriesIn_(allDirs, path);
-    }, this);
+      function(d) {
+        var path = ng_.getPath(dir, d);
+        if (!node.goog.googcodecheck.isDir_(path)) return;
+        if (d === 'docs' || d === 'tests') { allDirs.push(path); return; }
+        this.getAllIgnoreableDirectoriesIn_(allDirs, path);
+      }, this);
   return allDirs;
 };
+
 
 /**
  * @private

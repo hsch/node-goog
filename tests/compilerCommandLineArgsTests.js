@@ -30,19 +30,19 @@ function clearDepsAndCompiledFile() {
 };
 
 function testCompileWithNoArgs() {
-  runCompilerWithCommandImpl('googcompile ' + __filename, true, true);
+  runCompilerWithCommandImpl('googcompile ' + __filename, false, false);
 };
 
 function testCompileWithNoDepsArg() {
-  runCompilerWithCommandImpl('googcompile -n ' + __filename, true, false);
+  runCompilerWithCommandImpl('googcompile -c ' + __filename, true, false);
 };
 
 function testCompileWithQuietArg() {
-  runCompilerWithCommandImpl('googcompile -q ' + __filename, false, false);
+  runCompilerWithCommandImpl('googcompile -d ' + __filename, false, true);
 };
 
 function testCompileWithDepsOnlyArg() {
-  runCompilerWithCommandImpl('googcompile -d ' + __filename, false, false);
+  runCompilerWithCommandImpl('googcompile -c -d ' + __filename, true, true);
 };
 
 function runCompilerWithCommandImpl(cmd, compiledMinFile, depsFile) {

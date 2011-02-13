@@ -119,7 +119,7 @@ node.goog.NodeTestInstance.prototype.run = function() {
  * @return {goog.testing.AsyncTestCase} The async test case created.
  */
 node.goog.NodeTestInstance.prototype.createAsyncTestCase_ = function() {
-  return new goog.testing.AsyncTestCase(this.shortName_);
+  return this.testCase_ = new goog.testing.AsyncTestCase(this.shortName_);
 };
 
 
@@ -157,7 +157,7 @@ node.goog.NodeTestInstance.prototype.loadTestContentsIntoMemory_ =
  */
 node.goog.NodeTestInstance.prototype.createAndRunTestCase_ = function() {
   var async = goog.isDefAndNotNull(this.testCase_);
-  if (!async) this.testCase_ = new goog.testing.TestCase(this.shortName_);
+  if (!async) { this.testCase_ = new goog.testing.TestCase(this.shortName_); }
   this.testCase_.autoDiscoverTests();
   this.testCase_.setCompletedCallback(goog.bind(this.onTestComplete_, this));
   this.testCase_.runTests();

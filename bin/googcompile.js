@@ -60,13 +60,13 @@ node.goog.googcompile = function() {
    * @private
    * @type {boolean}
    */
-  this.noCompileFile_ = false;
+  this.compile = false;
 
   /**
    * @private
    * @type {boolean}
    */
-  this.compileonly_ = false;
+  this.deps = false;
 
   /**
    * @private
@@ -95,12 +95,10 @@ node.goog.googcompile = function() {
 
   var cli = require('cli');
   var options = cli.parse({
-    'quiet': ['q', 'Quit compilation, does not produce .min.js and deps.js ' +
-          'files.'],
-    'compileonly': ['c', 'Compiles only, Does not build the ' +
-          'dependencies file.'],
-    'depsonly': ['d', 'Does not save the compiled min.js file but DOES save ' +
-          'the deps.js file.']
+    'compile': ['c', 'Produces the <filename>.min.js file. If ommitted the ' +
+      ' code is still compiled and warnings shown, the compiled file is ' +
+      'just NOT written'],
+    'deps': ['d', 'Produces a deps.js file.']
   });
 
   var that = this;
@@ -120,8 +118,9 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
   process.on('SIGINT', onexit);
   process.on('uncaughtException', onexit);
 
-  this.noCompileFile_ = options.quiet === true || options.depsonly === true;
-  this.compileonly_ = options.quiet === true || options.compileonly === true;
+  this.compile = options.compile;
+  this.deps = options.deps;
+
   this.fileToCompile_ = cliArgs[cliArgs.length - 1];
 
   if (!this.fileToCompile_) {
@@ -144,8 +143,7 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
  * @private
  */
 node.goog.googcompile.prototype.runCommands_ = function() {
-  var command = this.compileonly_ ?
-      this.runCompilation_ : this.runDependencies_;
+  var command = this.deps ? this.runDependencies_ : this.runCompilation_;
   command.call(this);
 };
 
@@ -157,7 +155,7 @@ node.goog.googcompile.prototype.runDependencies_ = function() {
   var that = this;
   var fileDir = this.compiledFileName_.substring(0,
       this.compiledFileName_.lastIndexOf('/') + 1);
-  var depsFile = that.compileonly_ ? '' : ng_.getPath(fileDir, 'deps.js');
+  var depsFile = that.deps ? ng_.getPath(fileDir, 'deps.js') : '';
   this.runCommand_(this.getDepsClArgs_(), 'depswriter.py',
       depsFile, '', function(err) {
         if (err) throw err;
@@ -178,7 +176,7 @@ node.goog.googcompile.prototype.runCompilation_ = function() {
       renameSync(this.fileToCompile_, this.fileToCompileIgnore_);
   var clArgs = this.getCompilerClArgs_();
   this.runCommand_(clArgs, 'closurebuilder.py',
-                   this.noCompileFile_ ? '' : this.compiledFileName_, bashInst);
+                   this.compile ? this.compiledFileName_ : '', bashInst);
 };
 
 
@@ -369,7 +367,7 @@ node.goog.googcompile.prototype.getDepsClArgs_ = function() {
  * @private
  * @param {Object.<number>} map The map to check.
  * @param {string} s The string to check in the map.
- * @return {string} null if the string is already in the map.  If not it is
+ * @return {string?} null if the string is already in the map.  If not it is
  *    then added to the specified map and we return the real path of the file;.
  */
 node.goog.googcompile.prototype.isPathInMap_ = function(map, s) {

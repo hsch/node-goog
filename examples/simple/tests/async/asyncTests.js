@@ -8,7 +8,8 @@ goog.require('node.goog.examples.simple.Example');
 
 goog.provide('node.goog.examples.simple.tests.asyncTests');
 
-testFunction1 = function() {
+function testFunction1() {
+  assertFalse(example_.completed);
   asyncTestCase.waitForAsync();
   setTimeout(function() {
     assertNotEquals(typeof(example_), 'undefined');

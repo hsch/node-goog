@@ -82,9 +82,9 @@ and ready for compilation just run the following command:
 
 The `googcompile` command accepts various arguments:
 
-* -q: quiet - Does not generate the compiled JavaScript (.min.js) file or the
-dependencies (deps.js) file.
-* -n: nodeps - Does not generate the dependencies file (deps.js).
+* -c: Create [C]ompile file - Produces a compiled <filename>.min.js file
+* -d: Create [D]ependencies- Creates a deps.js file that can be used as an
+additionalDeps in an external project.
 
 ## JSDoc Documentation
 
