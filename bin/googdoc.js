@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+
 /**
  * @private
  * @type {node.goog}
@@ -26,8 +27,8 @@ var ng_ = require('goog').goog.init();
 goog.provide('node.goog.googdoc');
 
 goog.require('goog.array');
-goog.require('node_goog_opts');
 goog.require('node.goog');
+goog.require('node_goog_opts');
 
 
 

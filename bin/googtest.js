@@ -23,6 +23,7 @@
  * @author guido@tapia.com.au (Guido Tapia)
  */
 
+
 /**
  * @private
  * @const
@@ -46,6 +47,8 @@ goog.require('goog.testing.TestCase');
 
 goog.require('node.goog');
 goog.require('node.goog.NodeTestsRunner');
+
+
 
 /**
  * The node.goog.googtest class runs all tests (files case insensitive
@@ -71,7 +74,7 @@ node.goog.googtest = function() {
    * @type {node.goog.NodeTestsRunner}
    */
   this.tr_ = new node.goog.NodeTestsRunner(
-    this.getAllTestFiles_(), this.getTestArgs_());
+      this.getAllTestFiles_(), this.getTestArgs_());
 
   process.on('uncaughtException', goog.bind(this.onException_, this));
 
@@ -81,13 +84,16 @@ node.goog.googtest = function() {
 };
 
 
-
+/**
+ * @private
+ */
 node.goog.googtest.prototype.loadAdditionalTestingDependencies_ = function() {
   var dirOrFile = process.argv[2];
   var dir = this.fs_.statSync(dirOrFile).isDirectory() ? dirOrFile : null;
-  if (!dir) { dir = dirOrFile.substring(0, dirOrFile.lastIndexOf('/'));  }
-  var opts = ng_.loadAditionalDependenciesInSettingsFile(ng_.getPath(dir, 'closure.json'));
+  if (!dir) { dir = dirOrFile.substring(0, dirOrFile.lastIndexOf('/')); }
+  ng_.loadAditionalDependenciesInSettingsFile(ng_.getPath(dir, 'closure.json'));
 };
+
 
 /**
  * @private
@@ -104,7 +110,7 @@ node.goog.googtest.prototype.getAllTestFiles_ = function() {
 /**
  * @private
  * @return {string} The arguments we will pass to all tests to filter
- *    test results
+ *    test results.
  */
 node.goog.googtest.prototype.getTestArgs_ = function() {
   return process.argv.length > 2 ? process.argv.slice(3).join(',') : '';
@@ -112,6 +118,9 @@ node.goog.googtest.prototype.getTestArgs_ = function() {
 
 
 /**
+ * @param {string} dir The directory to read recursively.
+ * @param {Array.<string>} allFiles The array containing all the files read.
+ * @return {Array.<string>} The allFiles array for fluency.
  * @private
  */
 node.goog.googtest.prototype.readDirRecursiveSyncImpl_ =
@@ -128,9 +137,10 @@ node.goog.googtest.prototype.readDirRecursiveSyncImpl_ =
   return allFiles;
 };
 
+
 /**
  * @private
- * @param {Error} err The exception thrown by tests
+ * @param {Error} err The exception thrown by tests.
  */
 node.goog.googtest.prototype.onException_ = function(err) {
   console.error(err.stack);

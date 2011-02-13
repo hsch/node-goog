@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+
 /**
  * @private
  * @type {node.goog}
@@ -26,8 +27,8 @@ var ng_ = require('goog').goog.init();
 goog.provide('node.goog.googcodecheck');
 
 goog.require('goog.array');
-goog.require('node_goog_opts');
 goog.require('node.goog');
+goog.require('node_goog_opts');
 
 
 
@@ -165,25 +166,31 @@ node.goog.googcodecheck.prototype.getLinterArgs_ = function(dir) {
  * @return {Array.<string>} An array of all files to ignore.
  */
 node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
-  var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
-      function(f) { return this.isIgnorableFile_(dir, f); }, this);
-  return goog.array.map(excludes, function(f) {
-    return ng_.getPath(dir, f);
-  });
+  if (!node.goog.googcodecheck.isDir_(dir)) return [];
+  return this.getAllIgnoreableFilesIn_([], dir);
 };
-
 
 /**
  * @private
- * @param {string} dir The directory to code check.
- * @return {Array.<string>} An array of all directories to ignore.
+ * @param {Array.<string>} allFiles The array containing all files
+ *    to exclude
+ * @param {string} dir The directory to parse recursiverly for other
+ *  ignoreable files.
+ * @return {Array.<string>} An array of all ignoreable files to in the
+ *    specified directory.
  */
-node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
-  var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
-      function(f) { return this.isIgnorableDir_(dir, f); }, this);
-  return goog.array.map(excludes, function(f) {
-    return ng_.getPath(dir, f);
-  });
+node.goog.googcodecheck.prototype.getAllIgnoreableFilesIn_ =
+    function(allFiles, dir) {
+  goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
+    function(f) {
+      var path = ng_.getPath(dir, f);
+      if (!node.goog.googcodecheck.isDir_(path)) {
+        if (this.isIgnorableFile_(dir, f)) { allFiles.push(path); }
+      } else {
+        this.getAllIgnoreableFilesIn_(allFiles, path);
+      }
+    }, this);
+  return allFiles;
 };
 
 
@@ -212,17 +219,34 @@ node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
 
 /**
  * @private
- * @param {string} dir The directory of the files we are checking.
- * @param {string} d If this directory can be ignored from the checks.
- * @return {boolean} Wether the specified file can be safely ignored.
+ * @param {string} dir The directory to code check.
+ * @return {Array.<string>} An array of all directories to ignore.
  */
-node.goog.googcodecheck.prototype.isIgnorableDir_ = function(dir, d) {
-  if (!node.goog.googcodecheck.isDir_(
-      ng_.getPath(dir, d))) return false;
-
-  return d === 'docs';
+node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
+  if (!node.goog.googcodecheck.isDir_(dir)) return [];
+  return this.getAllIgnoreableDirectoriesIn_([], dir);
 };
 
+/**
+ * @private
+ * @param {Array.<string>} allDirs The array containing all directories
+ *    to exclude
+ * @param {string} dir The directory to parse recursiverly for other
+ *  ignoreable directories.
+ * @return {Array.<string>} An array of all ignoreable directories to in the
+ *    specified directory.
+ */
+node.goog.googcodecheck.prototype.getAllIgnoreableDirectoriesIn_ =
+    function(allDirs, dir) {
+  goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
+    function(d) {
+      var path = ng_.getPath(dir, d);
+      if (!node.goog.googcodecheck.isDir_(path)) return;
+      if (d === 'docs' || d === 'tests') { allDirs.push(path); return; }
+      this.getAllIgnoreableDirectoriesIn_(allDirs, path);
+    }, this);
+  return allDirs;
+};
 
 /**
  * @private
@@ -241,7 +265,7 @@ node.goog.googcodecheck.prototype.runProcess_ =
           if (stderr) console.error(stderr);
           if (stdout) console.log(stdout);
           console.error(err.stack);
-          throw err;
+          return;
         }
 
         console.log('\nSuccessfully Executed ' + command +

@@ -22,6 +22,7 @@
  * @author guido@tapia.com.au (Guido Tapia)
  */
 
+
 /**
  * @private
  * @const
@@ -32,6 +33,7 @@ var ng_ = require('goog').goog.init();
 goog.provide('node.goog.googcompile');
 
 goog.require('node.goog');
+
 
 
 /**
@@ -95,7 +97,7 @@ node.goog.googcompile = function() {
   var options = cli.parse({
     'quiet': ['q', 'Quit compilation, does not produce .min.js and deps.js ' +
           'files.'],
-    'compileonly': ['c', 'Compiles only, Does not build the '+
+    'compileonly': ['c', 'Compiles only, Does not build the ' +
           'dependencies file.'],
     'depsonly': ['d', 'Does not save the compiled min.js file but DOES save ' +
           'the deps.js file.']
@@ -132,7 +134,7 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
   this.fileToCompileIgnore_ = this.fileToCompile_.replace('.js', '.ignorejs');
 
   var additionalSettingsFile = ng_.getPath(
-    ng_.getFileDirectory(this.fileToCompile_), 'closure.json');
+      ng_.getFileDirectory(this.fileToCompile_), 'closure.json');
   ng_.loadAditionalDependenciesInSettingsFile(additionalSettingsFile);
   this.runCommands_();
 };
@@ -142,7 +144,8 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
  * @private
  */
 node.goog.googcompile.prototype.runCommands_ = function() {
-  var command = this.compileonly_ ? this.runCompilation_ : this.runDependencies_;
+  var command = this.compileonly_ ?
+      this.runCompilation_ : this.runDependencies_;
   command.call(this);
 };
 
@@ -154,12 +157,12 @@ node.goog.googcompile.prototype.runDependencies_ = function() {
   var that = this;
   var fileDir = this.compiledFileName_.substring(0,
       this.compiledFileName_.lastIndexOf('/') + 1);
-  var depsFile = that.compileonly_ ? '' :ng_.getPath(fileDir, 'deps.js');
+  var depsFile = that.compileonly_ ? '' : ng_.getPath(fileDir, 'deps.js');
   this.runCommand_(this.getDepsClArgs_(), 'depswriter.py',
       depsFile, '', function(err) {
-    if (err) throw err;
-    that.runCompilation_();
-  });
+        if (err) throw err;
+        that.runCompilation_();
+      });
 };
 
 
@@ -223,8 +226,8 @@ node.goog.googcompile.prototype.createTmpFile_ =
 
 /**
  * @private
- * @param {string} command The command to run
- * @param {Array.<string>} clArgs Any additional arguments to the command
+ * @param {Array.<string>} clArgs Any additional arguments to the command.
+ * @param {string} command The command to run.
  * @param {string} targetFile The name of the file to produce.
  * @param {string} bashInstructions Any bash shell instructions that are
  *    required in the compiled file.
@@ -302,12 +305,13 @@ node.goog.googcompile.prototype.getCompilerClArgs_ =
   return clArgs;
 };
 
+
 /**
  * @private
  * @param {Object.<number>} addedPaths A cache of all loaded files, for
- *    duplicate checking
- * @param {Array.<string>} clArgs The array to add any additional deps to
- * @param {boolean}  wPrefix Wether to use root_with_prefix
+ *    duplicate checking.
+ * @param {Array.<string>} clArgs The array to add any additional deps to.
+ * @param {boolean}  wPrefix Wether to use root_with_prefix.
  */
 node.goog.googcompile.prototype.addAdditionalRoots_ =
     function(addedPaths, clArgs, wPrefix) {
@@ -325,12 +329,14 @@ node.goog.googcompile.prototype.addAdditionalRoots_ =
   }
 };
 
+
 /**
  * @private
  * @param {Object.<number>} addedPaths A cache of all loaded files, for
- *    duplicate checking
- * @param {Array.<string>} clArgs The array to add any additional deps to
- * @param {boolean}  wPrefix Wether to use root_with_prefix
+ *    duplicate checking.
+ * @param {Array.<string>} clArgs The array to add any additional deps to.
+ * @param {string} path The path to add as a root or root_with_prefix.
+ * @param {boolean}  wPrefix Wether to use root_with_prefix.
  */
 node.goog.googcompile.prototype.addRoot_ =
     function(addedPaths, clArgs, path, wPrefix) {
@@ -338,8 +344,8 @@ node.goog.googcompile.prototype.addRoot_ =
   if (!goog.isDefAndNotNull(realpath)) { return; }
 
   var root = wPrefix ?
-    ('"--root_with_prefix=' + path + ' ' + realpath + '"') :
-    ('--root=' + realpath);
+      ('"--root_with_prefix=' + path + ' ' + realpath + '"') :
+      ('--root=' + realpath);
   clArgs.push(root);
 };
 
@@ -364,7 +370,7 @@ node.goog.googcompile.prototype.getDepsClArgs_ = function() {
  * @param {Object.<number>} map The map to check.
  * @param {string} s The string to check in the map.
  * @return {string} null if the string is already in the map.  If not it is
- *    then added to the specified map and we return the real path of the file;
+ *    then added to the specified map and we return the real path of the file;.
  */
 node.goog.googcompile.prototype.isPathInMap_ = function(map, s) {
   var real = this.fs_.realpathSync(s);

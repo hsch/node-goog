@@ -5,9 +5,11 @@ goog.require('goog.array');
 goog.require('goog.testing.stacktrace');
 goog.require('node.goog.NodeTestInstance');
 
+
+
 /**
  * @constructor
- * @param {Array.<string>} testFiles The test files to test
+ * @param {Array.<string>} testFiles The test files to test.
  * @param {string} args Any args used to find appropriate tests to run.
  */
 node.goog.NodeTestsRunner = function(testFiles, args) {
@@ -34,17 +36,19 @@ node.goog.NodeTestsRunner = function(testFiles, args) {
 
   // Some require overrides to make stack traces properly visible
   goog.testing.stacktrace.parseStackFrame_ =
-    node.goog.NodeTestsRunner.parseStackFrameLine_;
+      node.goog.NodeTestsRunner.parseStackFrameLine_;
   goog.testing.stacktrace.framesToString_ =
-    node.goog.NodeTestsRunner.stackFramesToString_;
+      node.goog.NodeTestsRunner.stackFramesToString_;
 };
+
 
 /**
  * Executes the tests
  */
 node.goog.NodeTestsRunner.prototype.execute = function() {
   this.runNextTest_();
-}
+};
+
 
 /**
  * Runs the next test in the queue or calls displayResults_
@@ -58,25 +62,28 @@ node.goog.NodeTestsRunner.prototype.runNextTest_ = function() {
   this.runNextTestImpl_(this.testFiles_.pop());
 };
 
+
 /**
  * Runs the next specified test
- * @param {string} file The spricific test to run
+ * @param {string} file The spricific test to run.
  * @private
  */
 node.goog.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
   var instance = new node.goog.NodeTestInstance(file, this.args_,
-    goog.bind(this.onTestCompleted_, this));
+      goog.bind(this.onTestCompleted_, this));
   instance.run();
 };
 
+
 /**
  * @private
- * @param {goog.testing.TestCase} tc The test case that just completed
+ * @param {goog.testing.TestCase} tc The test case that just completed.
  */
 node.goog.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
   this.completedTestCases_.push(tc);
   this.runNextTest_();
 };
+
 
 /**
  * @private
@@ -85,19 +92,21 @@ node.goog.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
 node.goog.NodeTestsRunner.prototype.displayResults_ = function() {
   console.log('\x1B[0;34m\n=======\nRESULTS\n=======');
   var results = goog.array.map(this.completedTestCases_,
-    node.goog.NodeTestsRunner.renderTestCase_, this);
+      node.goog.NodeTestsRunner.renderTestCase_, this);
   console.log(results.join('\n\n'));
 };
+
 
 /**
  * @private
  * Renders the test case to the console.
  * @param {goog.testing.TestCase} tc The test case to render results.
- * @return {string} A string representation of this test case
+ * @return {string} A string representation of this test case.
  */
 node.goog.NodeTestsRunner.renderTestCase_ = function(tc) {
   return node.goog.NodeTestsRunner.colorizeReport(tc.getReport(false));
 };
+
 
 /**
  * @param {string} report The test report to colorize.
@@ -137,7 +146,6 @@ node.goog.NodeTestsRunner.padString_ = function(str, length, ch) {
   }
   return str;
 };
-
 
 
 /**
@@ -194,8 +202,8 @@ node.goog.NodeTestsRunner.stackFramesToString_ = function(frames) {
     var f = frames[i];
     if (!f) continue;
     var str = f.toCanonicalString();
-    if (str.indexOf('[object Object].execute (testing/testcase.js:900:12)')
-      === 0) { break; }
+    var ignorestr = '[object Object].execute (testing/testcase.js:900:12)';
+    if (str.indexOf(ignorestr) === 0) { break; }
     stack.push('> ');
     stack.push(str);
     stack.push('\n');
