@@ -60,10 +60,41 @@ node.goog.NodeTestInstance =
   this.onCompleteHandler_ = onCompleteHandler;
 
   this.setUpTestCaseInterceps_(testFilter || '');
+  this.overwriteAsyncTestCaseProblemPoints_();
+};
 
-  // Overwrite this functionality (no test runners, etc)
+
+/**
+ * Sets up any interceptions required into AsyncTestCase to stop any async style
+ * problems emerging in these tests.
+ * @private
+ * @suppress {visibility}
+ */
+node.goog.NodeTestInstance.prototype.overwriteAsyncTestCaseProblemPoints_ =
+    function() {
+  // The default createAndInstall relies on TestRunners and other internal
+  // goog.testing package which are not available in this context
   goog.testing.AsyncTestCase.createAndInstall =
       goog.bind(this.createAsyncTestCase_, this);
+
+  // The AsyncTestCase pump_ method throws
+  // AsyncTestCase.ControlBreakingException which causes all sorts of problems
+  // in this context.  Using object 'pump_' notation because
+  // @suppress {visibility} is being ignored by the libs compiler
+  var opump = goog.testing.AsyncTestCase.prototype['pump_'];
+  var that = this;
+  goog.testing.AsyncTestCase.prototype['pump_'] = function(opt_doFirst) {
+    try {
+      opump.call(this, opt_doFirst);
+    } catch (ex) {
+      // Safe to ignore
+      if (ex.isControlBreakingException) {
+        that.onTestComplete_();
+      } else {
+        throw ex;
+      }
+    }
+  };
 };
 
 
@@ -171,7 +202,23 @@ node.goog.NodeTestInstance.prototype.createAndRunTestCase_ = function() {
  * @private
  */
 node.goog.NodeTestInstance.prototype.onTestComplete_ = function() {
+  if (!this.ctx_) this.clearOutGlobalContext_();
   this.onCompleteHandler_(this.testCase_);
+};
+
+
+/**
+ * Clears out the testing stuff from the global context.  This tries to stop
+ * the tests stepping on each other's toes
+ * @private
+ */
+node.goog.NodeTestInstance.prototype.clearOutGlobalContext_ = function() {
+  for (var i in global) {
+    if (i.indexOf('test') === 0 || i.indexOf('setUp') === 0 ||
+        i.indexOf('tearDown') === 0) {
+      delete global[i];
+    }
+  }
 };
 
 

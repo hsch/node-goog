@@ -1,6 +1,6 @@
 #!/usr/local/bin/node
 
-require('goog').goog.init();
+var ng_ = require('goog').goog.init();
 
 var fs_ = require('fs');
 var path_ = require('path');
@@ -14,7 +14,7 @@ var compileDirs = ['lib/', 'bin/']
 var checkDirs = ['lib/', 'bin/', 'examples/simple', 'examples/animals'];
 var additionalFiles = ['examples/animals/example.js', 'examples/simple/example.js'];
 var ignoreable = ['.min.js', 'deps.js', '.externs.js', '.tmp.js', 'utils.js'];
-var doNotDelete = ['simple/deps.js', 'animals/deps.js'];
+var doNotDelete = ['simple/deps.js', 'animals/deps.js', 'bin/deps.js'];
 
 var allTestableFiles = getAllTestableFiles();
 
@@ -127,7 +127,7 @@ function deleteAllDepsAndMinFiles() {
     var dir = __dirname + '/' + baseDir + d;
     goog.array.forEach(fs_.readdirSync(dir), function(f) {
       if (f.indexOf('.min.js') > 0 || f.indexOf('.tmp.js') > 0 || f === 'deps.js') {
-        var file = dir + '/' + f;
+        var file = ng_.getPath(dir, f);
         if (goog.array.findIndex(doNotDelete, function (dnd) {
               return file.indexOf(dnd) >= 0;
             }) < 0) {

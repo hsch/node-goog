@@ -60,13 +60,13 @@ node.goog.googcompile = function() {
    * @private
    * @type {boolean}
    */
-  this.compile = false;
+  this.compile_ = false;
 
   /**
    * @private
    * @type {boolean}
    */
-  this.deps = false;
+  this.deps_ = false;
 
   /**
    * @private
@@ -96,8 +96,8 @@ node.goog.googcompile = function() {
   var cli = require('cli');
   var options = cli.parse({
     'compile': ['c', 'Produces the <filename>.min.js file. If ommitted the ' +
-      ' code is still compiled and warnings shown, the compiled file is ' +
-      'just NOT written'],
+          ' code is still compiled and warnings shown, the compiled file is ' +
+          'just NOT written'],
     'deps': ['d', 'Produces a deps.js file.']
   });
 
@@ -118,8 +118,8 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
   process.on('SIGINT', onexit);
   process.on('uncaughtException', onexit);
 
-  this.compile = options.compile;
-  this.deps = options.deps;
+  this.compile_ = options.compile;
+  this.deps_ = options.deps;
 
   this.fileToCompile_ = cliArgs[cliArgs.length - 1];
 
@@ -143,7 +143,7 @@ node.goog.googcompile.prototype.init_ = function(cliArgs, options) {
  * @private
  */
 node.goog.googcompile.prototype.runCommands_ = function() {
-  var command = this.deps ? this.runDependencies_ : this.runCompilation_;
+  var command = this.deps_ ? this.runDependencies_ : this.runCompilation_;
   command.call(this);
 };
 
@@ -155,7 +155,7 @@ node.goog.googcompile.prototype.runDependencies_ = function() {
   var that = this;
   var fileDir = this.compiledFileName_.substring(0,
       this.compiledFileName_.lastIndexOf('/') + 1);
-  var depsFile = that.deps ? ng_.getPath(fileDir, 'deps.js') : '';
+  var depsFile = this.deps_ ? ng_.getPath(fileDir, 'deps.js') : '';
   this.runCommand_(this.getDepsClArgs_(), 'depswriter.py',
       depsFile, '', function(err) {
         if (err) throw err;
@@ -176,7 +176,7 @@ node.goog.googcompile.prototype.runCompilation_ = function() {
       renameSync(this.fileToCompile_, this.fileToCompileIgnore_);
   var clArgs = this.getCompilerClArgs_();
   this.runCommand_(clArgs, 'closurebuilder.py',
-                   this.compile ? this.compiledFileName_ : '', bashInst);
+                   this.compile_ ? this.compiledFileName_ : '', bashInst);
 };
 
 

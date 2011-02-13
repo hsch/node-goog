@@ -10,7 +10,7 @@ TODO
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
 
-- Failing async tests (control breaking exceptions are stopping all tests)
+- Failing tests makes output very complex and unreadable.
 
 GOOGTEST
 =========
