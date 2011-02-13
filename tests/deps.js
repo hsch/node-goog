@@ -2,11 +2,11 @@
 // Please do not edit.
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/checkAllSampleTestsPassing.js', [], ['goog.array', 'goog.testing.AsyncTestCase', 'goog.testing.jsunit', 'node.goog.tests']);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/checkAllSamplesAreRunningTests.js', [], ['goog.array', 'goog.testing.AsyncTestCase', 'goog.testing.jsunit']);
-goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/closureUtilsTests.js', [], ['goog.array', 'goog.testing.jsunit', 'node.goog.utils']);
+goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/closureUtilsTests.js', ['node.goog.closureUtilsTests'], ['goog.array', 'goog.testing.jsunit', 'node.goog.utils', 'node_goog_settingsLoader']);
+goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/closureUtilsTests.min.js', [], []);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/compileAndCheckFilesTests.js', [], ['goog.array', 'goog.testing.AsyncTestCase', 'goog.testing.jsunit']);
-goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/compilerCommandLineArgsTests.js', ['node.goog.tests.compilerCommandLineArgsTests'], ['goog.testing.AsyncTestCase', 'goog.testing.jsunit', 'node.goog.utils']);
+goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/compilerCommandLineArgsTests.js', [], ['goog.testing.AsyncTestCase', 'goog.testing.jsunit', 'node.goog.utils']);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/deps.js', [], []);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/docFrameworkTests.js', [], ['goog.array', 'goog.testing.AsyncTestCase', 'goog.testing.jsunit', 'node.goog.utils']);
-goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/runClosureLibraryTests.js', [], []);
+goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/runClosureLibraryJSUnitsManual.js', [], ['goog.testing.jsunit', 'node.goog.tests']);
 goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/utils.js', ['node.goog.tests'], ['goog.array', 'node.goog.utils']);
-goog.addDependency('/home/ubuntu/Dev/projects/node-goog/tests/utils.min.js', [], []);

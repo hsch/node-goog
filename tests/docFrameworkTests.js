@@ -1,6 +1,11 @@
 #!/usr/local/bin/node
 
-require('goog').goog.init();
+/**
+ * @private
+ * @type {node.goog}
+ * @const
+ */
+var ng_ = require('goog').goog.init();
 
 var fs_ = require('fs');
 var path_ = require('path');
@@ -10,7 +15,6 @@ var googDoc;
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.array');
-goog.require('node.goog.utils');
 
 var tearDownPage = clearDir;
 
@@ -39,15 +43,14 @@ var setJSDOCOpts = function() {
   jsdto = goog.array.filter(jsdto, function(o) {
     return o.indexOf('/tests') < 0 && o.indexOf('-d=') < 0;
   });
-  jsdto.push('-d=' + node.goog.utils.getPath(testDir, 'docs'));
+  jsdto.push('-d=' + ng_.getPath(testDir, 'docs'));
   node.goog.utils.opts.additionalJSDocToolkitOptions = jsdto;
-  node.goog.utils.useCachedOpts = true;
 };
 
 
 function assertFilesInIndex(files) {
   var indexContents = fs_.readFileSync(
-    node.goog.utils.getPath(testDir, 'docs') + '/index.html').toString();
+    ng_.getPath(testDir, 'docs') + '/index.html').toString();
   goog.array.forEach(files, function(f) {
     assertTrue(indexContents.indexOf('>' + f + '<') > 0);
   });
@@ -55,14 +58,15 @@ function assertFilesInIndex(files) {
 
 function writeOutFile(file, contents) {
   if (!path_.existsSync(testDir)) { fs_.mkdirSync(testDir, 0777); }
-  var path = node.goog.utils.getPath(testDir, file)
+  var path = ng_.getPath(testDir, file)
   fs_.writeFileSync(path, contents.join('\n'), encoding = 'utf8');
 };
 
 function runDoc() {
   global._dirToDoc = testDir;
   if (googDoc) {
-    googDoc.init_(node.goog.utils.readSettingObject());
+    // TODO: Reimplement this (re initialise the node.goog object
+    googDoc.init_(ng_.readSettingObject());
   } else {
     googDoc = require('../bin/googdoc').googDoc;
   }
@@ -72,7 +76,7 @@ function getDirectory() {
   var file = process.argv[2];
   var idx = file.lastIndexOf('/');
   var dir = idx > 0 ? file.substring(0, idx) : file;
-  var d = node.goog.utils.getPath(dir, '_docTests');;
+  var d = ng_.getPath(dir, '_docTests');;
   return d;
 };
 

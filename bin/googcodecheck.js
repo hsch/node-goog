@@ -16,13 +16,18 @@
  * limitations under the License.
  */
 
-
-require('goog').goog.init();
+/**
+ * @private
+ * @type {node.goog}
+ * @const
+ */
+var ng_ = require('goog').goog.init();
 
 goog.provide('node.goog.googcodecheck');
 
 goog.require('goog.array');
-goog.require('node.goog.utils');
+goog.require('node_goog_opts');
+goog.require('node.goog');
 
 
 
@@ -30,6 +35,13 @@ goog.require('node.goog.utils');
  * @constructor
  */
 node.goog.googcodecheck = function() {
+
+  /**
+   * @private
+   * @type {node_goog_opts}
+   */
+  this.settings_;
+
   var dir = process.argv[2];
   var isDir = node.goog.googcodecheck.isDir_(dir);
   if (!isDir) {
@@ -76,7 +88,7 @@ node.goog.googcodecheck.isDir_ = function(f) {
 node.goog.googcodecheck.prototype.fixBashInstructionsOnDir_ = function(dir) {
   goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
       function(f) {
-        var path = node.goog.utils.getPath(dir, f);
+        var path = ng_.getPath(dir, f);
         if (node.goog.googcodecheck.isDir_(path)) {
           return this.fixBashInstructionsOnDir_(path);
         }
@@ -93,12 +105,12 @@ node.goog.googcodecheck.prototype.fixBashInstructionsOnDir_ = function(dir) {
 node.goog.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
   if (this.isIgnorableFile_(dir, file)) return;
   var fileContents = node.goog.googcodecheck.fs_.
-      readFileSync(node.goog.utils.getPath(dir, file), encoding = 'utf8');
+      readFileSync(ng_.getPath(dir, file), encoding = 'utf8');
   var m = /^# !([^;]+)\;/g.exec(fileContents);
   if (!m) { return; }
   var fixed = m[1].replace(/ /g, '');
   fileContents = fileContents.replace(m[0], '#!' + fixed);
-  node.goog.googcodecheck.fs_.writeFileSync(node.goog.utils.getPath(dir, file),
+  node.goog.googcodecheck.fs_.writeFileSync(ng_.getPath(dir, file),
       fileContents, encoding = 'utf8');
 };
 
@@ -125,21 +137,13 @@ node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
 
 /**
  * @private
- * @type {node.goog.opts}
- */
-node.goog.googcodecheck.prototype.settings_;
-
-
-/**
- * @private
  * @param {string} dir The directory to codecheck.
  * @return {Array.<string>} The array of arguments for the gjslint and
  *    fixjsstyle calls.
  */
 node.goog.googcodecheck.prototype.getLinterArgs_ = function(dir) {
   if (!this.settings_) {
-    this.settings_ = /** @type {node.goog.opts} */
-        (node.goog.utils.readSettingObject());
+    this.settings_ = ng_.args;
   }
   var excludes = this.getLinterExcludeFiles_(dir);
   var excludesDir = this.getLinterExcludeDir_(dir);
@@ -164,7 +168,7 @@ node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
   var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
       function(f) { return this.isIgnorableFile_(dir, f); }, this);
   return goog.array.map(excludes, function(f) {
-    return node.goog.utils.getPath(dir, f);
+    return ng_.getPath(dir, f);
   });
 };
 
@@ -178,7 +182,7 @@ node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
   var excludes = goog.array.filter(node.goog.googcodecheck.fs_.readdirSync(dir),
       function(f) { return this.isIgnorableDir_(dir, f); }, this);
   return goog.array.map(excludes, function(f) {
-    return node.goog.utils.getPath(dir, f);
+    return ng_.getPath(dir, f);
   });
 };
 
@@ -191,7 +195,7 @@ node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
  */
 node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
   if (node.goog.googcodecheck.isDir_(
-      node.goog.utils.getPath(dir, f))) return false;
+      ng_.getPath(dir, f))) return false;
 
   var ignore =
       f === 'goog.js' ||
@@ -214,7 +218,7 @@ node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
  */
 node.goog.googcodecheck.prototype.isIgnorableDir_ = function(dir, d) {
   if (!node.goog.googcodecheck.isDir_(
-      node.goog.utils.getPath(dir, d))) return false;
+      ng_.getPath(dir, d))) return false;
 
   return d === 'docs';
 };

@@ -1,7 +1,6 @@
 
 goog.provide('node.goog.tests');
 
-goog.require('node.goog.utils');
 goog.require('goog.array');
 
 node.goog.tests.fs_ = require('fs');
@@ -33,7 +32,7 @@ node.goog.tests.readDirRecursiveSync = function(dir, filter) {
 node.goog.tests.readDirRecursiveSyncImpl_ = function(dir, allFiles) {
   var files = node.goog.tests.fs_.readdirSync(dir);
   goog.array.forEach(files, function(f) {
-    var path = node.goog.utils.getPath(dir, f);
+    var path = node.goog.instance.getPath(dir, f);
     if (node.goog.tests.fs_.statSync(path).isDirectory()) {
       return node.goog.tests.readDirRecursiveSyncImpl_(path, allFiles);
     } {

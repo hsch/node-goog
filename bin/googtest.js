@@ -23,13 +23,12 @@
  * @author guido@tapia.com.au (Guido Tapia)
  */
 
-
 /**
  * @private
- * @type {*}
+ * @const
+ * @type {node.goog}
  */
 var ng_ = require('goog').goog.init();
-// var ng_ = require('goog').goog.init({additionalDeps:['../tests/deps.js']});
 
 goog.provide('node.goog.googtest');
 
@@ -44,9 +43,9 @@ global.navigator = { userAgent: 'node.js' };
 goog.require('goog.array');
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
-goog.require('node.goog.NodeTestsRunner');
-goog.require('node.goog.utils');
 
+goog.require('node.goog');
+goog.require('node.goog.NodeTestsRunner');
 
 /**
  * The node.goog.googtest class runs all tests (files case insensitive
@@ -55,7 +54,6 @@ goog.require('node.goog.utils');
  * @constructor
  */
 node.goog.googtest = function() {
-
   /**
    * @private
    * @type {extern_fs}
@@ -72,12 +70,25 @@ node.goog.googtest = function() {
    * @private
    * @type {node.goog.NodeTestsRunner}
    */
-  this.tr_ = new node.goog.NodeTestsRunner(this.getAllTestFiles_());
+  this.tr_ = new node.goog.NodeTestsRunner(
+    this.getAllTestFiles_(), this.getTestArgs_());
+
   process.on('uncaughtException', goog.bind(this.onException_, this));
+
+  this.loadAdditionalTestingDependencies_();
+
   this.tr_.execute();
 };
 
 
+
+node.goog.googtest.prototype.loadAdditionalTestingDependencies_ = function() {
+  var dirOrFile = process.argv[2];
+  var dir = this.fs_.statSync(dirOrFile).isDirectory() ? dirOrFile : null;
+  if (!dir) { dir = dirOrFile.substring(0, dirOrFile.lastIndexOf('/'));  }
+  ng_.parseCompilerArgsFromFile(
+    ng_.getPath(dir, 'deps.js'));
+};
 
 /**
  * @private
@@ -93,12 +104,22 @@ node.goog.googtest.prototype.getAllTestFiles_ = function() {
 
 /**
  * @private
+ * @return {string} The arguments we will pass to all tests to filter
+ *    test results
+ */
+node.goog.googtest.prototype.getTestArgs_ = function() {
+  return process.argv.length > 2 ? process.argv.slice(3).join(',') : '';
+};
+
+
+/**
+ * @private
  */
 node.goog.googtest.prototype.readDirRecursiveSyncImpl_ =
     function(dir, allFiles) {
   var files = this.fs_.readdirSync(dir);
   goog.array.forEach(files, function(f) {
-    var path = node.goog.utils.getPath(dir, f);
+    var path = ng_.getPath(dir, f);
     if (this.fs_.statSync(path).isDirectory()) {
       return this.readDirRecursiveSyncImpl_(path, allFiles);
     } else if (f.toLowerCase().indexOf('test') >= 0) {
@@ -115,3 +136,5 @@ node.goog.googtest.prototype.readDirRecursiveSyncImpl_ =
 node.goog.googtest.prototype.onException_ = function(err) {
   console.error(err.stack);
 };
+
+new node.goog.googtest();

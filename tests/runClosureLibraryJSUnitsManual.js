@@ -1,6 +1,11 @@
 #!/usr/local/bin/node
 
-require('goog').goog.init();
+/**
+ * @private
+ * @type {node.goog}
+ * @const
+ */
+var ng_ = require('goog').goog.init();
 
 goog.require('goog.testing.jsunit');
 
@@ -10,7 +15,7 @@ var fs_ = require('fs');
 var path_ = require('path');
 
 var allTestFiles;
-var tmpdir = node.goog.utils.getPath(process.cwd(), 'tests/tmpclosuretests/');
+var tmpdir = ng_.getPath(process.cwd(), 'tests/tmpclosuretests/');
 var runningTmpFileCount = 0;
 var results = [];
 var maxTests = -1;
@@ -43,7 +48,7 @@ function testClousreTests() {
       testsToRun, allFilesInTmp.length);
 
     var commands = goog.array.map(allFilesInTmp,
-      function(f) { return 'googtest ' + node.goog.utils.getPath(tmpdir, f); });
+      function(f) { return 'googtest ' + ng_.getPath(tmpdir, f); });
     node.goog.tests.paralleliseExecs(
       commands,runTestCallback_, onCompleted_, maxParallels);
   });
@@ -78,7 +83,7 @@ function copyAndParseFile(file, oncomplete) {
     var isHtml = fileName.indexOf('.js') < 0;
     var toFile = (++runningTmpFileCount) + '_' +
       (isHtml ? fileName + '.js' : fileName);
-    toFile = node.goog.utils.getPath(tmpdir, toFile);
+    toFile = ng_.getPath(tmpdir, toFile);
     if (isHtml) contents = convertToJS_(contents);
     fs_.writeFile(toFile, contents, 'utf-8', function(err) {
         if (err) throw err;

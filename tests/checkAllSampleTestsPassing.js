@@ -1,6 +1,11 @@
 #!/usr/local/bin/node
 
-require('goog').goog.init();
+/**
+ * @private
+ * @type {node.goog}
+ * @const
+ */
+var ng_ = require('goog').goog.init();
 
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
@@ -16,7 +21,7 @@ var testsDirs = ['examples/simple/tests/'];
 
 var testFiles = getAllTestFiles_();
 
-setUpPage = function() { asyncTestCase.stepTimeout = 10000;};
+setUpPage = function() { asyncTestCase.stepTimeout = 1000;};
 
 function getAllTestFiles_() {
   var testFiles = [];
@@ -24,8 +29,8 @@ function getAllTestFiles_() {
   var pattern = /test[\w_\d]+\.js/gi;
   goog.array.forEach(testsDirs, function(d) {
     var files = node.goog.tests.readDirRecursiveSync(
-      node.goog.utils.getPath(
-        node.goog.utils.getPath(__dirname, baseDir), d), pattern);
+      ng_.getPath(
+        ng_.getPath(__dirname, baseDir), d), pattern);
     testFiles = goog.array.concat(testFiles, files);
   });
   return testFiles;
@@ -34,7 +39,7 @@ function getAllTestFiles_() {
 function readFilesInDir(d, list) {
   var files = fs_.readdirSync(d);
   goog.array.forEach(files, function(f) {
-    var path = node.goog.utils.getPath(d, f);
+    var path = ng_.getPath(d, f);
     if (fs_.statSync(path).isDirectory()) {
       return readFilesInDir(path, list);
     } else if (f.toLowerCase().indexOf('test') >= 0 && f.indexOf('.js') > 0) {

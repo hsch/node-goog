@@ -5,16 +5,20 @@
  * Currently we cannot get proper logs of async tests and we cannot use
  * googtest with async tests.
  */
+
+/**
+ * @private
+ * @type {node.goog}
+ * @const
+ */
 var ng_ = require('goog').goog.init();
 
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
 
-goog.require('node.goog.utils');
-
 var fs = require('fs');
 var path = require('path');
-var deps = node.goog.utils.getPath(__dirname, 'deps.js');
+var deps = ng_.getPath(__dirname, 'deps.js');
 var min = __filename.replace('.js', '.min.js');
 
 function setUp() { clearDepsAndCompiledFile(); };

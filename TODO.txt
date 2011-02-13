@@ -4,6 +4,10 @@ TODO
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
 
+- Remove the require('goog').goog.init() make it require('goog').init()
+  i.e. remove the redundant intermediate goog.
+- Add a script to update all third_party libraries
+
 GOOGTEST
 =========
 - googtest needs more work its quite buggy

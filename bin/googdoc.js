@@ -16,13 +16,18 @@
  * limitations under the License.
  */
 
-require('goog').goog.init();
+/**
+ * @private
+ * @type {node.goog}
+ * @const
+ */
+var ng_ = require('goog').goog.init();
 
 goog.provide('node.goog.googdoc');
 
 goog.require('goog.array');
-
-goog.require('node.goog.utils');
+goog.require('node_goog_opts');
+goog.require('node.goog');
 
 
 
@@ -30,7 +35,7 @@ goog.require('node.goog.utils');
  * @constructor
  */
 node.goog.googdoc = function() {
-  var args = node.goog.utils.readSettingObject();
+  var args = ng_.args;
   if (!args.jsdocToolkitDir) {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
         'specify a jsdocToolkitDir property pointing to the jsdoc-toolkit ' +
@@ -58,7 +63,7 @@ node.goog.googdoc = function() {
 
 /**
  * @private
- * @param {node.goog.opts} args The settings object.
+ * @param {node_goog_opts} args The settings object.
  */
 node.goog.googdoc.prototype.init_ = function(args) {
   // _dirToDoc is for testing so tests can set this global before calling
@@ -72,7 +77,7 @@ node.goog.googdoc.prototype.init_ = function(args) {
 
 /**
  * @private
- * @param {node.goog.opts} args The settings object.
+ * @param {node_goog_opts} args The settings object.
  * @param {string} entryPoint The file/directory to document.
  */
 node.goog.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
@@ -85,8 +90,8 @@ node.goog.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
 
   this.clArgs = [
     '-t=' +
-        node.goog.utils.getPath(jsDocToolkitDir, 'templates/codeview'),
-    '-d=' + node.goog.utils.getPath(entryPointDir, '/docs'),
+        ng_.getPath(jsDocToolkitDir, 'templates/codeview'),
+    '-d=' + ng_.getPath(entryPointDir, '/docs'),
     '-D="title:' +
         title + '"'
   ];

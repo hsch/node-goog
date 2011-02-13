@@ -3,8 +3,9 @@
 
 require('goog').goog.init();
 
+goog.require('goog.array');
 goog.require('goog.testing.jsunit');
-goog.require('node.goog.NodeTestsRunner');
+goog.require('node_goog_settingsLoader');
 
 
 function testParseStackFrame() {
