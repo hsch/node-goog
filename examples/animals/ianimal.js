@@ -1,5 +1,5 @@
 
-goog.provide('node.goog.examples.animals.IAnimal');
+goog.provide('nclosure.examples.animals.IAnimal');
 
 
 
@@ -8,10 +8,10 @@ goog.provide('node.goog.examples.animals.IAnimal');
  *
  * @interface
  */
-node.goog.examples.animals.IAnimal = function() {};
+nclosure.examples.animals.IAnimal = function() {};
 
 
 /**
  * Makes the animal talk in its own special way
  */
-node.goog.examples.animals.IAnimal.prototype.talk = goog.abstractMethod;
+nclosure.examples.animals.IAnimal.prototype.talk = goog.abstractMethod;

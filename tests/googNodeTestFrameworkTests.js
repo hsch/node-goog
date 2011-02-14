@@ -1,11 +1,11 @@
 #!/usr/local/bin/node
 
 
-require('goog').goog();
+require('nclosure').nclosure();
 
 goog.require('goog.array');
 goog.require('goog.testing.jsunit');
-goog.require('node_goog_settingsLoader');
+goog.require('nclosure_settingsLoader');
 
 
 function testParseStackFrame() {
@@ -16,7 +16,7 @@ function testParseStackFrame() {
     '    at Object.raiseException_ (testing/asserts.js:904:9)',
     '    at _assert (testing/asserts.js:145:26)',
     '    at assertEquals (testing/asserts.js:289:3)',
-    '    at /home/ubuntu/Dev/projects/node-goog/tests/closureUtilsTests.js:70:3',
+    '    at /home/ubuntu/Dev/projects/nclosure/tests/closureUtilsTests.js:70:3',
     '    at [object Object].execute (testing/testcase.js:901:12)'
   ];
 
@@ -26,12 +26,12 @@ function testParseStackFrame() {
   validateStackLine(ls[3], ['Object', 'raiseException_', '(testing/asserts.js:904:9)']);
   validateStackLine(ls[4], ['', '_assert', '(testing/asserts.js:145:26)']);
   validateStackLine(ls[5], ['', 'assertEquals', '(testing/asserts.js:289:3)']);
-  validateStackLine(ls[6], ['', '', '/home/ubuntu/Dev/projects/node-goog/tests/closureUtilsTests.js:70:3']);
+  validateStackLine(ls[6], ['', '', '/home/ubuntu/Dev/projects/nclosure/tests/closureUtilsTests.js:70:3']);
   validateStackLine(ls[7], ['[object Object]', 'execute', '(testing/testcase.js:901:12)']);
 };
 
 function validateStackLine(line, frame) {
-  var expVals = node.goog.NodeTestsRunner.parseStackFrameLine_(line);
+  var expVals = nclosure.NodeTestsRunner.parseStackFrameLine_(line);
 
   if (!expVals) {
     assertNull('Line: ' + line + ' exptected null frame', frame);

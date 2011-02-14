@@ -1,4 +1,4 @@
-# node-goog: Google Closure Tools in Node.js
+# nclosure: Server Side Google Closure Tools in Node.js
 
 ## Overview
 
@@ -31,10 +31,10 @@ code design and maintainability by providing support for:
 
 ## Installation (core)
 
-* Install `node-goog`.  By getting the source (NPM install comming soon):
+* Install `nclosure`.  By getting the source (NPM install comming soon):
 
-			git clone git://github.com/gatapia/node-goog.git
-			cd node-goog
+			git clone git://github.com/gatapia/nclosure.git
+			cd nclosure
 			npm link
 
 ## Closure Library
@@ -43,10 +43,10 @@ For full details on utilities provided in the closure library refer to the
 [official docs](http://closure-library.googlecode.com/svn/docs/index.html).
 To use any utility provided in the closure library just:
 
-1. Include `node-goog` in your application by `require`(ing) it and initialising
+1. Include `nclosure` in your application by `require`(ing) it and initialising
 it.
 
-		require('goog').goog();
+		require('nclosure').nclosure();
 
 2. `goog.require` any namespace from the Closure library.
 
@@ -84,7 +84,7 @@ additionalDeps in an external project.
 
 ## JSDoc Documentation
 
-To run `node-goog`'s documentation tool simply run:
+To run `nclosure`'s documentation tool simply run:
 
     googdoc <directory or source file>
 
@@ -93,17 +93,17 @@ For full documentation details please read the
 
 ## Closure Testing
 
-`node-goog` supports testing using Closure's 'goog.testing.jsunit' test tools.
+`nclosure` supports testing using Closure's 'goog.testing.jsunit' test tools.
 To set up a unit test simply create a test file like:
 
     #!/usr/local/bin/node
-    require('goog').goog();
+    require('nclosure').nclosure();
 
     goog.require('goog.testing.jsunit');
     // Import the code you are testing
-    goog.require('node.goog.examples.simple.Example');
+    goog.require('nclosure.examples.simple.Example');
 
-    goog.provide('node.goog.examples.simple.tests.syncTests');
+    goog.provide('nclosure.examples.simple.tests.syncTests');
 
     // Any testXXX function are auto-discovered and run
     var testFunction1 = function() {
@@ -119,7 +119,7 @@ ensure that the deps.js file of the code you are testing
 is declared in the closure.json file of the tests directory or passed in to the
 call to `goog();` like:
 
-    require('goog').goog({additionalDeps:['/pathToDeps/deps.js']});
+    require('nclosure').goog({additionalDeps:['/pathToDeps/deps.js']});
 
 To run a single test just execute:
 
@@ -131,7 +131,7 @@ To run all tests in a single directory run the following command:
 
 ## Closure Linter
 
-For detailed code style checking you can also use `node-goog`'s
+For detailed code style checking you can also use `nclosure`'s
 linter support.  To use linter you will need to download and install
 [Closure Linter](http://code.google.com/closure/utilities/index.html).
 
@@ -148,13 +148,13 @@ Once installed simply run the following command to `linter` your code.
 
 ## Advanced Configuration
 
-`node-goog` can be configured in several ways.  The easiest is to modify the
+`nclosure` can be configured in several ways.  The easiest is to modify the
 `bin/closure.json` file with your global settings.  Settings here can be
 extended by placing a `closure.json` file in your source directory. You can
 also place a `closure.json` in the directory running `node`.
 
-Finally, `node-goog` can also be configured by passing an optional options
-object to the `require('goog').goog(opts);` call.
+Finally, `nclosure` can also be configured by passing an optional options
+object to the `require('nclosure').goog(opts);` call.
 
 All configuration files and configuration objects take the following format:
 
@@ -182,7 +182,7 @@ All configuration files and configuration objects take the following format:
           additionalLinterOptions: Additional gjslint and fixjsstyle options,
             e.g.: "['--summary=true']"
           nodeDir: The location of the node source code.  This is only required
-            if you are contributing to the node-goog project or would like to
+            if you are contributing to the nclosure project or would like to
             update your node-extern files.
         }
 
@@ -194,7 +194,9 @@ My sincerest appreciation to Google for open sourcing this awesome toolset.
 Thanks to the jsdoc-toolkit guys (Michael Mathews + co) and to Wouter Bos for
 his awesome jsdoc-toolkit template.  Thanks also to Aaron Wirtz for his
 [node-jsdoc-toolkit](https://github.com/p120ph37/node-jsdoc-toolkit) project.
-
+Huge thanks also goes to Hendrik Schnepel whose awesome
+[nclosure project](https://github.com/hsch/nclosure) got me started with
+this project.
 
 ## License
 

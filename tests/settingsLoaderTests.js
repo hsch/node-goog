@@ -1,18 +1,18 @@
 #!/usr/local/bin/node
 
-require('goog').goog();
+require('nclosure').nclosure();
 
 goog.require('goog.testing.jsunit');
-goog.require('node_goog_settingsLoader');
+goog.require('nclosure_settingsLoader');
 
 /**
  * @private
- * @type {node_goog_settingsLoader}
+ * @type {nclosure_settingsLoader}
  */
 var settingsLoader;
 
 function setUpPage() {
-  settingsLoader = /** @type {node_goog_settingsLoader} */ (
+  settingsLoader = /** @type {nclosure_settingsLoader} */ (
     require('../lib/settingsloader').settingsLoader);
 };
 

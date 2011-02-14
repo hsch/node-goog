@@ -1,9 +1,9 @@
 
-goog.provide('node.goog.NodeTestsRunner');
+goog.provide('nclosure.NodeTestsRunner');
 
 goog.require('goog.array');
 goog.require('goog.testing.stacktrace');
-goog.require('node.goog.NodeTestInstance');
+goog.require('nclosure.NodeTestInstance');
 
 
 
@@ -12,7 +12,7 @@ goog.require('node.goog.NodeTestInstance');
  * @param {Array.<string>} testFiles The test files to test.
  * @param {string} args Any args used to find appropriate tests to run.
  */
-node.goog.NodeTestsRunner = function(testFiles, args) {
+nclosure.NodeTestsRunner = function(testFiles, args) {
   /**
    * The test files to test, this will be 'pop'ed as these are run.
    * @private
@@ -36,16 +36,16 @@ node.goog.NodeTestsRunner = function(testFiles, args) {
 
   // Some require overrides to make stack traces properly visible
   goog.testing.stacktrace.parseStackFrame_ =
-      node.goog.NodeTestsRunner.parseStackFrameLine_;
+      nclosure.NodeTestsRunner.parseStackFrameLine_;
   goog.testing.stacktrace.framesToString_ =
-      node.goog.NodeTestsRunner.stackFramesToString_;
+      nclosure.NodeTestsRunner.stackFramesToString_;
 };
 
 
 /**
  * Executes the tests
  */
-node.goog.NodeTestsRunner.prototype.execute = function() {
+nclosure.NodeTestsRunner.prototype.execute = function() {
   this.runNextTest_();
 };
 
@@ -54,7 +54,7 @@ node.goog.NodeTestsRunner.prototype.execute = function() {
  * Runs the next test in the queue or calls displayResults_
  * @private
  */
-node.goog.NodeTestsRunner.prototype.runNextTest_ = function() {
+nclosure.NodeTestsRunner.prototype.runNextTest_ = function() {
   if (this.testFiles_.length === 0) {
     this.displayResults_();
     // If we get a timeout exception we have to terminate the thread
@@ -71,8 +71,8 @@ node.goog.NodeTestsRunner.prototype.runNextTest_ = function() {
  * @param {string} file The spricific test to run.
  * @private
  */
-node.goog.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
-  var instance = new node.goog.NodeTestInstance(file, this.args_,
+nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
+  var instance = new nclosure.NodeTestInstance(file, this.args_,
       goog.bind(this.onTestCompleted_, this));
   instance.run();
 };
@@ -82,7 +82,7 @@ node.goog.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
  * @private
  * @param {goog.testing.TestCase} tc The test case that just completed.
  */
-node.goog.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
+nclosure.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
   this.completedTestCases_.push(tc);
   this.runNextTest_();
 };
@@ -92,10 +92,10 @@ node.goog.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
  * @private
  * Spits the results to the console
  */
-node.goog.NodeTestsRunner.prototype.displayResults_ = function() {
+nclosure.NodeTestsRunner.prototype.displayResults_ = function() {
   console.log('\x1B[0;34m\n=======\nRESULTS\n=======');
   var results = goog.array.map(this.completedTestCases_,
-      node.goog.NodeTestsRunner.renderTestCase_, this);
+      nclosure.NodeTestsRunner.renderTestCase_, this);
   console.log(results.join('\n\n'));
 };
 
@@ -106,8 +106,8 @@ node.goog.NodeTestsRunner.prototype.displayResults_ = function() {
  * @param {goog.testing.TestCase} tc The test case to render results.
  * @return {string} A string representation of this test case.
  */
-node.goog.NodeTestsRunner.renderTestCase_ = function(tc) {
-  return node.goog.NodeTestsRunner.colorizeReport(tc.getReport(false));
+nclosure.NodeTestsRunner.renderTestCase_ = function(tc) {
+  return nclosure.NodeTestsRunner.colorizeReport(tc.getReport(false));
 };
 
 
@@ -115,7 +115,7 @@ node.goog.NodeTestsRunner.renderTestCase_ = function(tc) {
  * @param {string} report The test report to colorize.
  * @return {string} The colorized report.
  */
-node.goog.NodeTestsRunner.colorizeReport = function(report) {
+nclosure.NodeTestsRunner.colorizeReport = function(report) {
   var lines = report.replace(/\s*$/, '').split('\n');
   // Remove empty lines
   lines = goog.array.filter(lines, function(l) { return l !== ''; });
@@ -129,7 +129,7 @@ node.goog.NodeTestsRunner.colorizeReport = function(report) {
     return (isSuccess ? '\x1B[0;32m' : '\x1B[0;31m') + l;
   });
   var titleLen = lines[0].length - 7; // 7 for the color
-  var underline = node.goog.NodeTestsRunner.padString_('', titleLen, '-');
+  var underline = nclosure.NodeTestsRunner.padString_('', titleLen, '-');
   lines.splice(1, 0, underline);
   return lines.join('\n');
 };
@@ -143,7 +143,7 @@ node.goog.NodeTestsRunner.colorizeReport = function(report) {
  * @return {string} The padded string.
  * @private
  */
-node.goog.NodeTestsRunner.padString_ = function(str, length, ch) {
+nclosure.NodeTestsRunner.padString_ = function(str, length, ch) {
   while (str.length < length) {
     str = ch + str;
   }
@@ -168,7 +168,7 @@ node.goog.NodeTestsRunner.padString_ = function(str, length, ch) {
  * @param {string} line A line in the stack trace.
  * @return {goog.testing.stacktrace.Frame} The parsed frame.
 */
-node.goog.NodeTestsRunner.parseStackFrameLine_ = function(line) {
+nclosure.NodeTestsRunner.parseStackFrameLine_ = function(line) {
   if (!line || line.indexOf('    at ') !== 0) { return null; }
   line = line.substring(line.indexOf(' at ') + 4);
   // return new goog.testing.stacktrace.Frame('', line, '', '', line);
@@ -199,7 +199,7 @@ node.goog.NodeTestsRunner.parseStackFrameLine_ = function(line) {
  * @return {string} Canonical, pretty printed stack trace.
  * @private
  */
-node.goog.NodeTestsRunner.stackFramesToString_ = function(frames) {
+nclosure.NodeTestsRunner.stackFramesToString_ = function(frames) {
   var stack = [];
   for (var i = 0, len = frames.length; i < len; i++) {
     var f = frames[i];

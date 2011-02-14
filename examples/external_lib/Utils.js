@@ -1,11 +1,11 @@
 
-goog.provide('node.goog.external.Utils');
+goog.provide('nclosure.external.Utils');
 
 
 /**
  * @param {string} echo The string to echo.
  * @return {string} The echo string.
  */
-node.goog.external.Utils.echo = function(echo) {
+nclosure.external.Utils.echo = function(echo) {
   return echo;
 };

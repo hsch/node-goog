@@ -1,41 +1,24 @@
 #!/usr/local/bin/node
 
 /**
- * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
-/**
  * @private
- * @type {node.goog}
+ * @type {nclosure}
  * @const
  */
-var ng_ = require('goog').goog();
+var ng_ = require('nclosure').nclosure();
 
-goog.provide('node.goog.googdoc');
+goog.provide('nclosure.googdoc');
 
 goog.require('goog.array');
-goog.require('node.goog');
-goog.require('node_goog_opts');
+goog.require('nclosure');
+goog.require('nclosure_opts');
 
 
 
 /**
  * @constructor
  */
-node.goog.googdoc = function() {
+nclosure.googdoc = function() {
   var args = ng_.args;
   if (!args.jsdocToolkitDir) {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
@@ -64,11 +47,11 @@ node.goog.googdoc = function() {
 
 /**
  * @private
- * @param {node_goog_opts} args The settings object.
+ * @param {nclosure_opts} args The settings object.
  */
-node.goog.googdoc.prototype.init_ = function(args) {
+nclosure.googdoc.prototype.init_ = function(args) {
   // _dirToDoc is for testing so tests can set this global before calling
-  // goog.require('node.goog.googdoc')
+  // goog.require('nclosure.googdoc')
   this.createJSDocArgs_(args, global['_dirToDoc'] || process.argv[2]);
 
   // Run node-jsdoc-toolkit
@@ -78,10 +61,10 @@ node.goog.googdoc.prototype.init_ = function(args) {
 
 /**
  * @private
- * @param {node_goog_opts} args The settings object.
+ * @param {nclosure_opts} args The settings object.
  * @param {string} entryPoint The file/directory to document.
  */
-node.goog.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
+nclosure.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var title = entryPointDirIdx > 0 ?
       entryPoint.substring(entryPointDirIdx + 1) : entryPoint;
@@ -107,10 +90,10 @@ node.goog.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
 /**
  * @private
  */
-node.goog.googdoc.prototype.runJSDocToolkit_ = function() {
+nclosure.googdoc.prototype.runJSDocToolkit_ = function() {
   this.jsdoc_toolkit_.init(this.clArgs);
 };
 
 
-/** @type {node.goog.googdoc} */
-exports.googDoc = new node.goog.googdoc();
+/** @type {nclosure.googdoc} */
+exports.googDoc = new nclosure.googdoc();

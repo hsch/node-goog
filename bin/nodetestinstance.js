@@ -1,5 +1,5 @@
 
-goog.provide('node.goog.NodeTestInstance');
+goog.provide('nclosure.NodeTestInstance');
 
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
@@ -17,7 +17,7 @@ goog.require('goog.testing.TestCase');
  *    in the test case so the handler can do as they wish with results.
  * @param {string=} testFilter Only run tests with name matching this filter.
  */
-node.goog.NodeTestInstance =
+nclosure.NodeTestInstance =
     function(file, args, onCompleteHandler, testFilter) {
 
   /**
@@ -70,7 +70,7 @@ node.goog.NodeTestInstance =
  * @private
  * @suppress {visibility}
  */
-node.goog.NodeTestInstance.prototype.overwriteAsyncTestCaseProblemPoints_ =
+nclosure.NodeTestInstance.prototype.overwriteAsyncTestCaseProblemPoints_ =
     function() {
   // The default createAndInstall relies on TestRunners and other internal
   // goog.testing package which are not available in this context
@@ -103,7 +103,7 @@ node.goog.NodeTestInstance.prototype.overwriteAsyncTestCaseProblemPoints_ =
  * @param {string} filter The filter to apply to the running tests.
  * @private
  */
-node.goog.NodeTestInstance.prototype.setUpTestCaseInterceps_ =
+nclosure.NodeTestInstance.prototype.setUpTestCaseInterceps_ =
     function(filter) {
   // Crazy jibber jabber from goog.testing.TestCase. Ugly code here but little
   // alternative other than re implementing TestCase which is 95% there
@@ -138,7 +138,7 @@ node.goog.NodeTestInstance.prototype.setUpTestCaseInterceps_ =
 /**
  * Runs the test
  */
-node.goog.NodeTestInstance.prototype.run = function() {
+nclosure.NodeTestInstance.prototype.run = function() {
   var contents = this.loadTestContents_();
   this.loadTestContentsIntoMemory_(contents);
   this.createAndRunTestCase_();
@@ -149,7 +149,7 @@ node.goog.NodeTestInstance.prototype.run = function() {
  * @private
  * @return {goog.testing.AsyncTestCase} The async test case created.
  */
-node.goog.NodeTestInstance.prototype.createAsyncTestCase_ = function() {
+nclosure.NodeTestInstance.prototype.createAsyncTestCase_ = function() {
   return this.testCase_ = new goog.testing.AsyncTestCase(this.shortName_);
 };
 
@@ -158,7 +158,7 @@ node.goog.NodeTestInstance.prototype.createAsyncTestCase_ = function() {
  * @private
  * @return {string} The test file contents.
  */
-node.goog.NodeTestInstance.prototype.loadTestContents_ = function() {
+nclosure.NodeTestInstance.prototype.loadTestContents_ = function() {
   return require('fs').readFileSync(this.file_, encoding = 'utf8');
 };
 
@@ -167,7 +167,7 @@ node.goog.NodeTestInstance.prototype.loadTestContents_ = function() {
  * @private
  * @param {string} contents The test file contents.
  */
-node.goog.NodeTestInstance.prototype.loadTestContentsIntoMemory_ =
+nclosure.NodeTestInstance.prototype.loadTestContentsIntoMemory_ =
     function(contents) {
   if (this.shortName_.indexOf('.js') < 0) {
     contents = this.convertHtmlTestToJS_(contents);
@@ -186,7 +186,7 @@ node.goog.NodeTestInstance.prototype.loadTestContentsIntoMemory_ =
 /**
  * @private
  */
-node.goog.NodeTestInstance.prototype.createAndRunTestCase_ = function() {
+nclosure.NodeTestInstance.prototype.createAndRunTestCase_ = function() {
   var async = goog.isDefAndNotNull(this.testCase_);
   if (!async) { this.testCase_ = new goog.testing.TestCase(this.shortName_); }
   this.testCase_.autoDiscoverTests();
@@ -201,7 +201,7 @@ node.goog.NodeTestInstance.prototype.createAndRunTestCase_ = function() {
  *    instance.
  * @private
  */
-node.goog.NodeTestInstance.prototype.onTestComplete_ = function() {
+nclosure.NodeTestInstance.prototype.onTestComplete_ = function() {
   if (!this.ctx_) this.clearOutGlobalContext_();
   this.onCompleteHandler_(this.testCase_);
 };
@@ -212,7 +212,7 @@ node.goog.NodeTestInstance.prototype.onTestComplete_ = function() {
  * the tests stepping on each other's toes
  * @private
  */
-node.goog.NodeTestInstance.prototype.clearOutGlobalContext_ = function() {
+nclosure.NodeTestInstance.prototype.clearOutGlobalContext_ = function() {
   for (var i in global) {
     if (i.indexOf('test') === 0 || i.indexOf('setUp') === 0 ||
         i.indexOf('tearDown') === 0) {
@@ -226,7 +226,7 @@ node.goog.NodeTestInstance.prototype.clearOutGlobalContext_ = function() {
  * @private
  * @return {Object} The testing context to use to run the tests in.
  */
-node.goog.NodeTestInstance.prototype.initialiseTestingContext_ = function() {
+nclosure.NodeTestInstance.prototype.initialiseTestingContext_ = function() {
   var ctx = {
     'require': global.goog.require,
     'goog': global.goog,
@@ -241,7 +241,7 @@ node.goog.NodeTestInstance.prototype.initialiseTestingContext_ = function() {
  * @param {string} html The html file contents.
  * @return {string} The JavaScript contents.
  */
-node.goog.NodeTestInstance.prototype.convertHtmlTestToJS_ = function(html) {
+nclosure.NodeTestInstance.prototype.convertHtmlTestToJS_ = function(html) {
   var blocks = [];
   var idx = html.indexOf('<script');
   while (idx >= 0) {

@@ -1,6 +1,7 @@
 TODO
 ====
-- Rename project
+
+- Add acknoledgement file for all acks
 
 - Fix non source code install (npm)
 
@@ -8,10 +9,10 @@ TODO
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
 
+- Failing tests makes output very complex and unreadable
+
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
-
-- Failing tests makes output very complex and unreadable
 
 - googtest should run (exec) tests in parallel, this would also solve any
 context sharing issues.

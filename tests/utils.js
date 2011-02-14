@@ -1,11 +1,11 @@
 
-goog.provide('node.goog.tests');
+goog.provide('nclosure.tests');
 
 goog.require('goog.array');
 
-node.goog.tests.fs_ = require('fs');
-node.goog.tests.path_ = require('path');
-node.goog.tests.child_process_ = require('child_process');
+nclosure.tests.fs_ = require('fs');
+nclosure.tests.path_ = require('path');
+nclosure.tests.child_process_ = require('child_process');
 
 /**
  * @param {string} dir The directory to read all files for
@@ -14,9 +14,9 @@ node.goog.tests.child_process_ = require('child_process');
  * @return {Array.<string>} A list of all files in the specified directory
  *    (recursive) that optionally match the specified filter regex.
  */
-node.goog.tests.readDirRecursiveSync = function(dir, filter) {
+nclosure.tests.readDirRecursiveSync = function(dir, filter) {
   var files = [];
-  node.goog.tests.readDirRecursiveSyncImpl_(dir, files);
+  nclosure.tests.readDirRecursiveSyncImpl_(dir, files);
   if (filter) {
     filter = typeof(filter) === 'string' ? new RegExp(filter) : filter;
     files = goog.array.filter(files, function(f) {
@@ -29,12 +29,12 @@ node.goog.tests.readDirRecursiveSync = function(dir, filter) {
 /**
  * @private
  */
-node.goog.tests.readDirRecursiveSyncImpl_ = function(dir, allFiles) {
-  var files = node.goog.tests.fs_.readdirSync(dir);
+nclosure.tests.readDirRecursiveSyncImpl_ = function(dir, allFiles) {
+  var files = nclosure.tests.fs_.readdirSync(dir);
   goog.array.forEach(files, function(f) {
-    var path = node.goog.instance.getPath(dir, f);
-    if (node.goog.tests.fs_.statSync(path).isDirectory()) {
-      return node.goog.tests.readDirRecursiveSyncImpl_(path, allFiles);
+    var path = nclosure.instance.getPath(dir, f);
+    if (nclosure.tests.fs_.statSync(path).isDirectory()) {
+      return nclosure.tests.readDirRecursiveSyncImpl_(path, allFiles);
     } {
       allFiles.push(path);
     }
@@ -44,8 +44,8 @@ node.goog.tests.readDirRecursiveSyncImpl_ = function(dir, allFiles) {
 /**
  * Removes a specified directory and all its contents.
  */
-node.goog.tests.rmRfDir = function (dir, callback) {
-  node.goog.tests.child_process_.exec('rm -rf ' + dir, callback);
+nclosure.tests.rmRfDir = function (dir, callback) {
+  nclosure.tests.child_process_.exec('rm -rf ' + dir, callback);
 };
 
 /**
@@ -57,19 +57,19 @@ node.goog.tests.rmRfDir = function (dir, callback) {
  *    finnished
  * @param {number=} max The maximum number of separate processes to create
  */
-node.goog.tests.paralleliseExecs =
+nclosure.tests.paralleliseExecs =
     function(execCommands, callback, oncomplete, max) {
   if (!max || max <= 0 || max >= execCommands.length) {
     var remaining = execCommands.length;
     goog.array.forEach(execCommands, function(c) {
-      node.goog.tests.child_process_.exec(c, function(err, stderr, stdout) {
+      nclosure.tests.child_process_.exec(c, function(err, stderr, stdout) {
         if (callback) callback(c, err, stderr, stdout);
         if (--remaining === 0) oncomplete();
       });
     });
   } else {
     var commands = goog.array.clone(execCommands);
-    node.goog.tests.runNextCommandImpl_(commands, callback, oncomplete, max);
+    nclosure.tests.runNextCommandImpl_(commands, callback, oncomplete, max);
   }
 };
 
@@ -77,7 +77,7 @@ node.goog.tests.paralleliseExecs =
  * @private
  * @type {number}
  */
-node.goog.tests.runningCommands_ = 0;
+nclosure.tests.runningCommands_ = 0;
 
 /**
  * @private
@@ -89,24 +89,24 @@ node.goog.tests.runningCommands_ = 0;
  *    finnished
  * @param {number=} max The maximum number of separate processes to create
  */
-node.goog.tests.runNextCommandImpl_ =
+nclosure.tests.runNextCommandImpl_ =
     function(execCommands, callback, oncomplete, max) {
-  if (execCommands.length <= 0 || node.goog.tests.runningCommands_ >= max) return;
+  if (execCommands.length <= 0 || nclosure.tests.runningCommands_ >= max) return;
 
-  node.goog.tests.runningCommands_++;
+  nclosure.tests.runningCommands_++;
   var command = execCommands.pop();
-  node.goog.tests.child_process_.exec(command, function(err, stderr, stdout) {
-    node.goog.tests.runningCommands_--;
-    node.goog.tests.runNextCommandImpl_(
+  nclosure.tests.child_process_.exec(command, function(err, stderr, stdout) {
+    nclosure.tests.runningCommands_--;
+    nclosure.tests.runNextCommandImpl_(
         execCommands, callback, oncomplete, max);
     if (callback) callback(command, err, stderr, stdout);
-    if (node.goog.tests.runningCommands_ === 0 && execCommands.length === 0) {
+    if (nclosure.tests.runningCommands_ === 0 && execCommands.length === 0) {
       return oncomplete();
     }
   });
 
-  if (node.goog.tests.runningCommands_ < max - 1) {
-    node.goog.tests.runNextCommandImpl_(
+  if (nclosure.tests.runningCommands_ < max - 1) {
+    nclosure.tests.runNextCommandImpl_(
         execCommands, callback, oncomplete, max);
   }
 };

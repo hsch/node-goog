@@ -20,33 +20,33 @@
  * Does not require an opts parameter as we are providing all the options in
  * the closure.json file in this directory;
  */
-require('goog').goog();
+require('nclosure').nclosure();
 
 /*
- * Now that the nodegoog is initialised you can use any base.js functionality
+ * Now that the nclosure is initialised you can use any base.js functionality
  * such as goog.require / goog.provide
  *
  * Note: At least one namespace must be provided for compilation purposes
  */
 
-goog.provide('node.goog.examples.animals.Example');
+goog.provide('nclosure.examples.animals.Example');
 
 goog.require('goog.array');
-goog.require('node.goog.examples.animals.Cat');
-goog.require('node.goog.examples.animals.Dog');
-goog.require('node.goog.examples.animals.IAnimal');
-goog.require('node.goog.examples.animals.Monkey');
-goog.require('node.goog.examples.animals.Tiger');
+goog.require('nclosure.examples.animals.Cat');
+goog.require('nclosure.examples.animals.Dog');
+goog.require('nclosure.examples.animals.IAnimal');
+goog.require('nclosure.examples.animals.Monkey');
+goog.require('nclosure.examples.animals.Tiger');
 
 
 
 /**
  * @constructor
  */
-node.goog.examples.animals.Example = function() {
+nclosure.examples.animals.Example = function() {
   /**
    * @private
-   * @type {Array.<node.goog.examples.animals.IAnimal>}
+   * @type {Array.<nclosure.examples.animals.IAnimal>}
    */
   this.animals_ = this.initRandomAnimals_();
   this.makeAnimalsTalk_();
@@ -56,17 +56,17 @@ node.goog.examples.animals.Example = function() {
 
 /**
  * @private
- * @return {Array.<node.goog.examples.animals.IAnimal>} A colleciton of
+ * @return {Array.<nclosure.examples.animals.IAnimal>} A colleciton of
  *    random animals.
  */
-node.goog.examples.animals.Example.prototype.initRandomAnimals_ = function() {
-  /** @type {Array.<node.goog.examples.animals.IAnimal>} */
+nclosure.examples.animals.Example.prototype.initRandomAnimals_ = function() {
+  /** @type {Array.<nclosure.examples.animals.IAnimal>} */
   var animals = [];
   var types = [
-    node.goog.examples.animals.Dog,
-    node.goog.examples.animals.Cat,
-    node.goog.examples.animals.Tiger,
-    node.goog.examples.animals.Monkey
+    nclosure.examples.animals.Dog,
+    nclosure.examples.animals.Cat,
+    nclosure.examples.animals.Tiger,
+    nclosure.examples.animals.Monkey
   ];
   var len = parseInt(10 + (Math.random() * 10), 10);
   console.log('Creating ' + len + ' random animals');
@@ -81,8 +81,8 @@ node.goog.examples.animals.Example.prototype.initRandomAnimals_ = function() {
 /**
  * @private
  */
-node.goog.examples.animals.Example.prototype.makeAnimalsTalk_ = function() {
-  /** @type {Array.<node.goog.examples.animals.IAnimal>} */
+nclosure.examples.animals.Example.prototype.makeAnimalsTalk_ = function() {
+  /** @type {Array.<nclosure.examples.animals.IAnimal>} */
   goog.array.forEach(this.animals_, this.makeAnimalTalk_, this);
 
 };
@@ -90,9 +90,9 @@ node.goog.examples.animals.Example.prototype.makeAnimalsTalk_ = function() {
 
 /**
  * @private
- * @param {node.goog.examples.animals.IAnimal} animal The animal to talkify.
+ * @param {nclosure.examples.animals.IAnimal} animal The animal to talkify.
  */
-node.goog.examples.animals.Example.prototype.makeAnimalTalk_ =
+nclosure.examples.animals.Example.prototype.makeAnimalTalk_ =
     function(animal) {
   animal.talk();
 };
@@ -101,4 +101,4 @@ node.goog.examples.animals.Example.prototype.makeAnimalTalk_ =
 /*
  * Start the demo
  */
-new node.goog.examples.animals.Example();
+new nclosure.examples.animals.Example();

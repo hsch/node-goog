@@ -1,50 +1,39 @@
 #!/usr/local/bin/node
 
 /**
- * @fileoverview Copyright 2011 Guido Tapia (guido@tapia.com.au).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @fileoverview This file runs fixjsstyle and gjslint on a directory
+ * recursively checking and trying to fix as many style issues as possible.
+ * These tools run agains Google's coding style guide.
  */
-
 
 /**
  * @private
- * @type {node.goog}
+ * @type {nclosure}
  * @const
  */
-var ng_ = require('goog').goog();
+var ng_ = require('nclosure').nclosure();
 
-goog.provide('node.goog.googcodecheck');
+goog.provide('nclosure.googcodecheck');
 
 goog.require('goog.array');
-goog.require('node.goog');
-goog.require('node_goog_opts');
+goog.require('nclosure');
+goog.require('nclosure_opts');
 
 
 
 /**
  * @constructor
  */
-node.goog.googcodecheck = function() {
+nclosure.googcodecheck = function() {
 
   /**
    * @private
-   * @type {node_goog_opts}
+   * @type {nclosure_opts}
    */
   this.settings_;
 
   var dir = process.argv[2];
-  var isDir = node.goog.googcodecheck.isDir_(dir);
+  var isDir = nclosure.googcodecheck.isDir_(dir);
   if (!isDir) {
     dir = dir.substring(0, dir.lastIndexOf('/') + 1);
   }
@@ -68,7 +57,7 @@ node.goog.googcodecheck = function() {
  * @const
  * @type {extern_fs}
  */
-node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
+nclosure.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
 
 
 /**
@@ -76,8 +65,8 @@ node.goog.googcodecheck.fs_ = /** @type {extern_fs} */ (require('fs'));
  * @param {string} f The file or directory path.
  * @return {boolean} Wether the specified path is a directory.
  */
-node.goog.googcodecheck.isDir_ = function(f) {
-  return node.goog.googcodecheck.fs_.statSync(f)['isDirectory']();
+nclosure.googcodecheck.isDir_ = function(f) {
+  return nclosure.googcodecheck.fs_.statSync(f)['isDirectory']();
 };
 
 
@@ -86,11 +75,11 @@ node.goog.googcodecheck.isDir_ = function(f) {
  * @param {string} dir The directory to recursively fix the bash instructions
  *    on.
  */
-node.goog.googcodecheck.prototype.fixBashInstructionsOnDir_ = function(dir) {
-  goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
+nclosure.googcodecheck.prototype.fixBashInstructionsOnDir_ = function(dir) {
+  goog.array.forEach(nclosure.googcodecheck.fs_.readdirSync(dir),
       function(f) {
         var path = ng_.getPath(dir, f);
-        if (node.goog.googcodecheck.isDir_(path)) {
+        if (nclosure.googcodecheck.isDir_(path)) {
           return this.fixBashInstructionsOnDir_(path);
         }
         this.fixBashInstructions_(dir, f);
@@ -103,15 +92,15 @@ node.goog.googcodecheck.prototype.fixBashInstructionsOnDir_ = function(dir) {
  * @param {string} dir The directory to code check.
  * @param {string} file The file to check.
  */
-node.goog.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
+nclosure.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
   if (this.isIgnorableFile_(dir, file)) return;
-  var fileContents = node.goog.googcodecheck.fs_.
+  var fileContents = nclosure.googcodecheck.fs_.
       readFileSync(ng_.getPath(dir, file), encoding = 'utf8');
   var m = /^# !([^;]+)\;/g.exec(fileContents);
   if (!m) { return; }
   var fixed = m[1].replace(/ /g, '');
   fileContents = fileContents.replace(m[0], '#!' + fixed);
-  node.goog.googcodecheck.fs_.writeFileSync(ng_.getPath(dir, file),
+  nclosure.googcodecheck.fs_.writeFileSync(ng_.getPath(dir, file),
       fileContents, encoding = 'utf8');
 };
 
@@ -121,7 +110,7 @@ node.goog.googcodecheck.prototype.fixBashInstructions_ = function(dir, file) {
  * @param {string} dir The directory to code check.
  * @param {function():undefined} callback The exit callback.
  */
-node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
+nclosure.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
   this.runProcess_('fixjsstyle', this.getLinterArgs_(dir), callback);
 };
 
@@ -131,7 +120,7 @@ node.goog.googcodecheck.prototype.runFixStyle_ = function(dir, callback) {
  * @param {string} dir The directory to code check.
  * @param {function():undefined=} callback The exit callback.
  */
-node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
+nclosure.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
   this.runProcess_('gjslint', this.getLinterArgs_(dir), callback);
 };
 
@@ -142,7 +131,7 @@ node.goog.googcodecheck.prototype.runGSJLint_ = function(dir, callback) {
  * @return {Array.<string>} The array of arguments for the gjslint and
  *    fixjsstyle calls.
  */
-node.goog.googcodecheck.prototype.getLinterArgs_ = function(dir) {
+nclosure.googcodecheck.prototype.getLinterArgs_ = function(dir) {
   if (!this.settings_) {
     this.settings_ = ng_.args;
   }
@@ -165,8 +154,8 @@ node.goog.googcodecheck.prototype.getLinterArgs_ = function(dir) {
  * @param {string} dir The directory to code check.
  * @return {Array.<string>} An array of all files to ignore.
  */
-node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
-  if (!node.goog.googcodecheck.isDir_(dir)) return [];
+nclosure.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
+  if (!nclosure.googcodecheck.isDir_(dir)) return [];
   return this.getAllIgnoreableFilesIn_([], dir);
 };
 
@@ -180,12 +169,12 @@ node.goog.googcodecheck.prototype.getLinterExcludeFiles_ = function(dir) {
  * @return {Array.<string>} An array of all ignoreable files to in the
  *    specified directory.
  */
-node.goog.googcodecheck.prototype.getAllIgnoreableFilesIn_ =
+nclosure.googcodecheck.prototype.getAllIgnoreableFilesIn_ =
     function(allFiles, dir) {
-  goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
+  goog.array.forEach(nclosure.googcodecheck.fs_.readdirSync(dir),
       function(f) {
         var path = ng_.getPath(dir, f);
-        if (!node.goog.googcodecheck.isDir_(path)) {
+        if (!nclosure.googcodecheck.isDir_(path)) {
           if (this.isIgnorableFile_(dir, f)) { allFiles.push(path); }
         } else {
           this.getAllIgnoreableFilesIn_(allFiles, path);
@@ -201,8 +190,8 @@ node.goog.googcodecheck.prototype.getAllIgnoreableFilesIn_ =
  * @param {string} f If this file can be ignored from the checks.
  * @return {boolean} Wether the specified file can be safely ignored.
  */
-node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
-  if (node.goog.googcodecheck.isDir_(
+nclosure.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
+  if (nclosure.googcodecheck.isDir_(
       ng_.getPath(dir, f))) return false;
 
   var ignore =
@@ -223,8 +212,8 @@ node.goog.googcodecheck.prototype.isIgnorableFile_ = function(dir, f) {
  * @param {string} dir The directory to code check.
  * @return {Array.<string>} An array of all directories to ignore.
  */
-node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
-  if (!node.goog.googcodecheck.isDir_(dir)) return [];
+nclosure.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
+  if (!nclosure.googcodecheck.isDir_(dir)) return [];
   return this.getAllIgnoreableDirectoriesIn_([], dir);
 };
 
@@ -238,12 +227,12 @@ node.goog.googcodecheck.prototype.getLinterExcludeDir_ = function(dir) {
  * @return {Array.<string>} An array of all ignoreable directories to in the
  *    specified directory.
  */
-node.goog.googcodecheck.prototype.getAllIgnoreableDirectoriesIn_ =
+nclosure.googcodecheck.prototype.getAllIgnoreableDirectoriesIn_ =
     function(allDirs, dir) {
-  goog.array.forEach(node.goog.googcodecheck.fs_.readdirSync(dir),
+  goog.array.forEach(nclosure.googcodecheck.fs_.readdirSync(dir),
       function(d) {
         var path = ng_.getPath(dir, d);
-        if (!node.goog.googcodecheck.isDir_(path)) return;
+        if (!nclosure.googcodecheck.isDir_(path)) return;
         if (d === 'docs' || d === 'tests') { allDirs.push(path); return; }
         this.getAllIgnoreableDirectoriesIn_(allDirs, path);
       }, this);
@@ -257,7 +246,7 @@ node.goog.googcodecheck.prototype.getAllIgnoreableDirectoriesIn_ =
  * @param {Array.<string>} args The arguments to pass to the command.
  * @param {function():undefined=} callback The exit callback.
  */
-node.goog.googcodecheck.prototype.runProcess_ =
+nclosure.googcodecheck.prototype.runProcess_ =
     function(command, args, callback) {
   command += ' ' + args.join(' ');
 
@@ -277,4 +266,4 @@ node.goog.googcodecheck.prototype.runProcess_ =
       });
 };
 
-new node.goog.googcodecheck();
+new nclosure.googcodecheck();

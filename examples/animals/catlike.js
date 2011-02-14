@@ -1,14 +1,14 @@
-goog.provide('node.goog.examples.animals.CatLike');
+goog.provide('nclosure.examples.animals.CatLike');
 
-goog.require('node.goog.examples.animals.IAnimal');
+goog.require('nclosure.examples.animals.IAnimal');
 
 
 
 /**
  * @constructor
- * @implements {node.goog.examples.animals.IAnimal}
+ * @implements {nclosure.examples.animals.IAnimal}
  */
-node.goog.examples.animals.CatLike = function() {};
+nclosure.examples.animals.CatLike = function() {};
 
 
 /**
@@ -17,6 +17,6 @@ node.goog.examples.animals.CatLike = function() {};
   *
   * @inheritDoc
   */
-node.goog.examples.animals.CatLike.prototype.talk = function() {
+nclosure.examples.animals.CatLike.prototype.talk = function() {
   console.log('MEEEAWWW');
 };

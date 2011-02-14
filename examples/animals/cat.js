@@ -1,17 +1,17 @@
 
-goog.provide('node.goog.examples.animals.Cat');
+goog.provide('nclosure.examples.animals.Cat');
 
-goog.require('node.goog.examples.animals.CatLike');
-goog.require('node.goog.examples.animals.IAnimal');
+goog.require('nclosure.examples.animals.CatLike');
+goog.require('nclosure.examples.animals.IAnimal');
 
 
 
 /**
  * @constructor
- * @extends {node.goog.examples.animals.CatLike}
+ * @extends {nclosure.examples.animals.CatLike}
  */
-node.goog.examples.animals.Cat = function() {
-  node.goog.examples.animals.CatLike.call(this);
+nclosure.examples.animals.Cat = function() {
+  nclosure.examples.animals.CatLike.call(this);
 };
-goog.inherits(node.goog.examples.animals.Cat,
-    node.goog.examples.animals.CatLike);
+goog.inherits(nclosure.examples.animals.Cat,
+    nclosure.examples.animals.CatLike);

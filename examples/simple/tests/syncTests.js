@@ -1,11 +1,11 @@
 #!/usr/local/bin/node
 
-require('goog').goog();
+require('nclosure').nclosure();
 
 goog.require('goog.testing.jsunit');
-goog.require('node.goog.examples.simple.Example');
+goog.require('nclosure.examples.simple.Example');
 
-goog.provide('node.goog.examples.simple.tests.syncTests');
+goog.provide('nclosure.examples.simple.tests.syncTests');
 
 testFunction1 = function() {
   assertNotEquals(typeof(example_), 'undefined');

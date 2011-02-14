@@ -1,19 +1,19 @@
-goog.provide('node.goog.examples.animals.Tiger');
+goog.provide('nclosure.examples.animals.Tiger');
 
-goog.require('node.goog.examples.animals.CatLike');
-goog.require('node.goog.examples.animals.IAnimal');
+goog.require('nclosure.examples.animals.CatLike');
+goog.require('nclosure.examples.animals.IAnimal');
 
 
 
 /**
  * @constructor
- * @extends {node.goog.examples.animals.CatLike}
+ * @extends {nclosure.examples.animals.CatLike}
  */
-node.goog.examples.animals.Tiger = function() {
-  node.goog.examples.animals.CatLike.call(this);
+nclosure.examples.animals.Tiger = function() {
+  nclosure.examples.animals.CatLike.call(this);
 };
-goog.inherits(node.goog.examples.animals.Tiger,
-    node.goog.examples.animals.CatLike);
+goog.inherits(nclosure.examples.animals.Tiger,
+    nclosure.examples.animals.CatLike);
 
 
 /**
@@ -21,6 +21,6 @@ goog.inherits(node.goog.examples.animals.Tiger,
  * Don't use te default implementation of CatLike.talk as tigers are very
  *    special and deserve respect.
  */
-node.goog.examples.animals.Tiger.prototype.talk = function() {
+nclosure.examples.animals.Tiger.prototype.talk = function() {
   console.log('SCARY TIGGGGER NOISE!!!');
 };

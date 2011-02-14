@@ -1,17 +1,17 @@
-goog.provide('node.goog.examples.animals.Monkey');
+goog.provide('nclosure.examples.animals.Monkey');
 
-goog.require('node.goog.examples.animals.IAnimal');
+goog.require('nclosure.examples.animals.IAnimal');
 
 
 
 /**
  * @constructor
- * @implements {node.goog.examples.animals.IAnimal}
+ * @implements {nclosure.examples.animals.IAnimal}
  */
-node.goog.examples.animals.Monkey = function() {};
+nclosure.examples.animals.Monkey = function() {};
 
 
 /** @inheritDoc */
-node.goog.examples.animals.Monkey.prototype.talk = function() {
+nclosure.examples.animals.Monkey.prototype.talk = function() {
   console.log('MONKEY MONKEY MONKEY');
 };

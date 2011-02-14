@@ -1,12 +1,12 @@
 #!/usr/local/bin/node
 
-require('goog').goog();
+require('nclosure').nclosure();
 
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.jsunit');
-goog.require('node.goog.examples.simple.Example');
+goog.require('nclosure.examples.simple.Example');
 
-goog.provide('node.goog.examples.simple.tests.asyncTests');
+goog.provide('nclosure.examples.simple.tests.asyncTests');
 
 function testFunction1() {
   assertFalse(example_.completed);

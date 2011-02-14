@@ -2,14 +2,14 @@
 
 /**
  * @private
- * @type {node.goog}
+ * @type {nclosure}
  * @const
  */
-var ng_ = require('goog').goog();
+var ng_ = require('nclosure').nclosure();
 
 goog.require('goog.testing.jsunit');
 
-goog.require('node.goog.tests');
+goog.require('nclosure.tests');
 
 var fs_ = require('fs');
 var path_ = require('path');
@@ -25,8 +25,8 @@ var start = Date.now();
 
 function setUpPage() {
   // TODO: This assumes the googtest command is running in
-  // the node-goog directory.
-  allTestFiles = node.goog.tests.readDirRecursiveSync
+  // the nclosure directory.
+  allTestFiles = nclosure.tests.readDirRecursiveSync
     ('third_party/closure-library/closure/goog/', '_test[\d\w_]*\.(html|js)');
   if (maxTests > 0 && maxTests < allTestFiles.length)
      allTestFiles = allTestFiles.slice(0, maxTests);
@@ -38,7 +38,7 @@ function setUpPage() {
   asyncTestCase.stepTimeout = testsToRun * 500;
 };
 
-function tearDownPage() {  node.goog.tests.rmRfDir(tmpdir); };
+function tearDownPage() {  nclosure.tests.rmRfDir(tmpdir); };
 
 function testClousreTests() {
   assertTrue('Could not find test files', allTestFiles.length > 0);
@@ -56,7 +56,7 @@ function testClousreTests() {
 
     var commands = goog.array.map(allFilesInTmp,
       function(f) { return 'googtest ' + ng_.getPath(tmpdir, f); });
-    node.goog.tests.paralleliseExecs(
+    nclosure.tests.paralleliseExecs(
       commands,runTestCallback_, onCompleted_, maxParallels);
   });
 };
@@ -68,7 +68,7 @@ function copyAndParseAllTestFiles(oncomplete) {
     copyAndParseAllTestFilesImpl(oncomplete)
   };
   if (path_.existsSync(tmpdir)) {
-    node.goog.tests.rmRfDir(tmpdir, function(err) {
+    nclosure.tests.rmRfDir(tmpdir, function(err) {
       if (err) return oncomplete(err);
       fs_.mkdir(tmpdir, 0777, impl);
     });

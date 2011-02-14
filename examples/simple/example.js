@@ -1,17 +1,18 @@
 #!/usr/local/bin/node
 
 /**
- * @fileoverview  To get started with node-goog you will need to do the
+ * @fileoverview  To get started with nclosure you will need to do the
  *  following:
  * <ul>
- *  <li>Load node-goog through Node's standard mechanism
- *    <p>i.e. [var nodegoog = require( 'goog' )].</p>
- *  </li><li>Initialise nodegoog:
- *    <p>i.e. [require('goog').goog(options)]</p>
+ *  <li>Load nclosure through Node's standard mechanism
+ *    <p>i.e. [var nclosure = require('nclosure')].</p>
+ *  </li><li>Initialise nclosure:
+ *    <p>i.e. [require('nclosure').nclosure(options)]</p>
  *    <p>
- *    <strong>Note: </strong>Before initialisation no goog commands can be run.
+ *    <strong>Note: </strong>Before initialisation no closure librarues can be
+ *      used.
  *    </p><p>
- *    The goog() method takes in an optional options object with the
+ *    The nclosure() method takes in an optional options object with the
  *    following properties:
  *    </p>
  *    <pre>
@@ -52,33 +53,33 @@
  * Does not require an opts parameter as we are providing all the options in
  * the closure.json file in this directory;
  */
-require('goog').goog();
+require('nclosure').nclosure();
 
 /*
- * Now that the nodegoog is initialised you can use any base.js functionality
+ * Now that the nclosure is initialised you can use any base.js functionality
  * such as goog.require / goog.provide
  */
 goog.require('goog.async.Delay');
 goog.require('goog.structs.Trie');
-goog.require('node.goog.external.Utils');
+goog.require('nclosure.external.Utils');
 
 // At least one namespace must be provided for compilation purposes
-goog.provide('node.goog.examples.simple.Example');
+goog.provide('nclosure.examples.simple.Example');
 
 
 
 /**
- * Example of how to use node-goog project.  The node-goog project allows you
+ * Example of how to use nclosure project.  The nclosure project allows you
  * to levarage google's closure compiler and libraries to provide you with a
  * rich set of tools and type-safety not found in any other JavaScript stack.
- * This example aims to demonstrate how to use the node-goog tool not teach
+ * This example aims to demonstrate how to use the nclosure tool not teach
  * you the basics of google closure.  For more information on google closure
  * tools see the Closure Tools project documentation.
  *
  * @see <a href="http://code.google.com/closure/">Closure Tools</a>.
  * @constructor
  */
-node.goog.examples.simple.Example = function() {
+nclosure.examples.simple.Example = function() {
   /**
    * Wether the timer is finnished
    * @type {boolean}
@@ -96,7 +97,7 @@ node.goog.examples.simple.Example = function() {
  *
  * @private
  */
-node.goog.examples.simple.Example.prototype.createDelay_ = function() {
+nclosure.examples.simple.Example.prototype.createDelay_ = function() {
   new goog.async.Delay(function() {
     console.info('Bye!');
     this.completed = true;
@@ -111,9 +112,9 @@ node.goog.examples.simple.Example.prototype.createDelay_ = function() {
  *
  * @private
  */
-node.goog.examples.simple.Example.prototype.testTrie_ = function() {
+nclosure.examples.simple.Example.prototype.testTrie_ = function() {
   var trie = new goog.structs.Trie();
-  trie.add('demo', 'node-goog');
+  trie.add('demo', 'nclosure');
   trie.add('ex', ['girlfriend', 'parrot']);
   trie.add('example', { 'hello': 'world' });
 
@@ -126,15 +127,15 @@ node.goog.examples.simple.Example.prototype.testTrie_ = function() {
  *
  * @private
  */
-node.goog.examples.simple.Example.prototype.testExternalLib_ = function() {
-  console.info('Using node.goog.external.Utils.echo("hello world"): ' +
-      node.goog.external.Utils.echo('hello world'));
+nclosure.examples.simple.Example.prototype.testExternalLib_ = function() {
+  console.info('Using nclosure.external.Utils.echo("hello world"): ' +
+      nclosure.external.Utils.echo('hello world'));
 };
 
 
 /**
  * A reference to the running example for testing purposes
- * @type {node.goog.examples.simple.Example}
+ * @type {nclosure.examples.simple.Example}
  * @private
  */
-var example_ = new node.goog.examples.simple.Example();
+var example_ = new nclosure.examples.simple.Example();

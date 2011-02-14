@@ -1,6 +1,6 @@
 #!/usr/local/bin/node
 
-require('goog').goog();
+require('nclosure').nclosure();
 
 var fs_ = require('fs');
 var path_ = require('path');

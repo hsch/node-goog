@@ -1,6 +1,6 @@
 #!/usr/local/bin/node
 
-var ng_ = require('goog').goog();
+var ng_ = require('nclosure').nclosure();
 
 var fs_ = require('fs');
 var path_ = require('path');
