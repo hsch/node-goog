@@ -31,13 +31,9 @@ code design and maintainability by providing support for:
 
 ## Installation (core)
 
-* Install `node-goog`.  By either:
+* Install `node-goog`.  By getting the source:
 
-			npm install goog
-
-	or get the source (recommended so you can help out):
-
-			git clone git://github.com/hsch/node-goog.git
+			git clone git://github.com/gatapia/node-goog.git
 			cd node-goog
 			npm link
 

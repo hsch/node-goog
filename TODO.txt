@@ -1,5 +1,7 @@
 TODO
 ====
+- Check non source code install
+
 - Not working on cygwin (running through the linked npm commands is not
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
@@ -14,5 +16,9 @@ TODO
 
 - googtest should run (exec) tests in parallel, this would also solve any
 context sharing issues.
+
+- JSDoc should run in parallel for performance
+
+- Use JSDoc as a CTAGs generator
 
 - Include GJSLINT and FIXJSSTYLE in distribution
