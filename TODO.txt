@@ -10,19 +10,9 @@ TODO
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
 
-- Failing tests makes output very complex and unreadable.
+- Failing tests makes output very complex and unreadable
 
-GOOGTEST
-=========
-- googtest needs more work its quite buggy
-  - Running sungle tests does not log anything to stderr or stdout
-  - googtest should run (exec) tests in parallel?
-  - googtests are stepping on each others toes.  They can overwrite their
-    functions?!?!?!
+- googtest should run (exec) tests in parallel, this would also solve any
+context sharing issues.
 
-GOOG HACKS THAT NEED ATTENTION
-==============================
 - Include GJSLINT and FIXJSSTYLE in distribution
-- goog.js has lots of hacks to integrate into the libs, clean this up
-- Testing code is horrible fix this up, perhaps implement own version of
-  MultiTestRunner optimised for console

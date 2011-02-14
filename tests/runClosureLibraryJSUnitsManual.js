@@ -31,8 +31,8 @@ function setUpPage() {
   if (maxTests > 0 && maxTests < allTestFiles.length)
      allTestFiles = allTestFiles.slice(0, maxTests);
 
-  // Only run 20 tests until this is all working
-  allTestFiles = allTestFiles.slice(0, 20);
+  // This line allows the tests to be limited for testing purposes
+  // allTestFiles = allTestFiles.slice(10, 15);
 
   testsToRun = allTestFiles.length;
   asyncTestCase.stepTimeout = testsToRun * 500;
@@ -167,7 +167,8 @@ function onCompleted_() {
                     reportFile.join('\n') +
                     '</table></body></html>', 'utf-8');
 
-  console.log(summary);
+  console.error(summary +
+    '\nFor full details see tests/closure_tests_report.html');
   asyncTestCase.continueTesting();
 };
 

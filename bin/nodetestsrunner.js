@@ -57,7 +57,10 @@ node.goog.NodeTestsRunner.prototype.execute = function() {
 node.goog.NodeTestsRunner.prototype.runNextTest_ = function() {
   if (this.testFiles_.length === 0) {
     this.displayResults_();
-    return;
+    // If we get a timeout exception we have to terminate the thread
+    // so lets just terminate all the time (this is after any
+    // necessary clean ups so quite safe)
+    process.exit(0);
   }
   this.runNextTestImpl_(this.testFiles_.pop());
 };
