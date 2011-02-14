@@ -2,7 +2,7 @@
   "name": "goog",
   "description": "Server-side Google Closure with Node.js",
   "author": "Hendrik Schnepel <hendrik.schnepel@gmail.com>",
-  "url":"https://github.com/hsch/node-goog",
+  "url":"https://github.com/gatapia/node-goog",
   "directories": {
     "lib": "./lib",
     "bin": "./bin",
@@ -15,7 +15,7 @@
   "version": "0.3.1",
   "engines": { "node": ">=0.3.0-pre" },
   "repository": { "type": "git",
-                 "url" : "git://github.com/hsch/node-goog.git" },
+                 "url" : "git://github.com/gatapia/node-goog.git" },
   "licenses": [ { "type": "Apache License, Version 2.0",
                  "url": "http://www.apache.org/licenses/LICENSE-2.0" } ]
 }
