@@ -20,7 +20,7 @@
  * Does not require an opts parameter as we are providing all the options in
  * the closure.json file in this directory;
  */
-require('goog').goog.init();
+require('goog').goog();
 
 /*
  * Now that the nodegoog is initialised you can use any base.js functionality

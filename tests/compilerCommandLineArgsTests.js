@@ -11,7 +11,7 @@
  * @type {node.goog}
  * @const
  */
-var ng_ = require('goog').goog.init();
+var ng_ = require('goog').goog();
 
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');

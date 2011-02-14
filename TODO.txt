@@ -1,13 +1,12 @@
 TODO
 ====
-- Check non source code install
+- Rename project
+
+- Fix non source code install (npm)
 
 - Not working on cygwin (running through the linked npm commands is not
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
-
-- Remove the require('goog').goog.init() make it require('goog').init()
-  i.e. remove the redundant intermediate goog.
 
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
@@ -22,3 +21,6 @@ context sharing issues.
 - Use JSDoc as a CTAGs generator
 
 - Include GJSLINT and FIXJSSTYLE in distribution
+
+- Improve the number of closure tests passing the test suite. see
+  tests/closure_tests_report.html

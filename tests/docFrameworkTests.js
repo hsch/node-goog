@@ -5,7 +5,7 @@
  * @type {node.goog}
  * @const
  */
-var ng_ = require('goog').goog.init();
+var ng_ = require('goog').goog();
 
 var fs_ = require('fs');
 var path_ = require('path');

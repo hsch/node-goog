@@ -31,7 +31,7 @@ code design and maintainability by providing support for:
 
 ## Installation (core)
 
-* Install `node-goog`.  By getting the source:
+* Install `node-goog`.  By getting the source (NPM install comming soon):
 
 			git clone git://github.com/gatapia/node-goog.git
 			cd node-goog
@@ -46,7 +46,7 @@ To use any utility provided in the closure library just:
 1. Include `node-goog` in your application by `require`(ing) it and initialising
 it.
 
-		require('goog').goog.init();
+		require('goog').goog();
 
 2. `goog.require` any namespace from the Closure library.
 
@@ -97,7 +97,7 @@ For full documentation details please read the
 To set up a unit test simply create a test file like:
 
     #!/usr/local/bin/node
-    require('goog').goog.init();
+    require('goog').goog();
 
     goog.require('goog.testing.jsunit');
     // Import the code you are testing
@@ -117,9 +117,9 @@ To set up a unit test simply create a test file like:
 If the tests are not in the same directory as your code you will have to
 ensure that the deps.js file of the code you are testing
 is declared in the closure.json file of the tests directory or passed in to the
-call to `goog.init();` like:
+call to `goog();` like:
 
-    require('goog').goog.init({additionalDeps:['/pathToDeps/deps.js']});
+    require('goog').goog({additionalDeps:['/pathToDeps/deps.js']});
 
 To run a single test just execute:
 
@@ -154,7 +154,7 @@ extended by placing a `closure.json` file in your source directory. You can
 also place a `closure.json` in the directory running `node`.
 
 Finally, `node-goog` can also be configured by passing an optional options
-object to the `require('goog').goog.init(opts);` call.
+object to the `require('goog').goog(opts);` call.
 
 All configuration files and configuration objects take the following format:
 

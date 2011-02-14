@@ -7,11 +7,11 @@
  *  <li>Load node-goog through Node's standard mechanism
  *    <p>i.e. [var nodegoog = require( 'goog' )].</p>
  *  </li><li>Initialise nodegoog:
- *    <p>i.e. [nodegoog.init(options)]</p>
+ *    <p>i.e. [require('goog').goog(options)]</p>
  *    <p>
  *    <strong>Note: </strong>Before initialisation no goog commands can be run.
  *    </p><p>
- *    The nodegoog.init method takes in an optional options object with the
+ *    The goog() method takes in an optional options object with the
  *    following properties:
  *    </p>
  *    <pre>
@@ -52,7 +52,7 @@
  * Does not require an opts parameter as we are providing all the options in
  * the closure.json file in this directory;
  */
-require('goog').goog.init();
+require('goog').goog();
 
 /*
  * Now that the nodegoog is initialised you can use any base.js functionality

@@ -28,7 +28,7 @@
  * @const
  * @type {node.goog}
  */
-var ng_ = require('goog').goog.init();
+var ng_ = require('goog').goog();
 
 goog.provide('node.goog.googcompile');
 

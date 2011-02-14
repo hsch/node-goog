@@ -22,7 +22,7 @@
  * @type {node.goog}
  * @const
  */
-var ng_ = require('goog').goog.init();
+var ng_ = require('goog').goog();
 
 goog.provide('node.goog.googcodecheck');
 

@@ -1,6 +1,6 @@
 #!/usr/local/bin/node
 
-require('goog').goog.init();
+require('goog').goog();
 
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.jsunit');

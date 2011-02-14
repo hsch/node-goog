@@ -1,6 +1,6 @@
 #!/usr/local/bin/node
 
-require('goog').goog.init();
+require('goog').goog();
 
 var fs_ = require('fs');
 var path_ = require('path');
