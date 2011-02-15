@@ -162,13 +162,13 @@ function onCompleted_() {
   var summary = 'Closure Library Tests Results ' +
                     '(Success: ' + successes + '/' + testsToRun +
                     ') - Took: ' + took + 'ms.';
-  fs_.writeFileSync('tests/closure_tests_report.html',
+  fs_.writeFileSync('tests/closure_lib_tsts.html',
                     '<html><body><h1>' + summary + '</h1>' +
                     reportFile.join('\n') +
                     '</table></body></html>', 'utf-8');
 
   console.error(summary +
-    '\nFor full details see tests/closure_tests_report.html');
+    '\nFor full details see tests/closure_lib_tsts.html');
   asyncTestCase.continueTesting();
 };
 

@@ -65,6 +65,8 @@ nclosure.NodeTestsRunner.prototype.runNextTest_ = function() {
  * @private
  */
 nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
+  console.error('Running Tests [' + file + ']');
+
   var fs = require('fs');
   var exec = 'nodetestinstance ' + file + ' ' + this.args_;
   var that = this;

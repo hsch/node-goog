@@ -1,9 +1,8 @@
 TODO
 ====
 
-- Make all paths relative to the working directory in settingsloader.getPath
-
-- Tests a little messed up, try running nctest tests
+- Make all paths relative to the working directory in settingsloader.getPath,
+  this will clean up commands a little
 
 - checkAllSampleTestsPassing.js needs a better mechanism to to integarte to
   new nctest framework
@@ -12,7 +11,9 @@ TODO
 
 - Add acknoledgement file for all acks
 
-- Redo the examples, make more relevand samples
+- Make compile output a bit cleaner, no need to print out command by default
+
+- Redo the examples, make more relevant samples
 
 - Fix non source code install (npm)
 
@@ -30,4 +31,4 @@ TODO
 - Include GJSLINT and FIXJSSTYLE in distribution
 
 - Improve the number of closure tests passing the test suite. see
-  tests/closure_tests_report.html
+  tests/closure_lib_tsts.html
