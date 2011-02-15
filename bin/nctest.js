@@ -49,7 +49,7 @@ nclosure.nctest = function() {
    * @type {nclosure.NodeTestsRunner}
    */
   this.tr_ = new nclosure.NodeTestsRunner(
-      this.getAllTestFiles_(), this.getTestArgs_());
+      this.getAllTestFiles_(process.argv[2]), this.getTestArgs_());
 
   process.on('uncaughtException', goog.bind(this.onException_, this));
 
@@ -59,13 +59,45 @@ nclosure.nctest = function() {
 
 /**
  * @private
+ * @param {string} dirOrFile The directory to check for tests files (or
+ *    test file).
  * @return {Array.<string>} All tests files in this directory (recursive).
  */
-nclosure.nctest.prototype.getAllTestFiles_ = function() {
-  var dirOrFile = process.argv[2];
-  if (!this.fs_.statSync(dirOrFile).isDirectory()) { return [dirOrFile]; }
+nclosure.nctest.prototype.getAllTestFiles_ = function(dirOrFile) {
+  if (!this.fs_.statSync(dirOrFile).isDirectory()) {
+    return this.getTestSuiteFiles_(dirOrFile) || [dirOrFile];
+  }
 
   return this.readDirRecursiveSyncImpl_(dirOrFile, []);
+};
+
+
+/**
+ * @private
+ * @param {string} file The file to check if its a test suite.
+ * @return {Array.<string>} If this is a test suite, which is a file that
+ *    goog.require('goog.testing.jsunit') and has a suite variable then
+ *    return the test suite files relative to this file's directory.
+ */
+nclosure.nctest.prototype.getTestSuiteFiles_ = function(file) {
+  var contents = this.fs_.readFileSync(file).toString();
+  var suiteJsRegex = /var\s+suite\s*\=\s*\[([^;]+)\]/gim;
+
+  var m = suiteJsRegex.exec(contents);
+  if (!m) { return null; }
+  var suittests = goog.array.map(m[1].split(','), function(s) {
+    s = goog.string.trim(s);
+    return s.substring(1, s.length - 2);
+  });
+  var dir = ng_.getFileDirectory(file);
+  var alltests = [];
+  if (!suittests) { return null; }
+
+  var filesOrDirs = goog.array.map(suittests, function(t) {
+    var dirOrFile = ng_.getPath(dir, t);
+    alltests = goog.array.concat(alltests, this.getAllTestFiles_(dirOrFile));
+  }, this);
+  return alltests;
 };
 
 
@@ -92,6 +124,9 @@ nclosure.nctest.prototype.readDirRecursiveSyncImpl_ =
     var path = ng_.getPath(dir, f);
     if (this.fs_.statSync(path).isDirectory()) {
       return this.readDirRecursiveSyncImpl_(path, allFiles);
+    } else if (f.toLowerCase().indexOf('suite') >= 0) {
+      var suiteFiles = this.getTestSuiteFiles_(path);
+      if (suiteFiles) allFiles = goog.array.concat(allFiles, suiteFiles);
     } else if (f.toLowerCase().indexOf('test') >= 0) {
       allFiles.push(path);
     }

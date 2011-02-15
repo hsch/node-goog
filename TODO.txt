@@ -4,8 +4,7 @@ TODO
 - Make all paths relative to the working directory in settingsloader.getPath,
   this will clean up commands a little
 
-- checkAllSampleTestsPassing.js needs a better mechanism to to integarte to
-  new nctest framework
+- Documenta test suite support
 
 - When tests fail with an exception we do not get a report
 
