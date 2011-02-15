@@ -3,7 +3,7 @@
 /**
  * @fileOverview This test is to try to get the async stuff working better.
  * Currently we cannot get proper logs of async tests and we cannot use
- * googtest with async tests.
+ * nctest with async tests.
  */
 
 /**
@@ -30,19 +30,19 @@ function clearDepsAndCompiledFile() {
 };
 
 function testCompileWithNoArgs() {
-  runCompilerWithCommandImpl('googcompile ' + __filename, false, false);
+  runCompilerWithCommandImpl('nccompile ' + __filename, false, false);
 };
 
 function testCompileWithNoDepsArg() {
-  runCompilerWithCommandImpl('googcompile -c ' + __filename, true, false);
+  runCompilerWithCommandImpl('nccompile -c ' + __filename, true, false);
 };
 
 function testCompileWithQuietArg() {
-  runCompilerWithCommandImpl('googcompile -d ' + __filename, false, true);
+  runCompilerWithCommandImpl('nccompile -d ' + __filename, false, true);
 };
 
 function testCompileWithDepsOnlyArg() {
-  runCompilerWithCommandImpl('googcompile -c -d ' + __filename, true, true);
+  runCompilerWithCommandImpl('nccompile -c -d ' + __filename, true, true);
 };
 
 function runCompilerWithCommandImpl(cmd, compiledMinFile, depsFile) {

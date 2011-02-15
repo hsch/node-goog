@@ -14,7 +14,7 @@ TODO
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
 
-- googtest should run (exec) tests in parallel, this would also solve any
+- nctest should run (exec) tests in parallel, this would also solve any
 context sharing issues.
 
 - JSDoc should run in parallel for performance

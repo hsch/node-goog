@@ -1,5 +1,6 @@
 #!/usr/local/bin/node
 
+
 /**
  * @private
  * @type {nclosure}
@@ -7,7 +8,7 @@
  */
 var ng_ = require('nclosure').nclosure();
 
-goog.provide('nclosure.googdoc');
+goog.provide('nclosure.ncdoc');
 
 goog.require('goog.array');
 goog.require('nclosure');
@@ -18,7 +19,7 @@ goog.require('nclosure_opts');
 /**
  * @constructor
  */
-nclosure.googdoc = function() {
+nclosure.ncdoc = function() {
   var args = ng_.args;
   if (!args.jsdocToolkitDir) {
     throw new Error('To run the jsdoc-toolkit documentation module please ' +
@@ -49,9 +50,9 @@ nclosure.googdoc = function() {
  * @private
  * @param {nclosure_opts} args The settings object.
  */
-nclosure.googdoc.prototype.init_ = function(args) {
+nclosure.ncdoc.prototype.init_ = function(args) {
   // _dirToDoc is for testing so tests can set this global before calling
-  // goog.require('nclosure.googdoc')
+  // goog.require('nclosure.ncdoc')
   this.createJSDocArgs_(args, global['_dirToDoc'] || process.argv[2]);
 
   // Run node-jsdoc-toolkit
@@ -64,7 +65,7 @@ nclosure.googdoc.prototype.init_ = function(args) {
  * @param {nclosure_opts} args The settings object.
  * @param {string} entryPoint The file/directory to document.
  */
-nclosure.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
+nclosure.ncdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
   var entryPointDirIdx = entryPoint.lastIndexOf('/');
   var title = entryPointDirIdx > 0 ?
       entryPoint.substring(entryPointDirIdx + 1) : entryPoint;
@@ -90,10 +91,10 @@ nclosure.googdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
 /**
  * @private
  */
-nclosure.googdoc.prototype.runJSDocToolkit_ = function() {
+nclosure.ncdoc.prototype.runJSDocToolkit_ = function() {
   this.jsdoc_toolkit_.init(this.clArgs);
 };
 
 
-/** @type {nclosure.googdoc} */
-exports.googDoc = new nclosure.googdoc();
+/** @type {nclosure.ncdoc} */
+exports.googDoc = new nclosure.ncdoc();

@@ -24,7 +24,7 @@ var testsToRun;
 var start = Date.now();
 
 function setUpPage() {
-  // TODO: This assumes the googtest command is running in
+  // TODO: This assumes the nctest command is running in
   // the nclosure directory.
   allTestFiles = nclosure.tests.readDirRecursiveSync
     ('third_party/closure-library/closure/goog/', '_test[\d\w_]*\.(html|js)');
@@ -55,7 +55,7 @@ function testClousreTests() {
       testsToRun, allFilesInTmp.length);
 
     var commands = goog.array.map(allFilesInTmp,
-      function(f) { return 'googtest ' + ng_.getPath(tmpdir, f); });
+      function(f) { return 'nctest ' + ng_.getPath(tmpdir, f); });
     nclosure.tests.paralleliseExecs(
       commands,runTestCallback_, onCompleted_, maxParallels);
   });

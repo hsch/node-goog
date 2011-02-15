@@ -74,9 +74,9 @@ Once your source code is
 [annotated](http://code.google.com/closure/compiler/docs/js-for-compiler.html)
 and ready for compilation just run the following command:
 
-		googcompile source.js
+		nccompile source.js
 
-The `googcompile` command accepts various arguments:
+The `nccompile` command accepts various arguments:
 
 * -c: Create [C]ompile file - Produces a compiled <filename>.min.js file
 * -d: Create [D]ependencies- Creates a deps.js file that can be used as an
@@ -86,7 +86,7 @@ additionalDeps in an external project.
 
 To run `nclosure`'s documentation tool simply run:
 
-    googdoc <directory or source file>
+    ncdoc <directory or source file>
 
 For full documentation details please read the
 [official jsdoc-toolkit docs](://code.google.com/p/jsdoc-toolkit/).
@@ -127,7 +127,7 @@ To run a single test just execute:
 
 To run all tests in a single directory run the following command:
 
-      googtest <dirname>
+      nctest <dirname>
 
 ## Closure Linter
 
@@ -144,7 +144,7 @@ To install Closure Linter read the following
 
 Once installed simply run the following command to `linter` your code.
 
-		googcodecheck <directory>
+		ncstyle <directory>
 
 ## Advanced Configuration
 
@@ -200,7 +200,7 @@ this project.
 
 ## License
 
-Copyright 2010 Hendrik Schnepel (hendrik.schnepel@gmail.com)
+Copyright 2011 Guido Tapia (guido@tapia.com.au)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

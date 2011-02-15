@@ -2,6 +2,7 @@
 goog.provide('nclosure.tests');
 
 goog.require('goog.array');
+goog.require('nclosure');
 
 nclosure.tests.fs_ = require('fs');
 nclosure.tests.path_ = require('path');
@@ -32,7 +33,7 @@ nclosure.tests.readDirRecursiveSync = function(dir, filter) {
 nclosure.tests.readDirRecursiveSyncImpl_ = function(dir, allFiles) {
   var files = nclosure.tests.fs_.readdirSync(dir);
   goog.array.forEach(files, function(f) {
-    var path = nclosure.instance.getPath(dir, f);
+    var path = nclosure_instance.getPath(dir, f);
     if (nclosure.tests.fs_.statSync(path).isDirectory()) {
       return nclosure.tests.readDirRecursiveSyncImpl_(path, allFiles);
     } {

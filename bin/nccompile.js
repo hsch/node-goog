@@ -14,7 +14,7 @@
  */
 var ng_ = require('nclosure').nclosure();
 
-goog.provide('nclosure.googcompile');
+goog.provide('nclosure.nccompile');
 
 goog.require('nclosure');
 
@@ -23,7 +23,7 @@ goog.require('nclosure');
 /**
  * @constructor
  */
-nclosure.googcompile = function() {
+nclosure.nccompile = function() {
 
   /**
   * @private
@@ -95,7 +95,7 @@ nclosure.googcompile = function() {
  * @param {Array.<string>} cliArgs The command line args.
  * @param {Object.<string>} options The parsed options.
  */
-nclosure.googcompile.prototype.init_ = function(cliArgs, options) {
+nclosure.nccompile.prototype.init_ = function(cliArgs, options) {
   var that = this;
   var onexit = function(err) { that.onExit_.call(that, err); };
   process.on('exit', onexit);
@@ -108,7 +108,7 @@ nclosure.googcompile.prototype.init_ = function(cliArgs, options) {
   this.fileToCompile_ = cliArgs[cliArgs.length - 1];
 
   if (!this.fileToCompile_) {
-    throw new Error('No file specified, usage googcompile <filetocompile>');
+    throw new Error('No file specified, usage nccompile <filetocompile>');
   }
 
   this.tmpFileName_ = this.fileToCompile_.replace('.js', '.tmp.js');
@@ -126,7 +126,7 @@ nclosure.googcompile.prototype.init_ = function(cliArgs, options) {
 /**
  * @private
  */
-nclosure.googcompile.prototype.runCommands_ = function() {
+nclosure.nccompile.prototype.runCommands_ = function() {
   var command = this.deps_ ? this.runDependencies_ : this.runCompilation_;
   command.call(this);
 };
@@ -135,7 +135,7 @@ nclosure.googcompile.prototype.runCommands_ = function() {
 /**
  * @private
  */
-nclosure.googcompile.prototype.runDependencies_ = function() {
+nclosure.nccompile.prototype.runDependencies_ = function() {
   var that = this;
   var fileDir = this.compiledFileName_.substring(0,
       this.compiledFileName_.lastIndexOf('/') + 1);
@@ -151,7 +151,7 @@ nclosure.googcompile.prototype.runDependencies_ = function() {
 /**
  * @private
  */
-nclosure.googcompile.prototype.runCompilation_ = function() {
+nclosure.nccompile.prototype.runCompilation_ = function() {
   var fileContents = this.fs_.
       readFileSync(this.fileToCompile_, encoding = 'utf8');
 
@@ -168,7 +168,7 @@ nclosure.googcompile.prototype.runCompilation_ = function() {
  * @private
  * @param {Error=} err An optional error.
  */
-nclosure.googcompile.prototype.onExit_ =
+nclosure.nccompile.prototype.onExit_ =
     function(err) {
   if (this.path_.existsSync(this.tmpFileName_)) {
     this.fs_.unlinkSync(this.tmpFileName_);
@@ -186,7 +186,7 @@ nclosure.googcompile.prototype.onExit_ =
  * @return {string} Any bash shell instructions that need to be copied into
  *    the compiled file.
  */
-nclosure.googcompile.prototype.createTmpFile_ =
+nclosure.nccompile.prototype.createTmpFile_ =
     function(contents) {
   var bashInstIdx = contents.indexOf('#!');
   var hasInst = bashInstIdx === 0; // Must be top line
@@ -215,7 +215,7 @@ nclosure.googcompile.prototype.createTmpFile_ =
  *    required in the compiled file.
  * @param {function(Error=):undefined=} callback The callback to call on exit.
  */
-nclosure.googcompile.prototype.runCommand_ = function(clArgs, command,
+nclosure.nccompile.prototype.runCommand_ = function(clArgs, command,
     targetFile, bashInstructions, callback) {
 
   var exec = ng_.getPath(ng_.args.closureBasePath,
@@ -245,7 +245,7 @@ nclosure.googcompile.prototype.runCommand_ = function(clArgs, command,
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   operation.
  */
-nclosure.googcompile.prototype.getCompilerClArgs_ =
+nclosure.nccompile.prototype.getCompilerClArgs_ =
     function() {
   var path = this.getDirectory_(this.tmpFileName_);
   var addedPaths = {};
@@ -295,7 +295,7 @@ nclosure.googcompile.prototype.getCompilerClArgs_ =
  * @param {Array.<string>} clArgs The array to add any additional deps to.
  * @param {boolean}  wPrefix Wether to use root_with_prefix.
  */
-nclosure.googcompile.prototype.addAdditionalRoots_ =
+nclosure.nccompile.prototype.addAdditionalRoots_ =
     function(addedPaths, clArgs, wPrefix) {
 
   if (ng_.args.additionalCompileRoots) {
@@ -320,7 +320,7 @@ nclosure.googcompile.prototype.addAdditionalRoots_ =
  * @param {string} path The path to add as a root or root_with_prefix.
  * @param {boolean}  wPrefix Wether to use root_with_prefix.
  */
-nclosure.googcompile.prototype.addRoot_ =
+nclosure.nccompile.prototype.addRoot_ =
     function(addedPaths, clArgs, path, wPrefix) {
   var realpath = this.isPathInMap_(addedPaths, path);
   if (!goog.isDefAndNotNull(realpath)) { return; }
@@ -337,7 +337,7 @@ nclosure.googcompile.prototype.addRoot_ =
  * @return {Array.<string>} Any additional compiler args for the compilation
  *   dependency check operation.
  */
-nclosure.googcompile.prototype.getDepsClArgs_ = function() {
+nclosure.nccompile.prototype.getDepsClArgs_ = function() {
   var path = this.getDirectory_(this.fileToCompile_);
   var addedPaths = {};
   var clArgs = [];
@@ -354,7 +354,7 @@ nclosure.googcompile.prototype.getDepsClArgs_ = function() {
  * @return {string?} null if the string is already in the map.  If not it is
  *    then added to the specified map and we return the real path of the file;.
  */
-nclosure.googcompile.prototype.isPathInMap_ = function(map, s) {
+nclosure.nccompile.prototype.isPathInMap_ = function(map, s) {
   var real = this.fs_.realpathSync(s);
   if (map[real]) return null;
   map[real] = 1;
@@ -367,10 +367,10 @@ nclosure.googcompile.prototype.isPathInMap_ = function(map, s) {
  * @param {string} file The file whose parent directory we are trying to find.
  * @return {string} The parent directory of the soecified file.
  */
-nclosure.googcompile.prototype.getDirectory_ = function(file) {
+nclosure.nccompile.prototype.getDirectory_ = function(file) {
   var pathIdx = file.lastIndexOf('/');
   var path = pathIdx > 0 ? file.substring(0, pathIdx) : '.';
   return path;
 };
 
-new nclosure.googcompile();
+new nclosure.nccompile();

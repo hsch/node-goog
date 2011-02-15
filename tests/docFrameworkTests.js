@@ -67,7 +67,7 @@ function runDoc() {
   if (googDoc) {
     googDoc.init_(ng_.args);
   } else {
-    googDoc = require('../bin/googdoc').googDoc;
+    googDoc = require('../bin/ncdoc').googDoc;
   }
 };
 

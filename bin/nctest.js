@@ -15,7 +15,7 @@
  */
 var ng_ = require('nclosure').nclosure();
 
-goog.provide('nclosure.googtest');
+goog.provide('nclosure.nctest');
 
 
 /**
@@ -35,12 +35,12 @@ goog.require('nclosure.NodeTestsRunner');
 
 
 /**
- * The nclosure.googtest class runs all tests (files case insensitive
+ * The nclosure.nctest class runs all tests (files case insensitive
  * named *test*) in a directory.
  *
  * @constructor
  */
-nclosure.googtest = function() {
+nclosure.nctest = function() {
   /**
    * @private
    * @type {extern_fs}
@@ -71,7 +71,7 @@ nclosure.googtest = function() {
 /**
  * @private
  */
-nclosure.googtest.prototype.loadAdditionalTestingDependencies_ = function() {
+nclosure.nctest.prototype.loadAdditionalTestingDependencies_ = function() {
   var dirOrFile = process.argv[2];
   var dir = this.fs_.statSync(dirOrFile).isDirectory() ? dirOrFile : null;
   if (!dir) { dir = dirOrFile.substring(0, dirOrFile.lastIndexOf('/')); }
@@ -83,7 +83,7 @@ nclosure.googtest.prototype.loadAdditionalTestingDependencies_ = function() {
  * @private
  * @return {Array.<string>} All tests files in this directory (recursive).
  */
-nclosure.googtest.prototype.getAllTestFiles_ = function() {
+nclosure.nctest.prototype.getAllTestFiles_ = function() {
   var dirOrFile = process.argv[2];
   if (!this.fs_.statSync(dirOrFile).isDirectory()) { return [dirOrFile]; }
 
@@ -96,7 +96,7 @@ nclosure.googtest.prototype.getAllTestFiles_ = function() {
  * @return {string} The arguments we will pass to all tests to filter
  *    test results.
  */
-nclosure.googtest.prototype.getTestArgs_ = function() {
+nclosure.nctest.prototype.getTestArgs_ = function() {
   return process.argv.length > 2 ? process.argv.slice(3).join(',') : '';
 };
 
@@ -107,7 +107,7 @@ nclosure.googtest.prototype.getTestArgs_ = function() {
  * @return {Array.<string>} The allFiles array for fluency.
  * @private
  */
-nclosure.googtest.prototype.readDirRecursiveSyncImpl_ =
+nclosure.nctest.prototype.readDirRecursiveSyncImpl_ =
     function(dir, allFiles) {
   var files = this.fs_.readdirSync(dir);
   goog.array.forEach(files, function(f) {
@@ -126,11 +126,11 @@ nclosure.googtest.prototype.readDirRecursiveSyncImpl_ =
  * @private
  * @param {Error} err The exception thrown by tests.
  */
-nclosure.googtest.prototype.onException_ = function(err) {
+nclosure.nctest.prototype.onException_ = function(err) {
   if (!err) return;
   if (err.stack) console.error(err.stack);
   else if (err.message) console.error(err.message);
   else if (typeof(err) === 'string') console.error(err);
 };
 
-new nclosure.googtest();
+new nclosure.nctest();

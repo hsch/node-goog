@@ -83,9 +83,9 @@ function doNextFile(files, operation, oncomplete) {
 };
 
 function compileFileImpl(file, callback) {
-  console.log('googcompile ' + file);
+  console.log('nccompile ' + file);
   asyncTestCase.waitForAsync();
-  require('child_process').exec('googcompile ' + file,
+  require('child_process').exec('nccompile ' + file,
       function(err, stdout, stderr) {
     stdout = stdout.replace(/\.tmp\.js/g, '.js');
     stderr = stderr.replace(/\.tmp\.js/g, '.js');
@@ -106,9 +106,9 @@ function compileFileImpl(file, callback) {
 };
 
 function checkFileImpl(file, callback) {
-  console.log('googcodecheck ' + file);
+  console.log('ncstyle ' + file);
   asyncTestCase.waitForAsync();
-  require('child_process').exec('googcodecheck ' + file,
+  require('child_process').exec('ncstyle ' + file,
       function(err, stdout, stderr) {
     stdout = stdout.replace(/\.tmp\.js/g, '.js');
     stderr = stderr.replace(/\.tmp\.js/g, '.js');
