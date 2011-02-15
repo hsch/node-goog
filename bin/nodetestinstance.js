@@ -29,6 +29,7 @@ global.navigator = { userAgent: 'node.js' };
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
 goog.require('goog.testing.stacktrace');
+goog.require('nclosure');
 
 
 
@@ -86,6 +87,7 @@ nclosure.NodeTestInstance.prototype.loadAdditionalTestingDependencies_ =
     function() {
   var dir = this.file_.substring(0, this.file_.lastIndexOf('/'));
   ng_.loadAditionalDependenciesInSettingsFile(ng_.getPath(dir, 'closure.json'));
+  ng_.loadDependenciesFile(dir, 'deps.js');
 };
 
 

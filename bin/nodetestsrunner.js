@@ -53,12 +53,9 @@ nclosure.NodeTestsRunner.prototype.execute = function() {
 nclosure.NodeTestsRunner.prototype.runNextTest_ = function() {
   if (this.testFiles_.length === 0) {
     this.displayResults_();
-    // If we get a timeout exception we have to terminate the thread
-    // so lets just terminate all the time (this is after any
-    // necessary clean ups so quite safe)
-    process.exit(0);
+  } else {
+    this.runNextTestImpl_(this.testFiles_.pop());
   }
-  this.runNextTestImpl_(this.testFiles_.pop());
 };
 
 
@@ -72,7 +69,8 @@ nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
   var exec = 'nodetestinstance ' + file + ' ' + this.args_;
   var that = this;
   var reportFile = '.tmptestreport.json';
-  var cmd = require('child_process').spawn('nodetestinstance', [file, this.args_]);
+  var cmd = require('child_process').
+      spawn('nodetestinstance', [file, this.args_]);
   var stderr = '', stdout = '', err;
   var ondata = function(d) {
     d = goog.string.trim(d.toString());

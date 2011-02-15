@@ -7,6 +7,8 @@
  */
 var ng_ = require('nclosure').nclosure();
 
+goog.provide('nclosure_tests.checkAllSampleTestsPassing');
+
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.array');
@@ -21,7 +23,7 @@ var testsDirs = ['examples/simple/tests/'];
 
 var testFiles = getAllTestFiles_();
 
-setUpPage = function() { asyncTestCase.stepTimeout = 1000;};
+setUpPage = function() { asyncTestCase.stepTimeout = 2000;};
 
 function getAllTestFiles_() {
   var testFiles = [];

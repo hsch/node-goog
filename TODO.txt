@@ -1,7 +1,14 @@
 TODO
 ====
 
+- Make all paths relative to the working directory in settingsloader.getPath
+
 - Tests a little messed up, try running nctest tests
+
+- checkAllSampleTestsPassing.js needs a better mechanism to to integarte to
+  new nctest framework
+
+- When tests fail with an exception we do not get a report
 
 - Add acknoledgement file for all acks
 

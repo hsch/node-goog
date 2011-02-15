@@ -6,7 +6,7 @@ require('nclosure').nclosure();
 goog.require('goog.array');
 goog.require('goog.testing.jsunit');
 goog.require('nclosure_settingsLoader');
-
+goog.require('nclosure.NodeTestInstance');
 
 function testParseStackFrame() {
   var ls = [
@@ -31,7 +31,7 @@ function testParseStackFrame() {
 };
 
 function validateStackLine(line, frame) {
-  var expVals = nclosure.NodeTestsRunner.parseStackFrameLine_(line);
+  var expVals = nclosure.NodeTestInstance.parseStackFrameLine_(line);
 
   if (!expVals) {
     assertNull('Line: ' + line + ' exptected null frame', frame);
