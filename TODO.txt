@@ -1,7 +1,11 @@
 TODO
 ====
 
+- Tests a little messed up, try running nctest tests
+
 - Add acknoledgement file for all acks
+
+- Redo the examples, make more relevand samples
 
 - Fix non source code install (npm)
 
@@ -9,13 +13,8 @@ TODO
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
 
-- Failing tests makes output very complex and unreadable
-
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
-
-- nctest should run (exec) tests in parallel, this would also solve any
-context sharing issues.
 
 - JSDoc should run in parallel for performance
 

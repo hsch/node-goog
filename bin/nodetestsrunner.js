@@ -2,8 +2,7 @@
 goog.provide('nclosure.NodeTestsRunner');
 
 goog.require('goog.array');
-goog.require('goog.testing.stacktrace');
-goog.require('nclosure.NodeTestInstance');
+goog.require('goog.string');
 
 
 
@@ -19,7 +18,6 @@ nclosure.NodeTestsRunner = function(testFiles, args) {
    * @type {Array.<string>}
    */
   this.testFiles_ = goog.array.clone(testFiles);
-
   /**
    * @private
    * @type {string}
@@ -30,16 +28,14 @@ nclosure.NodeTestsRunner = function(testFiles, args) {
    * When test instances complete the running of their test cases they get
    *  stored here so we can then use this information to display results.
    * @private
-   * @type {Array.<goog.testing.TestCase>}
+   * @type {Array.<nclosure.NodeTestsRunner.result>}
    */
-  this.completedTestCases_ = [];
-
-  // Some require overrides to make stack traces properly visible
-  goog.testing.stacktrace.parseStackFrame_ =
-      nclosure.NodeTestsRunner.parseStackFrameLine_;
-  goog.testing.stacktrace.framesToString_ =
-      nclosure.NodeTestsRunner.stackFramesToString_;
+  this.completedResults_ = [];
 };
+
+
+/** @typedef {{err:string,stdout:string,stderr:string,report:string}} */
+nclosure.NodeTestsRunner.result;
 
 
 /**
@@ -72,18 +68,50 @@ nclosure.NodeTestsRunner.prototype.runNextTest_ = function() {
  * @private
  */
 nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
-  var instance = new nclosure.NodeTestInstance(file, this.args_,
-      goog.bind(this.onTestCompleted_, this));
-  instance.run();
+  var fs = require('fs');
+  var exec = 'nodetestinstance ' + file + ' ' + this.args_;
+  var that = this;
+  var reportFile = '.tmptestreport.json';
+  var cmd = require('child_process').spawn('nodetestinstance', [file, this.args_]);
+  var stderr = '', stdout = '', err;
+  var ondata = function(d) {
+    d = goog.string.trim(d.toString());
+    if (!d) return;
+    stderr += d;
+    console.error(d);
+  };
+  cmd.stderr.on('data', ondata);
+  cmd.stdout.on('data', ondata);
+  cmd.on('uncaughtException',
+         function(error) { err = error; console.error(error.stack); });
+  cmd.on('exit', function(code) {
+    var report = '';
+    if (require('path').existsSync(reportFile)) {
+      report = fs.readFileSync(reportFile).toString();
+      fs.unlinkSync(reportFile);
+    }
+
+    var results = {
+      'file': file,
+      'exitCode': code,
+      'err': err,
+      'stdout': stdout,
+      'stderr': stderr,
+      'report': report
+    };
+
+    that.onTestCompleted_(results);
+  });
 };
 
 
 /**
  * @private
- * @param {goog.testing.TestCase} tc The test case that just completed.
+ * @param {nclosure.NodeTestsRunner.result} results The results object
+ *  scrapped from the NodeTestInstance process.
  */
-nclosure.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
-  this.completedTestCases_.push(tc);
+nclosure.NodeTestsRunner.prototype.onTestCompleted_ = function(results) {
+  this.completedResults_.push(results);
   this.runNextTest_();
 };
 
@@ -94,8 +122,8 @@ nclosure.NodeTestsRunner.prototype.onTestCompleted_ = function(tc) {
  */
 nclosure.NodeTestsRunner.prototype.displayResults_ = function() {
   console.log('\x1B[0;34m\n=======\nRESULTS\n=======');
-  var results = goog.array.map(this.completedTestCases_,
-      nclosure.NodeTestsRunner.renderTestCase_, this);
+  var results = goog.array.map(this.completedResults_,
+      nclosure.NodeTestsRunner.renderResult_, this);
   console.log(results.join('\n\n'));
 };
 
@@ -103,11 +131,15 @@ nclosure.NodeTestsRunner.prototype.displayResults_ = function() {
 /**
  * @private
  * Renders the test case to the console.
- * @param {goog.testing.TestCase} tc The test case to render results.
+ * @param {nclosure.NodeTestsRunner.result} result The result to render.
  * @return {string} A string representation of this test case.
  */
-nclosure.NodeTestsRunner.renderTestCase_ = function(tc) {
-  return nclosure.NodeTestsRunner.colorizeReport(tc.getReport(false));
+nclosure.NodeTestsRunner.renderResult_ = function(result) {
+  if (result.report)
+    return nclosure.NodeTestsRunner.colorizeReport(result.report);
+  else {
+    return '\x1B[0;31m' + result.file + ' [FAILED] - No Report Found';
+  }
 };
 
 
@@ -150,66 +182,3 @@ nclosure.NodeTestsRunner.padString_ = function(str, length, ch) {
   return str;
 };
 
-
-/**
- * For each raw text line find an appropriate 'goog.testing.stacktrace.Frame'
- * object which constructs with these args:
- *  {string} context Context object, empty in case of global functions
- *    or if the browser doesn't provide this information.
- *  {string} name Function name, empty in case of anonymous functions.
- *  {string} alias Alias of the function if available. For example the
- *    function name will be 'c' and the alias will be 'b' if the function is
- *    defined as <code>a.b = function c() {};</code>.
- *  {string} args Arguments of the function in parentheses if available.
- *  {string} path File path or URL including line number and optionally
- *   column number separated by colons
- *
- * @private
- * @param {string} line A line in the stack trace.
- * @return {goog.testing.stacktrace.Frame} The parsed frame.
-*/
-nclosure.NodeTestsRunner.parseStackFrameLine_ = function(line) {
-  if (!line || line.indexOf('    at ') !== 0) { return null; }
-  line = line.substring(line.indexOf(' at ') + 4);
-  // return new goog.testing.stacktrace.Frame('', line, '', '', line);
-
-  if (line.charAt(0) === '/') { // Path to test file
-    return new goog.testing.stacktrace.Frame('', '', '', '', line);
-  }
-  var contextAndFunct = line.substring(0, line.lastIndexOf(' ')).split('.');
-  var context = '';
-  var funct = '';
-  if (contextAndFunct.length === 1) {
-    funct = contextAndFunct[0];
-  } else {
-    context = contextAndFunct[0];
-    funct = contextAndFunct[1];
-  }
-  var path = line.substring(line.indexOf('(') + 1);
-
-  return new goog.testing.stacktrace.Frame(context, funct, '', '',
-      path.substring(0, path.length - 1));
-};
-
-
-/**
- * Converts the stack frames into canonical format. Chops the beginning and the
- * end of it which come from the testing environment, not from the test itself.
- * @param {!Array.<goog.testing.stacktrace.Frame>} frames The frames.
- * @return {string} Canonical, pretty printed stack trace.
- * @private
- */
-nclosure.NodeTestsRunner.stackFramesToString_ = function(frames) {
-  var stack = [];
-  for (var i = 0, len = frames.length; i < len; i++) {
-    var f = frames[i];
-    if (!f) continue;
-    var str = f.toCanonicalString();
-    var ignorestr = '[object Object].execute (testing/testcase.js:900:12)';
-    if (str.indexOf(ignorestr) === 0) { break; }
-    stack.push('> ');
-    stack.push(str);
-    stack.push('\n');
-  }
-  return stack.join('');
-};

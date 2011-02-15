@@ -18,16 +18,7 @@ var ng_ = require('nclosure').nclosure();
 goog.provide('nclosure.nctest');
 
 
-/**
- * goog/testing/testcase.js Reads this property as soon as it's 'required' so
- * set it now before the goog.requires below
- * @type {{userAgent:string}}
- */
-global.navigator = { userAgent: 'node.js' };
-
 goog.require('goog.array');
-goog.require('goog.testing.AsyncTestCase');
-goog.require('goog.testing.TestCase');
 
 goog.require('nclosure');
 goog.require('nclosure.NodeTestsRunner');
@@ -62,20 +53,7 @@ nclosure.nctest = function() {
 
   process.on('uncaughtException', goog.bind(this.onException_, this));
 
-  this.loadAdditionalTestingDependencies_();
-
   this.tr_.execute();
-};
-
-
-/**
- * @private
- */
-nclosure.nctest.prototype.loadAdditionalTestingDependencies_ = function() {
-  var dirOrFile = process.argv[2];
-  var dir = this.fs_.statSync(dirOrFile).isDirectory() ? dirOrFile : null;
-  if (!dir) { dir = dirOrFile.substring(0, dirOrFile.lastIndexOf('/')); }
-  ng_.loadAditionalDependenciesInSettingsFile(ng_.getPath(dir, 'closure.json'));
 };
 
 
@@ -128,6 +106,7 @@ nclosure.nctest.prototype.readDirRecursiveSyncImpl_ =
  */
 nclosure.nctest.prototype.onException_ = function(err) {
   if (!err) return;
+
   if (err.stack) console.error(err.stack);
   else if (err.message) console.error(err.message);
   else if (typeof(err) === 'string') console.error(err);

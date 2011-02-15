@@ -1,8 +1,10 @@
 
+goog.require('nclosure');
+goog.require('goog.array');
+
 goog.provide('nclosure.tests');
 
-goog.require('goog.array');
-goog.require('nclosure');
+
 
 nclosure.tests.fs_ = require('fs');
 nclosure.tests.path_ = require('path');

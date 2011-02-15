@@ -1,8 +1,34 @@
+#!/usr/local/bin/node
+
+/**
+ * @fileoverview Utility class to run tests in their own process (isolation)
+ * Note: this file should not be used manually but rather through the
+ * nctest command.
+ *
+ * @author guido@tapia.com.au (Guido Tapia)
+ */
+
+
+/**
+ * @private
+ * @const
+ * @type {nclosure}
+ */
+var ng_ = require('nclosure').nclosure();
 
 goog.provide('nclosure.NodeTestInstance');
 
+
+/**
+ * goog/testing/testcase.js Reads this property as soon as it's 'required' so
+ * set it now before the goog.requires below
+ * @type {{userAgent:string}}
+ */
+global.navigator = { userAgent: 'node.js' };
+
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
+goog.require('goog.testing.stacktrace');
 
 
 
@@ -12,13 +38,8 @@ goog.require('goog.testing.TestCase');
  *    responsible for.
  * @param {string} args The search args that are passed to the test case for
  *    test lookups.
- * @param {function(goog.testing.TestCase):undefined} onCompleteHandler The
- *    function that will be called when a test case completes.  It also passes
- *    in the test case so the handler can do as they wish with results.
- * @param {string=} testFilter Only run tests with name matching this filter.
  */
-nclosure.NodeTestInstance =
-    function(file, args, onCompleteHandler, testFilter) {
+nclosure.NodeTestInstance = function(file, args) {
 
   /**
    * @private
@@ -44,23 +65,27 @@ nclosure.NodeTestInstance =
    */
   this.testCase_;
 
-  /**
-   * The context to use to run all our tests. This stops this test stepping
-   * on the toes of all other tests in this suite (managed by nodetestsrunner).
-   * If this is null we will run the tests in the global scope (this context)
-   * @type {Object}
-   * @private
-   */
-  this.ctx_ = null; // this.initialiseTestingContext_();
+  // Some require overrides to make stack traces properly visible
+  goog.testing.stacktrace.parseStackFrame_ =
+      nclosure.NodeTestInstance.parseStackFrameLine_;
+  goog.testing.stacktrace.framesToString_ =
+      nclosure.NodeTestInstance.stackFramesToString_;
 
-  /**
-   * @private
-   * @type {function(goog.testing.TestCase):undefined}
-   */
-  this.onCompleteHandler_ = onCompleteHandler;
 
-  this.setUpTestCaseInterceps_(testFilter || '');
+  this.loadAdditionalTestingDependencies_();
+  this.setUpTestCaseInterceps_(args || '');
   this.overwriteAsyncTestCaseProblemPoints_();
+  this.run();
+};
+
+
+/**
+ * @private
+ */
+nclosure.NodeTestInstance.prototype.loadAdditionalTestingDependencies_ =
+    function() {
+  var dir = this.file_.substring(0, this.file_.lastIndexOf('/'));
+  ng_.loadAditionalDependenciesInSettingsFile(ng_.getPath(dir, 'closure.json'));
 };
 
 
@@ -120,12 +145,6 @@ nclosure.NodeTestInstance.prototype.setUpTestCaseInterceps_ =
     setTimeout: setTimeout,
     clearTimeout: clearTimeout
   };
-  if (this.ctx_) {
-    // When the test case is autoDiscoverTests it will look in this 'global'
-    // object, which is our context
-    goog.testing.TestCase.getGlobals =
-        goog.bind(function() { return this.ctx_; }, this);
-  }
 
   // Ignore this, return 1
   goog.testing.TestCase.prototype['countNumFilesLoaded_'] =
@@ -173,13 +192,8 @@ nclosure.NodeTestInstance.prototype.loadTestContentsIntoMemory_ =
     contents = this.convertHtmlTestToJS_(contents);
   }
   contents = contents.replace(/^#![^\n]+/, '\n'); // remove shebang
-  if (this.ctx_) {
-    process.binding('evals').Script.
-        runInNewContext(contents, this.ctx_, this.shortName_);
-  } else {
-    process.binding('evals').Script.
-        runInThisContext(contents, this.shortName_);
-  }
+  process.binding('evals').Script.
+      runInThisContext(contents, this.shortName_);
 };
 
 
@@ -202,37 +216,9 @@ nclosure.NodeTestInstance.prototype.createAndRunTestCase_ = function() {
  * @private
  */
 nclosure.NodeTestInstance.prototype.onTestComplete_ = function() {
-  if (!this.ctx_) this.clearOutGlobalContext_();
-  this.onCompleteHandler_(this.testCase_);
-};
-
-
-/**
- * Clears out the testing stuff from the global context.  This tries to stop
- * the tests stepping on each other's toes
- * @private
- */
-nclosure.NodeTestInstance.prototype.clearOutGlobalContext_ = function() {
-  for (var i in global) {
-    if (i.indexOf('test') === 0 || i.indexOf('setUp') === 0 ||
-        i.indexOf('tearDown') === 0) {
-      delete global[i];
-    }
-  }
-};
-
-
-/**
- * @private
- * @return {Object} The testing context to use to run the tests in.
- */
-nclosure.NodeTestInstance.prototype.initialiseTestingContext_ = function() {
-  var ctx = {
-    'require': global.goog.require,
-    'goog': global.goog,
-    'console': console
-  };
-  return ctx;
+  var data = this.testCase_.getReport(false);
+  var reportFile = '.tmptestreport.json';
+  require('fs').writeFileSync(reportFile, data);
 };
 
 
@@ -253,3 +239,69 @@ nclosure.NodeTestInstance.prototype.convertHtmlTestToJS_ = function(html) {
   }
   return blocks.join('\n');
 };
+
+
+/**
+ * For each raw text line find an appropriate 'goog.testing.stacktrace.Frame'
+ * object which constructs with these args:
+ *  {string} context Context object, empty in case of global functions
+ *    or if the browser doesn't provide this information.
+ *  {string} name Function name, empty in case of anonymous functions.
+ *  {string} alias Alias of the function if available. For example the
+ *    function name will be 'c' and the alias will be 'b' if the function is
+ *    defined as <code>a.b = function c() {};</code>.
+ *  {string} args Arguments of the function in parentheses if available.
+ *  {string} path File path or URL including line number and optionally
+ *   column number separated by colons
+ *
+ * @private
+ * @param {string} line A line in the stack trace.
+ * @return {goog.testing.stacktrace.Frame} The parsed frame.
+*/
+nclosure.NodeTestInstance.parseStackFrameLine_ = function(line) {
+  if (!line || line.indexOf('    at ') !== 0) { return null; }
+  line = line.substring(line.indexOf(' at ') + 4);
+  // return new goog.testing.stacktrace.Frame('', line, '', '', line);
+
+  if (line.charAt(0) === '/') { // Path to test file
+    return new goog.testing.stacktrace.Frame('', '', '', '', line);
+  }
+  var contextAndFunct = line.substring(0, line.lastIndexOf(' ')).split('.');
+  var context = '';
+  var funct = '';
+  if (contextAndFunct.length === 1) {
+    funct = contextAndFunct[0];
+  } else {
+    context = contextAndFunct[0];
+    funct = contextAndFunct[1];
+  }
+  var path = line.substring(line.indexOf('(') + 1);
+
+  return new goog.testing.stacktrace.Frame(context, funct, '', '',
+      path.substring(0, path.length - 1));
+};
+
+
+/**
+ * Converts the stack frames into canonical format. Chops the beginning and the
+ * end of it which come from the testing environment, not from the test itself.
+ * @param {!Array.<goog.testing.stacktrace.Frame>} frames The frames.
+ * @return {string} Canonical, pretty printed stack trace.
+ * @private
+ */
+nclosure.NodeTestInstance.stackFramesToString_ = function(frames) {
+  var stack = [];
+  for (var i = 0, len = frames.length; i < len; i++) {
+    var f = frames[i];
+    if (!f) continue;
+    var str = f.toCanonicalString();
+    var ignorestr = '[object Object].execute (testing/testcase.js:900:12)';
+    if (str.indexOf(ignorestr) === 0) { break; }
+    stack.push('> ');
+    stack.push(str);
+    stack.push('\n');
+  }
+  return stack.join('');
+};
+
+new nclosure.NodeTestInstance(process.argv[2], process.argv[3]);
