@@ -9,6 +9,8 @@ HIGH
 MED
 ---
 
+- Better docs, perhaps github pages
+
 - Redo the examples, make more relevant samples
 
 - Run jsdoc on entire project and document files better
