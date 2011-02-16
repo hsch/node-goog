@@ -125,9 +125,18 @@ To run a single test just execute:
 
     ./testSourceFile.js <optionalTestName>
 
-To run all tests in a single directory run the following command:
+To run all tests (files with the word test or suite in them) in a single
+directory run the following command:
 
       nctest <dirname>
+
+The testing framework also supports test suite files.  If you want to have a
+test suite simply have an array var named suite with the files to test
+(relative to the suite file).  I.e.
+
+      // Run all the tests inside the '../examples/simple/' directory
+      // This array can be directories or specific test (or other suite) files
+      var suite = ['../examples/simple/'];
 
 ## Closure Linter
 

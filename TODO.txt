@@ -4,8 +4,6 @@ TODO
 - Make all paths relative to the working directory in settingsloader.getPath,
   this will clean up commands a little
 
-- Documenta test suite support
-
 - When tests fail with an exception we do not get a report
 
 - Add acknoledgement file for all acks
