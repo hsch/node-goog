@@ -5,7 +5,7 @@ goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/checkAllSamplesAreR
 goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/compileAndCheckFilesTests.js', [], ['goog.array', 'goog.testing.AsyncTestCase', 'goog.testing.jsunit']);
 goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/compilerCommandLineArgsTests.js', [], ['goog.testing.AsyncTestCase', 'goog.testing.jsunit']);
 goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/docFrameworkTests.js', [], ['goog.array', 'goog.testing.AsyncTestCase', 'goog.testing.jsunit']);
-goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/googNodeTestFrameworkTests.js', [], ['goog.array', 'goog.testing.jsunit', 'nclosure_settingsLoader']);
+goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/googNodeTestFrameworkTests.js', [], ['goog.array', 'goog.testing.jsunit', 'nclosure.settingsLoader']);
 goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/runClosureLibraryJSUnitsManual.js', [], ['goog.testing.jsunit', 'nclosure.tests']);
-goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/settingsLoaderTests.js', [], ['goog.testing.jsunit', 'nclosure_settingsLoader']);
+goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/settingsLoaderTests.js', [], ['goog.testing.jsunit', 'nclosure.settingsLoader']);
 goog.addDependency('/home/ubuntu/Dev/projects/nclosure/tests/utils.js', ['nclosure.tests'], ['goog.array', 'nclosure']);

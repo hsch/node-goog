@@ -3,16 +3,16 @@
 require('nclosure').nclosure();
 
 goog.require('goog.testing.jsunit');
-goog.require('nclosure_settingsLoader');
+goog.require('nclosure.settingsLoader');
 
 /**
  * @private
- * @type {nclosure_settingsLoader}
+ * @type {nclosure.settingsLoader}
  */
 var settingsLoader;
 
 function setUpPage() {
-  settingsLoader = /** @type {nclosure_settingsLoader} */ (
+  settingsLoader = /** @type {nclosure.settingsLoader} */ (
     require('../lib/settingsloader').settingsLoader);
 };
 

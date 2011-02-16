@@ -11,7 +11,7 @@
 /**
  * @private
  * @const
- * @type {nclosure}
+ * @type {nclosure.core}
  */
 var ng_ = require('nclosure').nclosure();
 
@@ -20,8 +20,8 @@ goog.provide('nclosure.nctest');
 
 goog.require('goog.array');
 
-goog.require('nclosure');
 goog.require('nclosure.NodeTestsRunner');
+goog.require('nclosure.core');
 
 
 

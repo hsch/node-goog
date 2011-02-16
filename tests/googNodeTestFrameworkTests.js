@@ -5,7 +5,7 @@ require('nclosure').nclosure();
 
 goog.require('goog.array');
 goog.require('goog.testing.jsunit');
-goog.require('nclosure_settingsLoader');
+goog.require('nclosure.settingsLoader');
 goog.require('nclosure.NodeTestInstance');
 
 function testParseStackFrame() {

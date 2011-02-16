@@ -27,6 +27,7 @@
     '-E=deps\.js',
     '-E=/docs',
     '-E=/tests',
+    '-E=/third_party',
     '-p',
     '-r=10',
     '-D="noGlobal:true"',

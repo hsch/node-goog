@@ -8,7 +8,7 @@
 
 /**
  * @private
- * @type {nclosure}
+ * @type {nclosure.core}
  * @const
  */
 var ng_ = require('nclosure').nclosure();

@@ -10,13 +10,13 @@
 /**
  * @private
  * @const
- * @type {nclosure}
+ * @type {nclosure.core}
  */
 var ng_ = require('nclosure').nclosure();
 
 goog.provide('nclosure.nccompile');
 
-goog.require('nclosure');
+goog.require('nclosure.core');
 
 
 

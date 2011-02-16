@@ -12,7 +12,7 @@
 /**
  * @private
  * @const
- * @type {nclosure}
+ * @type {nclosure.core}
  */
 var ng_ = require('nclosure').nclosure();
 
@@ -29,7 +29,7 @@ global.navigator = { userAgent: 'node.js' };
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
 goog.require('goog.testing.stacktrace');
-goog.require('nclosure');
+goog.require('nclosure.core');
 
 
 

@@ -9,7 +9,7 @@
 
 /**
  * @private
- * @type {nclosure}
+ * @type {nclosure.core}
  * @const
  */
 var ng_ = require('nclosure').nclosure();
@@ -17,8 +17,8 @@ var ng_ = require('nclosure').nclosure();
 goog.provide('nclosure.ncstyle');
 
 goog.require('goog.array');
-goog.require('nclosure');
-goog.require('nclosure_opts');
+goog.require('nclosure.core');
+goog.require('nclosure.opts');
 
 
 
@@ -29,7 +29,7 @@ nclosure.ncstyle = function() {
 
   /**
    * @private
-   * @type {nclosure_opts}
+   * @type {nclosure.opts}
    */
   this.settings_;
 

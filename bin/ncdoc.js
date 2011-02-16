@@ -3,7 +3,7 @@
 
 /**
  * @private
- * @type {nclosure}
+ * @type {nclosure.core}
  * @const
  */
 var ng_ = require('nclosure').nclosure();
@@ -11,8 +11,8 @@ var ng_ = require('nclosure').nclosure();
 goog.provide('nclosure.ncdoc');
 
 goog.require('goog.array');
-goog.require('nclosure');
-goog.require('nclosure_opts');
+goog.require('nclosure.core');
+goog.require('nclosure.opts');
 
 
 
@@ -48,7 +48,7 @@ nclosure.ncdoc = function() {
 
 /**
  * @private
- * @param {nclosure_opts} args The settings object.
+ * @param {nclosure.opts} args The settings object.
  */
 nclosure.ncdoc.prototype.init_ = function(args) {
   // _dirToDoc is for testing so tests can set this global before calling
@@ -62,7 +62,7 @@ nclosure.ncdoc.prototype.init_ = function(args) {
 
 /**
  * @private
- * @param {nclosure_opts} args The settings object.
+ * @param {nclosure.opts} args The settings object.
  * @param {string} entryPoint The file/directory to document.
  */
 nclosure.ncdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
