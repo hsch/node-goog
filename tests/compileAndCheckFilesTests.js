@@ -26,7 +26,7 @@ function getAllTestableFiles() {
     readFilesInDir(__dirname + '/' + baseDir + d, allFiles);
   });
   goog.array.forEach(additionalFiles, function(f) {
-    allFiles.push(__dirname + '/' + baseDir +  f);
+    allFiles.push(ng_.getPath(__dirname + '/' + baseDir, f));
   });
   return allFiles;
 };
@@ -38,7 +38,7 @@ function readFilesInDir(d, allFiles) {
       if (f === 'docs') { return; }
       return readFilesInDir(d + f + '/', allFiles);
     } else if (isValidTestableFile(f)) {
-      allFiles.push(d + f);
+      allFiles.push(ng_.getPath(d, f));
     }
   });
   return allFiles;
@@ -61,7 +61,7 @@ testCompileAllFiles = function() {
 
 testCodeCheckAllFiles = function() {
   var dirs = goog.array.map(checkDirs, function(d) {
-    return __dirname + '/' + baseDir + d;
+    return ng_.getPath(__dirname + '/' + baseDir, d);
   });
   doAllFiles(checkFileImpl, dirs);
 };

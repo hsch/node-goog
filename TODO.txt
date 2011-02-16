@@ -1,18 +1,21 @@
 TODO
 ====
 
-- Make all paths relative to the working directory in settingsloader.getPath,
-  this will clean up commands a little
+HIGH
+----
 
 - When tests fail with an exception we do not get a report
 
 - Add acknoledgement file for all acks
 
+- Fix non source code install (npm)
+
+MED
+---
+
 - Redo the examples, make more relevant samples
 
 - Run jsdoc on entire project and document files better
-
-- Fix non source code install (npm)
 
 - Not working on cygwin (running through the linked npm commands is not
   working, actually running the js files in bin manually works if we update
@@ -20,6 +23,9 @@ TODO
 
 - Add a script to update all third_party libraries and to fix all required
   deps in the source code
+
+LOW
+---
 
 - JSDoc should run in parallel for performance
 
