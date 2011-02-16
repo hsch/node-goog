@@ -4,8 +4,6 @@ TODO
 HIGH
 ----
 
-- Add acknoledgement file for all acks
-
 - Fix non source code install (npm)
 
 MED

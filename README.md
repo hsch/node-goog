@@ -198,15 +198,6 @@ All configuration files and configuration objects take the following format:
 Note: All paths can be absolute or relative to the location of the current
 settings file.
 
-## Acknoledgements
-My sincerest appreciation to Google for open sourcing this awesome toolset.
-Thanks to the jsdoc-toolkit guys (Michael Mathews + co) and to Wouter Bos for
-his awesome jsdoc-toolkit template.  Thanks also to Aaron Wirtz for his
-[node-jsdoc-toolkit](https://github.com/p120ph37/node-jsdoc-toolkit) project.
-Huge thanks also goes to Hendrik Schnepel whose awesome
-[nclosure project](https://github.com/hsch/nclosure) got me started with
-this project.
-
 ## License
 
 Copyright 2011 Guido Tapia (guido@tapia.com.au)
