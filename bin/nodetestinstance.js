@@ -297,8 +297,9 @@ nclosure.NodeTestInstance.stackFramesToString_ = function(frames) {
     var f = frames[i];
     if (!f) continue;
     var str = f.toCanonicalString();
-    var ignorestr = '[object Object].execute (testing/testcase.js:900:12)';
-    if (str.indexOf(ignorestr) === 0) { break; }
+    if (str.indexOf('testing/testcase.js') >= 0) continue;
+    var ignorestr = '.createAndRunTestCase_';
+    if (str.indexOf(ignorestr) >= 0) { break; }
     stack.push('> ');
     stack.push(str);
     stack.push('\n');

@@ -4,8 +4,6 @@ TODO
 HIGH
 ----
 
-- When tests fail with an exception we do not get a report
-
 - Add acknoledgement file for all acks
 
 - Fix non source code install (npm)
