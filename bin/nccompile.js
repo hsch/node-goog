@@ -141,7 +141,7 @@ nclosure.nccompile.prototype.runDependencies_ = function() {
       this.compiledFileName_.lastIndexOf('/') + 1);
   var depsFile = this.deps_ ? ng_.getPath(fileDir, 'deps.js') : '';
   this.runCommand_(this.getDepsClArgs_(), 'depswriter.py',
-      depsFile, '', function(err) {
+      depsFile, '', null, function(err) {
         if (err) throw err;
         that.runCompilation_();
       });
@@ -160,7 +160,13 @@ nclosure.nccompile.prototype.runCompilation_ = function() {
       renameSync(this.fileToCompile_, this.fileToCompileIgnore_);
   var clArgs = this.getCompilerClArgs_();
   this.runCommand_(clArgs, 'closurebuilder.py',
-                   this.compile_ ? this.compiledFileName_ : '', bashInst);
+      this.compile_ ? this.compiledFileName_ : '', bashInst, function(output) {
+        var lastArg = clArgs[clArgs.length - 1];
+        if (lastArg.lastIndexOf('--') < 0) { return output; }
+        lastArg = lastArg.substring(lastArg.lastIndexOf('--'));
+        if (output.indexOf(lastArg) < 0) { return output; }
+        return output.substring(output.indexOf('\n', output.indexOf(lastArg)));
+      });
 };
 
 
@@ -213,10 +219,12 @@ nclosure.nccompile.prototype.createTmpFile_ =
  * @param {string} targetFile The name of the file to produce.
  * @param {string} bashInstructions Any bash shell instructions that are
  *    required in the compiled file.
+ * @param {(function(string):string)?} formatOutput A function to use to format
+ *    the output of the command.
  * @param {function(Error=):undefined=} callback The callback to call on exit.
  */
 nclosure.nccompile.prototype.runCommand_ = function(clArgs, command,
-    targetFile, bashInstructions, callback) {
+    targetFile, bashInstructions, formatOutput, callback) {
 
   var exec = ng_.getPath(ng_.args.closureBasePath,
                          'closure/bin/build/' + command);
@@ -230,7 +238,10 @@ nclosure.nccompile.prototype.runCommand_ = function(clArgs, command,
         }
         if (callback) callback(err);
 
-        if (stderr) { console.error(stderr.replace(/\.tmp\.js/g, '.js')); }
+        if (stderr) {
+          if (formatOutput) stderr = formatOutput(stderr);
+          console.error(stderr.replace(/\.tmp\.js/g, '.js'));
+        }
         if (stdout && targetFile) {
           stdout = stdout.replace(/\.tmp\.js/g, '.js');
           stdout = (bashInstructions || '') + stdout;

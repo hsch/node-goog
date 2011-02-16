@@ -8,9 +8,9 @@ TODO
 
 - Add acknoledgement file for all acks
 
-- Make compile output a bit cleaner, no need to print out command by default
-
 - Redo the examples, make more relevant samples
+
+- Run jsdoc on entire project and document files better
 
 - Fix non source code install (npm)
 
