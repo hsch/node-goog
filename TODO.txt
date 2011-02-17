@@ -27,8 +27,6 @@ LOW
 
 - JSDoc should run in parallel for performance
 
-- Use JSDoc as a CTAGs generator
-
 - Include GJSLINT and FIXJSSTYLE in distribution
 
 - Improve the number of closure tests passing the test suite. see
