@@ -33,6 +33,7 @@
     '-D="noGlobal:true"',
     '-D="index:files"'
   ],
+  jsdocToolkitTemplate: 'ctags',
   additionalLinterOptions: [
     '--strict', '-r'
   ]

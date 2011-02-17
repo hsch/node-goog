@@ -72,11 +72,14 @@ nclosure.ncdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
   var entryPointDir = entryPointDirIdx > 0 ?
       entryPoint.substring(0, entryPointDirIdx) : '.';
   var jsDocToolkitDir = args.jsdocToolkitDir;
+  var template = ng_.getPath(jsDocToolkitDir, 'templates/' +
+          (args.jsdocToolkitTemplate || 'codeview'));
+  var outputPath = ng_.getPath(entryPointDir,
+          args.jsdocToolkitTemplate === 'ctags' ? '' : '/docs');
 
   this.clArgs = [
-    '-t=' +
-        ng_.getPath(jsDocToolkitDir, 'templates/codeview'),
-    '-d=' + ng_.getPath(entryPointDir, '/docs'),
+    '-t=' + template,
+    '-d=' + outputPath,
     '-D="title:' +
         title + '"'
   ];
