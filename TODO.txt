@@ -19,9 +19,6 @@ MED
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
 
-- Add a script to update all third_party libraries and to fix all required
-  deps in the source code
-
 LOW
 ---
 

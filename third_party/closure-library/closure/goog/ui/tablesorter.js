@@ -175,6 +175,8 @@ goog.ui.TableSorter.prototype.sort_ = function(e) {
   var target = /** @type {Node} */ (e.target);
   var th = goog.dom.getAncestorByTagNameAndClass(target,
       goog.dom.TagName.TH);
+  if (!th) return; // Fix drag column in IE
+
   var col = th.cellIndex;
 
   // If the user clicks on the same column, sort it in reverse of what it is

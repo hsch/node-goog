@@ -173,6 +173,70 @@ See the COPYING file for details.
     assertNull('date cleared', picker.getDate());
   }
 
+  function testSetAllowedDateRange() {
+    picker = new goog.ui.DatePicker();
+    picker.createDom();
+    picker.enterDocument();
+    var selectEvents = 0;
+    var changeEvents = 0;
+    goog.events.listen(picker, goog.ui.DatePicker.Events.SELECT,
+        function() {
+          selectEvents++;
+        });
+    goog.events.listen(picker, goog.ui.DatePicker.Events.CHANGE,
+        function() {
+          changeEvents++;
+        });
+    picker.setAllowedDateRange(new Date(2010, 1, 1), null);
+    // Set valid date.
+    picker.setDate(new Date(2010, 1, 26));
+    assertEquals('no select event dispatched', 1, selectEvents);
+    assertEquals('no change event dispatched', 1, changeEvents);
+    assertTrue('date is set', new goog.date.Date(2010, 1, 26).equals(picker.getDate()));
+
+	// Set invalid date.	
+	picker.setDate(new Date(2009, 1, 1));
+    assertEquals('no select event dispatched', 1, selectEvents);
+    assertEquals('no change event dispatched', 1, changeEvents);
+    assertTrue('date was not set', new goog.date.Date(2010, 1, 26).equals(picker.getDate()));
+	
+	// Invalidate current date with new date range
+	picker.setAllowedDateRange(new Date(2011, 1, 1), null);
+	assertEquals('Null date set as current date was invalidated', 2, selectEvents);
+    assertEquals('Null date set as current date was invalidated', 2, changeEvents);
+    assertTrue('date was not set', picker.getDate() === null);
+	
+	// Set full date range
+	picker.setAllowedDateRange(new Date(2011, 1, 1), new Date(2012, 1, 1));	
+    picker.setDate(new Date(2011, 1, 1));
+    assertEquals('1 select event dispatched', 3, selectEvents);
+    assertEquals('1 change event', 3, changeEvents);
+	assertTrue('date was set', new goog.date.Date(2011, 1, 1).equals(picker.getDate()));
+
+	picker.setDate(new Date(2012, 1, 1));
+    assertEquals('1 select event dispatched', 4, selectEvents);
+    assertEquals('1 change event', 4, changeEvents);
+	assertTrue('date was set', new goog.date.Date(2012, 1, 1).equals(picker.getDate()));
+
+    // Test invalid dates	
+	picker.setDate(new Date(2010, 1, 1));
+    assertEquals('no select event dispatched', 4, selectEvents);
+    assertEquals('no change event dispatched', 4, changeEvents);
+	assertTrue('date was not set', new goog.date.Date(2012, 1, 1).equals(picker.getDate()));
+	
+	picker.setDate(new Date(2013, 1, 1));
+    assertEquals('no select event dispatched', 4, selectEvents);
+    assertEquals('no change event dispatched', 4, changeEvents);
+	assertTrue('date was not set', new goog.date.Date(2012, 1, 1).equals(picker.getDate()));
+	
+	// Test remove date range
+	picker.setAllowedDateRange(null, null);	
+	picker.setDate(new Date(2013, 1, 1));
+	assertEquals('1 select event dispatched', 5, selectEvents);
+    assertEquals('no change event dispatched', 5, changeEvents);
+	assertTrue('date was not set', new goog.date.Date(2013, 1, 1).equals(picker.getDate()));
+  }
+  
   function testEventListenerLeaks() {
     var listeners = goog.events.getTotalListenerCount();
     picker = new goog.ui.DatePicker();
