@@ -4,27 +4,25 @@ TODO
 HIGH
 ----
 
-- Fix non source code install (npm)
+- Fix npm install.  Currently requires full git clone to work.
 
 MED
 ---
 
-- Better docs, perhaps github pages
+- Better project documentation, perhaps github pages
 
 - Redo the examples, make more relevant samples
 
-- Run jsdoc on entire project and document files better
+- Run jsdoc on entire project and improve code documentation
 
 - Not working on cygwin (running through the linked npm commands is not
   working, actually running the js files in bin manually works if we update
   the paths to be all relative).
 
+- Include GJSLINT and FIXJSSTYLE in distribution
+
 LOW
 ---
-
-- JSDoc should run in parallel for performance
-
-- Include GJSLINT and FIXJSSTYLE in distribution
 
 - Improve the number of closure tests passing the test suite. see
   tests/closure_lib_tsts.html
