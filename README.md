@@ -13,7 +13,7 @@ code design and maintainability by providing support for:
 * Better Encapsulation
 * Type Safety
 * Interfaces and Mixins
-* Rich Documentation
+* Rich Source Documentation
 * A Huge Library of Production Ready Utilities, including:
 	* Collections / Arrays
 	* Testing / Mocking
@@ -46,7 +46,7 @@ To use any utility provided in the closure library just:
 1. Include `nclosure` in your application by `require`(ing) it and initialising
 it.
 
-		require('nclosure').nclosure();
+		require('nclosure').nclosure(); // nclosure() initialises the framework
 
 2. `goog.require` any namespace from the Closure library.
 
@@ -78,9 +78,12 @@ and ready for compilation just run the following command:
 
 The `nccompile` command accepts various arguments:
 
-* -c: Create [C]ompile file - Produces a compiled <filename>.min.js file
+* -c: Create [C]ompile file - Produces a compiled <filename>.min.js file.
+  Running your code using the compiled js file optimises your code and
+  reduces the number of imports your system does hence improving start up
+  time.
 * -d: Create [D]ependencies- Creates a deps.js file that can be used as an
-additionalDeps in an external project.
+  additionalDeps in an external project.
 
 ## JSDoc Documentation
 
@@ -97,19 +100,19 @@ For full documentation details please read the
 To set up a unit test simply create a test file like:
 
     #!/usr/local/bin/node
+    // You can now run the test just by executing this file
     require('nclosure').nclosure();
 
     goog.require('goog.testing.jsunit');
-    // Import the code you are testing
+    // Import the code you are testing (may need an additionalDeps defined)
     goog.require('nclosure.examples.simple.Example');
-
-    goog.provide('nclosure.examples.simple.tests.syncTests');
 
     // Any testXXX function are auto-discovered and run
     var testFunction1 = function() {
       assertNotEquals(typeof(example_), 'undefined');
     };
 
+    // Also auto discovered
     function testFunction2() {
       assertTrue(false);
     }
@@ -117,16 +120,16 @@ To set up a unit test simply create a test file like:
 If the tests are not in the same directory as your code you will have to
 ensure that the deps.js file of the code you are testing
 is declared in the closure.json file of the tests directory or passed in to the
-call to `goog();` like:
+call to `nclosure();` like:
 
-    require('nclosure').goog({additionalDeps:['/pathToDeps/deps.js']});
+    require('nclosure').nclosure({additionalDeps:['/pathToDeps/deps.js']});
 
 To run a single test just execute:
 
     ./testSourceFile.js <optionalTestName>
 
 To run all tests (files with the word test or suite in them) in a single
-directory run the following command:
+directory (recursive) run the following command:
 
       nctest <dirname>
 
@@ -135,7 +138,8 @@ test suite simply have an array var named suite with the files to test
 (relative to the suite file).  I.e.
 
       // Run all the tests inside the '../examples/simple/' directory
-      // This array can be directories or specific test (or other suite) files
+      // This array can be directories or specific test (or other suite)
+      // files
       var suite = ['../examples/simple/'];
 
 ## Closure Linter
@@ -160,20 +164,20 @@ Once installed simply run the following command to `linter` your code.
 `nclosure` can be configured in several ways.  The easiest is to modify the
 `bin/closure.json` file with your global settings.  Settings here can be
 extended by placing a `closure.json` file in your source directory. You can
-also place a `closure.json` in the directory running `node`.
+also place a `closure.json` in the directory running `node` (The cwd).
 
 Finally, `nclosure` can also be configured by passing an optional options
-object to the `require('nclosure').goog(opts);` call.
+object to the `require('nclosure').nclosure(opts);` call.
 
 All configuration files and configuration objects take the following format:
 
         {
-          closureBasePath: Location of the closure-library/closure/goog/
-              directory
+          closureBasePath: Location of the closure-library.  This defaults to
+            the closure library included in this package.
           additionalDeps: Any additional dependency files required to run your
-              code.  These files generally point to other closure libraries.
-              Note these deps files must have paths relative to this setting
-              file or be absolute.
+            code.  These files generally point to other closure libraries.
+            Note these deps files must have paths relative to this setting
+            file or be absolute.
           compiler_jar: Path to the compiler jar you want to use.  This defaults
             to the included compiler.jar file so only change this if you want
             to use a custom compiler.
@@ -185,7 +189,8 @@ All configuration files and configuration objects take the following format:
             roots required (assumes that the deps.js file is in the root folder
             of the source directory).
           jsdocToolkitDir: The location of jsdoc-toolkit.  This is only required
-            if you want to use jsdoc-toolkit to document your source code.
+            if you want to use jsdoc-toolkit to document your source code. This
+            defaults to the jsdoc instance included in this package.
           additionalJSDocToolkitOptions: Additional jsdoc-toolkit options,
             e.g.: "['-D="noGlobal:true"']"
           additionalLinterOptions: Additional gjslint and fixjsstyle options,
@@ -197,6 +202,30 @@ All configuration files and configuration objects take the following format:
 
 Note: All paths can be absolute or relative to the location of the current
 settings file.
+
+## More Help
+
+The best way to get going with nclosure is to look at the nclosure code (bin,
+lib and examples directories).  All nclosure code is annotated and should
+give you a good introduction to what can be acchieved with the tool.
+
+If you have any questions, issues, complaints, suggestions, .... just email me
+(guido@tapia.com.au) and I'll see what I can do to help.
+
+## Kown Limitations
+
+Since the Node.js core libs are not jsdoc'ed in any way I could not give any
+type safety when using these core libs.
+
+The documentation template is lacking in several areas this will be improved
+in the future.
+
+Linter is a pain to instal.
+
+Poor project documentation.
+
+For an up to date list of issues see the TODO.txt file.  Later I will start an
+issues list on github.
 
 ## License
 

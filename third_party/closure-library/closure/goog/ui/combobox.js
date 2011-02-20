@@ -52,6 +52,7 @@ goog.ui.ComboBox = function(opt_domHelper, opt_menu) {
   goog.ui.Component.call(this, opt_domHelper);
 
   this.labelInput_ = new goog.ui.LabelInput();
+  this.value_ = '';
   this.enabled_ = true;
 
   // TODO(user): Allow lazy creation of menus/menu items
@@ -343,6 +344,19 @@ goog.ui.ComboBox.prototype.removeAllItems = function() {
   }
 };
 
+/**
+ * Finds and returns the ComboBoxItem with the specified value, null if not found
+ * @param {string} value The value to look for
+ * @return {goog.ui.ComboBoxItem} The ComboBoxItem with the specified value.
+ */
+goog.ui.ComboBox.prototype.findItem = function(value) {
+  for (var i = this.getItemCount() - 1; i >= 0; --i) {
+    var item = this.getItemAt(i);
+	if (item.getValue() === value) return item;
+  }
+  return null;
+};
+
 
 /**
  * Removes a menu item at a given index in the menu.
@@ -475,8 +489,10 @@ goog.ui.ComboBox.prototype.setUseDropdownArrow = function(useDropdownArrow) {
  */
 goog.ui.ComboBox.prototype.setValue = function(value) {
   this.logger_.info('setValue() - ' + value);
-  if (this.labelInput_.getValue() != value) {
-    this.labelInput_.setValue(value);
+  if (this.value_ != value) {	
+    this.value_ = value;
+    var item = this.findItem(value);
+    this.labelInput_.setValue(item ? item.getCaption() : value);
     this.dispatchEvent(goog.ui.Component.EventType.CHANGE);
   }
 };
@@ -486,7 +502,15 @@ goog.ui.ComboBox.prototype.setValue = function(value) {
  * @return {string} The current value of the combo box.
  */
 goog.ui.ComboBox.prototype.getValue = function() {
-  return this.labelInput_.getValue();
+  return this.value_;  
+};
+
+/**
+ * @return {string} The current caption of the combo box.
+ */
+goog.ui.ComboBox.prototype.getCaption = function() {
+  var item = this.findItem(value);
+  return item ? item.getCaption() : '';  
 };
 
 

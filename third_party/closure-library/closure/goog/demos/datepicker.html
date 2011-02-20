@@ -13,6 +13,7 @@ See the COPYING file for details.
   <script>
     goog.require('goog.dom');
     goog.require('goog.date');
+	goog.require('goog.date.DateRange');
     goog.require('goog.i18n.DateTimeSymbols');
     goog.require('goog.i18n.DateTimeSymbols_en_ISO');
     goog.require('goog.i18n.DateTimeSymbols_en_US');
@@ -51,7 +52,7 @@ See the COPYING file for details.
       for="ck-4">ShowWeekdays</label><br>
   <input type="checkbox" id="ck-5"
       onclick="dp_custom.setAllowNone(this.checked);" checked><label
-      for="ck-5">AllowNone</label><br>
+      for="ck-5">AllowNone</label><br>	 
   <input type="checkbox" id="ck-6"
       onclick="dp_custom.setShowToday(this.checked);" checked><label
       for="ck-6">ShowToday</label><br>
@@ -61,6 +62,9 @@ See the COPYING file for details.
   <input type="checkbox" id="ck-8"
       onclick="dp_custom.setUseSimpleNavigationMenu(this.checked);"><label
       for="ck-8">UseSimpleNavigationMenu</label><br>
+  <input type="checkbox" id="ck-9"
+      onclick="dp_custom.setAllowedDateRange(this.checked ? goog.date.DateRange.lastWeek(dp_custom.getDate()).getStartDate() : null, this.checked ? goog.date.DateRange.lastWeek(dp_custom.getDate()).getEndDate() : null);"><label
+      for="ck-8">AllowedDateRange (lastWeek)</label><br>
   <br>
   <div id="widget_custom"></div>
   <div style="clear: both;">&nbsp;</div>

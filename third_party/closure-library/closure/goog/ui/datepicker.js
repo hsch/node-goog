@@ -205,6 +205,23 @@ goog.ui.DatePicker.prototype.elFootRow_ = null;
 
 
 /**
+ * The inclusive allowed date range (from) for selection (min date).  
+ * null is all dates allowed.  
+ * @type {goog.date.Date}
+ * @private
+ */
+goog.ui.DatePicker.prototype.allowedDateRangeFrom_ = null;
+
+
+/**
+ * The inclusive allowed date range (from) for selection (min date).  
+ * null is all dates allowed.  
+ * @type {goog.date.Date}
+ * @private
+ */
+goog.ui.DatePicker.prototype.allowedDateRangeTo_ = null;
+
+/**
  * Next unique instance ID of a datepicker cell.
  * @type {number}
  * @private
@@ -312,6 +329,22 @@ goog.ui.DatePicker.prototype.getAllowNone = function() {
  */
 goog.ui.DatePicker.prototype.getShowToday = function() {
   return this.showToday_;
+};
+
+
+/**
+ * @return {goog.date.Date} The allowed selection date range from.
+ */
+goog.ui.DatePicker.prototype.getAllowedDateRangeFrom = function() {
+  return this.allowedDateRangeFrom_;
+};
+
+
+/**
+ * @return {goog.date.Date} The allowed selection date range from.
+ */
+goog.ui.DatePicker.prototype.getAllowedDateRangeTo = function() {
+  return this.allowedDateRangeTo_;
 };
 
 
@@ -466,6 +499,18 @@ goog.ui.DatePicker.prototype.setShowToday = function(b) {
   }
 };
 
+/**
+ * Sets the allowed selection date range (to value).  null for unbounded.
+ * 
+ * @param {goog.date.Date|Date} allowedDateRangeFrom The start of the date range (null for unbounded)
+ * @param {goog.date.Date|Date} allowedDateRangeTo The end of the date range (null for unbounded)
+ */
+goog.ui.DatePicker.prototype.setAllowedDateRange = function(allowedDateRangeFrom, allowedDateRangeTo) {
+  this.allowedDateRangeFrom_ = allowedDateRangeFrom ? new goog.date.Date(allowedDateRangeFrom) : null;
+  this.allowedDateRangeTo_ = allowedDateRangeTo ? new goog.date.Date(allowedDateRangeTo) : null;
+  if (!this.isDateInAllowedRange_(this.getDate())) { this.setDate(null); }  
+  else { this.updateCalendarGrid_(); }
+};
 
 /**
  * Updates the display style of the None and Today buttons as well as hides the
@@ -559,7 +604,9 @@ goog.ui.DatePicker.prototype.getDate = function() {
  *
  * @param {goog.date.Date|Date} date Date to select or null to select nothing.
  */
-goog.ui.DatePicker.prototype.setDate = function(date) {
+goog.ui.DatePicker.prototype.setDate = function(date) {  
+  if (!this.isDateInAllowedRange_(date)) return; // Ignore invalid dates.
+  
   // Check if date has been changed
   var changed = date != this.date_ &&
       !(date && this.date_ &&
@@ -592,6 +639,21 @@ goog.ui.DatePicker.prototype.setDate = function(date) {
         goog.ui.DatePicker.Events.CHANGE, this, this.date_);
     this.dispatchEvent(changeEvent);
   }
+};
+
+
+/**
+ * Determines wether the specified date is within the allowed range.
+ * 
+ * @param {goog.date.Date|Date} date The specified date
+ * @return {boolean} Wether the specified date is within the allowed range.
+ */
+goog.ui.DatePicker.prototype.isDateInAllowedRange_ = function(date) {
+  if (!date) return true;
+  if (this.allowedDateRangeFrom_ && this.allowedDateRangeFrom_ > date) return false;
+  if (this.allowedDateRangeTo_ && this.allowedDateRangeTo_ < date) return false;
+  
+  return true;
 };
 
 
@@ -1225,7 +1287,10 @@ goog.ui.DatePicker.prototype.redrawCalendarGrid_ = function() {
       }
       goog.dom.a11y.setRole(el, 'gridcell');
       var classes = [goog.getCssName(this.getBaseCssClass(), 'date')];
-      if (this.showOtherMonths_ || o.getMonth() == month) {
+	  if (!this.isDateInAllowedRange_(o)) {				
+		classes.push(goog.getCssName(this.getBaseCssClass(), 'invalid-in-range'));		
+	  }
+	  if (this.showOtherMonths_ || o.getMonth() == month) {
         // Date belongs to previous or next month
         if (o.getMonth() != month) {
           classes.push(goog.getCssName(this.getBaseCssClass(), 'other-month'));

@@ -444,7 +444,7 @@ goog.testing.TestCase.prototype.getReport = function(opt_verbose) {
   if (this.testRunner_ && !this.testRunner_.isFinished()) {
     rv.push(this.name_ + ' [RUNNING]');
   } else {
-    var success = this.result_.isSuccess() &&
+    var success = this.result_.isSuccess() && 
       (!this.testRunner_ || !this.testRunner_.hasErrors());
     rv.push(this.name_ + ' [' + (success ? 'PASSED' : 'FAILED') + ']');
   }
@@ -633,6 +633,7 @@ goog.testing.TestCase.prototype.autoDiscoverTests = function() {
   var foundTests = [];
 
   for (var name in testSource) {
+
     try {
       var ref = testSource[name];
     } catch (ex) {

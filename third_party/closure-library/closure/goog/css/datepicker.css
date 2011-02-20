@@ -140,6 +140,10 @@ td.goog-date-picker-selected {
   background: #c3d9ff;
 }
 
+td.goog-date-picker-invalid-in-range {
+  background: #ccc;
+}
+
 .goog-date-picker-today {
   background: #9ab;
   font-weight: bold !important;
