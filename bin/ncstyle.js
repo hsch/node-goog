@@ -17,6 +17,7 @@ var ng_ = require('nclosure').nclosure();
 goog.provide('nclosure.ncstyle');
 
 goog.require('goog.array');
+goog.require('goog.string');
 goog.require('nclosure.core');
 goog.require('nclosure.opts');
 
@@ -256,8 +257,11 @@ nclosure.ncstyle.prototype.runProcess_ =
         if (callback) { callback(); }
         if (err) {
           if (stderr) console.error(stderr);
-          if (stdout) console.log(stdout);
-          console.error(err.stack);
+          if (stdout) {
+            var idx = stdout.indexOf('\nSome of the errors reported by');
+            if (idx >= 0) stdout = goog.string.trim(stdout.substring(0, idx));
+            console.error(stdout);
+          }
           return;
         }
 

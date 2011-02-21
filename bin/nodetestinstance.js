@@ -283,18 +283,20 @@ nclosure.NodeTestInstance.parseStackFrameLine_ = function(line) {
       path.substring(0, path.length - 1));
 };
 
+
 /**
  * @private
  * @type {Array.<string>}
  * @const
  */
-nclosure.NodeTestInstance.IGNOREABLE_LINES = [
+nclosure.NodeTestInstance.IGNOREABLE_LINES_ = [
   'testing/testcase.js',
   'testing/asserts.js',
   'testing/stacktrace.js',
   '.createAndRunTestCase_',
   'nodetestinstance.js'
 ];
+
 
 /**
  * Converts the stack frames into canonical format. Chops the beginning and the
@@ -310,9 +312,9 @@ nclosure.NodeTestInstance.stackFramesToString_ = function(frames) {
     if (!f && typeof(f) !== 'string') continue;
 
     var str = f.toCanonicalString();
-    if (goog.array.find(nclosure.NodeTestInstance.IGNOREABLE_LINES,
-        function (l) { return str.indexOf(l) >= 0; }
-    )) { continue; }
+    if (goog.array.find(nclosure.NodeTestInstance.IGNOREABLE_LINES_,
+        function(l) { return str.indexOf(l) >= 0; }
+        )) { continue; }
 
     stack.push('> ');
     stack.push(str);
