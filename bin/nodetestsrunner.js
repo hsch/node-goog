@@ -149,8 +149,6 @@ nclosure.NodeTestsRunner.renderResult_ = function(result) {
  */
 nclosure.NodeTestsRunner.colorizeReport = function(report) {
   var lines = report.replace(/\s*$/, '').split('\n');
-  // Remove empty lines
-  lines = goog.array.filter(lines, function(l) { return l !== ''; });
   var isSuccess = true;
   lines = goog.array.map(lines, function(l) {
     if (l.indexOf('[FAILED]') > 0) {
@@ -162,7 +160,7 @@ nclosure.NodeTestsRunner.colorizeReport = function(report) {
   });
   var titleLen = lines[0].length - 7; // 7 for the color
   var underline = nclosure.NodeTestsRunner.padString_('', titleLen, '-');
-  lines.splice(1, 0, underline);
+  lines[1] = underline;
   return lines.join('\n');
 };
 
