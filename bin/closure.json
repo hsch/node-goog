@@ -29,8 +29,7 @@
     '-E=/tests',
     '-E=/third_party',
     '-r=10',
-    '-D="noGlobal:true"',
-    '-D="index:files"'
+    '-D="noGlobal:true"'
   ],
   jsdocToolkitTemplate: 'codeview',
   additionalLinterOptions: [
