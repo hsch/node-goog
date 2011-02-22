@@ -28,7 +28,6 @@
     '-E=/docs',
     '-E=/tests',
     '-E=/third_party',
-    '-p',
     '-r=10',
     '-D="noGlobal:true"',
     '-D="index:files"'
