@@ -1,4 +1,4 @@
-﻿/* TABLE OF CONTENTS:
+/* TABLE OF CONTENTS:
  * - Browser reset
  * - HTML elements
  * - JsDoc styling
@@ -138,7 +138,7 @@ p {
  */
 
 
- 
+
 /*
  * BEGIN HACK
  */
@@ -170,7 +170,7 @@ div.index *.heading1 {
 	letter-spacing: 1px;
 	line-height: 1.3em;
 }
- 
+
 div.index div.menu {
 	background-color: #FFFFFF;
 }
