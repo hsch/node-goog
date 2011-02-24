@@ -1,9 +1,27 @@
 #!/usr/local/bin/node
 
 /**
- * @fileoverview Utility to compile a specific JS project.
+ * @fileoverview Utility to compile a specific JS project. To use the compiler:
+ * <pre>
+ *  ncompile [options] <file>
+ * </pre>
+ * Supported options are:
+ * <ul>
+ *  <li>-c Creates a minified file.</li>
+ *  <li>-d Creates a dependecy file (deps.js).  You can then reference this
+ *    file in other projects to use the libraries defined in you librayr.</li>
+ * </ul>
+ * For full details on the compiler see the
+ * <a href='http://code.google.com/closure/compiler/'>official docs</a> and
+ * the
+ * <a href='http://code.google.com/closure/compiler/docs/js-for-compiler.html'>
+ *  annotation docs</a>.
  *
  * @author guido@tapia.com.au (Guido Tapia)
+ * @see <a href='http://code.google.com/closure/compiler/'>official docs</a>
+ * @see
+ *  <a href='http://code.google.com/closure/compiler/docs/js-for-compiler.html'>
+ *    annotation docs</a>.
  */
 
 
@@ -22,6 +40,10 @@ goog.require('nclosure.core');
 
 /**
  * @constructor
+ * This compiler is automatically run once this file has been parsed.  It is
+ * not intended to be used programatically.
+ *
+ * This constructor starts the compilation process.
  */
 nclosure.nccompile = function() {
 
@@ -384,4 +406,5 @@ nclosure.nccompile.prototype.getDirectory_ = function(file) {
   return path;
 };
 
+// Go!
 new nclosure.nccompile();

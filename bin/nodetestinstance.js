@@ -39,6 +39,9 @@ goog.require('nclosure.core');
  *    responsible for.
  * @param {string} args The search args that are passed to the test case for
  *    test lookups.
+ *
+ * Note: this file should not be used manually but rather through the
+ * nctest command.
  */
 nclosure.NodeTestInstance = function(file, args) {
 

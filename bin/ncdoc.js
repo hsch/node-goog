@@ -1,5 +1,20 @@
 #!/usr/local/bin/node
 
+/**
+ * @fileoverview Utility to generate jsdoc style docs from your source code.
+ * To use the ncdoc too just:
+ * <pre>
+ *  ncdoc <dir>
+ * </pre>
+ * This will generate all your docs and put them in the <dir>/docs/ directory.
+ *
+ * For full details on jsdoc see the
+ * <a href='http://jsdoc.sourceforge.net/'>official docs</a>.
+ *
+ * @author guido@tapia.com.au (Guido Tapia)
+ * @see <a href='http://jsdoc.sourceforge.net/'>official docs</a>
+ */
+
 
 /**
  * @private
@@ -17,6 +32,9 @@ goog.require('nclosure.opts');
 
 
 /**
+ * This constructor is called automatically once this file is parsed.  This
+ * class is not intended to be used programatically.
+ *
  * @constructor
  */
 nclosure.ncdoc = function() {

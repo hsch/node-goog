@@ -2,9 +2,30 @@
 
 /**
  * @fileoverview This is a utility for running all test in a specified
- * directory.
+ * directory. To use nctest:
+ * <pre>
+ *  nctest <directory>
+ *  nctest <file>
+ *  nctest <file> specific directory name.
+ * </pre>
+ *
+ * When running tests or test suites in a directory nctest will look for
+ * all files named *test* or *suite* recursively.  nctest also supports testing
+ * html files which wil be scraped for all script tags.  This allows your
+ * existing closure jsunit tests to be run without having to turn them
+ * into js files.
+ *
+ * nctest also supports test suite files.  If a test suite file is encountered
+ * in a directory or specified in using <code>nctest <file></code> then it will
+ * parse any variable named suite and run all tests specified in this variable.
+ * <pre>
+ *  var suite = [file1, file2, suite1, ...];
+ * </pre>
+ * Closure's jsunit support is built ontop of jsunit.  For more information
+ * see the <a href='http://www.jsunit.net/'>jsunit official docs.</a>.
  *
  * @author guido@tapia.com.au (Guido Tapia)
+ * @see <a href='http://www.jsunit.net/'>jsunit official docs.</a>
  */
 
 
@@ -27,7 +48,10 @@ goog.require('nclosure.core');
 
 /**
  * The nclosure.nctest class runs all tests (files case insensitive
- * named *test*) in a directory.
+ * named *test* and *suite*) in a directory.
+ *
+ * This constructor is called automatically once this file is parsed.  This
+ * class is not intended to be used programatically.
  *
  * @constructor
  */

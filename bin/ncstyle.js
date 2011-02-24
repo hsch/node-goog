@@ -3,7 +3,31 @@
 /**
  * @fileoverview This file runs fixjsstyle and gjslint on a directory
  * recursively checking and trying to fix as many style issues as possible.
- * These tools run agains Google's coding style guide.
+ * These tools run agains Google's coding
+ * <a
+ * href='http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml'>
+ *  style guide</a>.
+ *
+ * To use ncstyle:
+ * <pre>
+ *  ncstyle <directory>
+ * </pre>
+ *
+ * It is also important to note that <em>"You should back up your files or store
+ * them in a source control system before using fixjsstyle, in case the script
+ * makes changes that you don't want."</em>
+ *
+ * For full details on the linter tools see the
+ * <a href='http://code.google.com/closure/utilities/docs/linter_howto.html'>
+ *  official docs<a/>.
+ * @author guido@tapia.com.au (Guido Tapia)
+ * @see
+ *  <a href='http://code.google.com/closure/utilities/docs/linter_howto.html'>
+ *  official docs<a/>.
+ * @see
+ * <a
+ * href='http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml'>
+ *    Google's JavaScript Style Guide</a>
  */
 
 
@@ -24,6 +48,8 @@ goog.require('nclosure.opts');
 
 
 /**
+ * This constructor is called automatically once this file is parsed.  This
+ * class is not intended to be used programatically.
  * @constructor
  */
 nclosure.ncstyle = function() {
@@ -271,4 +297,5 @@ nclosure.ncstyle.prototype.runProcess_ =
       });
 };
 
+// Go!!!
 new nclosure.ncstyle();

@@ -1,4 +1,14 @@
 
+/**
+ * @fileoverview Utility class to run all specified tests in their own process
+ * (isolation).
+ *
+ * Note: this file should not be used manually but rather through the
+ * nctest command.
+ *
+ * @author guido@tapia.com.au (Guido Tapia)
+ */
+
 goog.provide('nclosure.NodeTestsRunner');
 
 goog.require('goog.array');
@@ -10,6 +20,9 @@ goog.require('goog.string');
  * @constructor
  * @param {Array.<string>} testFiles The test files to test.
  * @param {string} args Any args used to find appropriate tests to run.
+ *
+ * Note: this file should not be used manually but rather through the
+ * nctest command.
  */
 nclosure.NodeTestsRunner = function(testFiles, args) {
   /**
@@ -39,7 +52,7 @@ nclosure.NodeTestsRunner.result;
 
 
 /**
- * Executes the tests
+ * Executes the tests specified in the constructor.
  */
 nclosure.NodeTestsRunner.prototype.execute = function() {
   this.runNextTest_();
@@ -136,7 +149,7 @@ nclosure.NodeTestsRunner.prototype.displayResults_ = function() {
  */
 nclosure.NodeTestsRunner.renderResult_ = function(result) {
   if (result.report)
-    return nclosure.NodeTestsRunner.colorizeReport(result.report);
+    return nclosure.NodeTestsRunner.colorizeReport_(result.report);
   else {
     return '\x1B[0;31m' + result.file + ' [FAILED] - No Report Found';
   }
@@ -146,8 +159,9 @@ nclosure.NodeTestsRunner.renderResult_ = function(result) {
 /**
  * @param {string} report The test report to colorize.
  * @return {string} The colorized report.
+ * @private
  */
-nclosure.NodeTestsRunner.colorizeReport = function(report) {
+nclosure.NodeTestsRunner.colorizeReport_ = function(report) {
   var lines = report.replace(/\s*$/, '').split('\n');
   var isSuccess = true;
   lines = goog.array.map(lines, function(l) {
