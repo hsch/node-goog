@@ -31,7 +31,11 @@ code design and maintainability by providing support for:
 
 ## Installation (core)
 
-* Install `nclosure`.  By getting the source (NPM install comming soon):
+* Install `nclosure`.  By:
+
+			npm install nclosure
+
+* Or better yet, by getting the source:
 
 			git clone git://github.com/gatapia/nclosure.git
 			cd nclosure

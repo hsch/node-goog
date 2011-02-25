@@ -4,8 +4,6 @@ TODO
 HIGH
 ----
 
-- Fix npm install.  Currently requires full git clone to work.
-
 - Better project documentation, including a tutorial
 
 - Better jsdoc stylesheet
