@@ -329,7 +329,7 @@ dl.inheritsList dd {
 	font-weight: bold;
 }
 
-pre.code {
+pre {
 	overflow: auto;
 	font-family: Consolas, "Courier New", Courier, monospace;
 	background: #eee;
