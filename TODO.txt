@@ -6,16 +6,6 @@ HIGH
 
 - Fix npm install.  Currently requires full git clone to work.
 
-- google's pretty print requires that code blocks use the pretty print class
-  this is sucky. Add an onload handler to codeview all.js to auto add
- 'prettyprint' to all code and pre blocks.
-
-- codeview template only styles class pre.code just make it pre.
-
-- Better syntax highlightinh in code view.
-
-- Allow go to method source when clicking on method name (details)
-
 - Better jsdoc stylesheet
 
 MED

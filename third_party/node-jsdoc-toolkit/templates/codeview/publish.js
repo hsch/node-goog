@@ -189,15 +189,18 @@ function makeSrcFile(path, srcDir, name) {
 		name = name.replace(/\:/g, "_");
 	}
 
-	var src = {path: path, name:name, charset: IO.encoding, hilited: ""};
+	var src = IO.readFile(path);
+  src = src.toString().replace(/</g, '&lt;');
 
-	if (defined(JSDOC.PluginManager)) {
-		JSDOC.PluginManager.run("onPublishSrc", src);
-	}
+  var html = ['<!DOCTYPE html>', '<html>', '<head>', '<title>' + name + '</title>'];
+    html.push('<link rel="stylesheet" href="../../css/prettify.css" media="all"></link>');
+    html.push('<link rel="stylesheet" href="../../css/all.css" media="all"></link>');
+    html.push('<script src="../../javascript/all.js"></script>');
+    html.push('<script src="../../javascript/prettify.js"></script>');
+    html.push('</head><body onload="prePrettyPrint();"><pre>' + src +
+      '</pre></body></html>');
 
-	if (src.hilited) {
-		IO.saveFile(srcDir, name+publish.conf.ext, src.hilited);
-	}
+  IO.saveFile(srcDir, name+publish.conf.ext, html.join('\n'));
 }
 
 /** Build output for displaying function parameters. */
