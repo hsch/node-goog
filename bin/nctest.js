@@ -111,7 +111,7 @@ nclosure.nctest.prototype.getTestSuiteFiles_ = function(file) {
   if (!m) { return null; }
   var suittests = goog.array.map(m[1].split(','), function(s) {
     s = goog.string.trim(s);
-    return s.substring(1, s.length - 2);
+    return s.substring(1, s.length - 1);
   });
   var dir = ng_.getFileDirectory(file);
   var alltests = [];

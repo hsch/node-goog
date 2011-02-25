@@ -1,0 +1,380 @@
+<html>
+  <head></head>
+  <body>
+    <h1>NClosure Tutorial</h1>
+    <h2>Installing NClosure</h2>
+    <p>
+      Installation is simple, you can use 'npm install nclosure' but I recommend
+      getting the sources.  This will allow you to read the nclosure source
+      which is a great example of closure style JavaScript.
+    </p>
+    <p>
+      To install from sources just:
+      <pre>
+git clone git://github.com/gatapia/nclosure.git
+cd nclosure
+npm link
+      </pre>
+    </p>
+    <h2>Hello World</h2>
+    <p>
+      Lets start the tutorial by writing a small application that spans accross
+      a couple of source files.  Closure makes developing multiple file projects
+      easy and is one of the many ways it encourages good development practices.
+    </p>
+    <p>
+    Our application will be a simple command line application that lists all
+    files in the current directory recursively sorted by name.
+    </p>
+    <pre>
+#!/usr/local/bin/node
+
+// We are now in closure mode
+require('nclosure').nclosure();
+
+// Lets declare our namespace 'demo.listfiles'.  Its always a good idea
+// to declare namespaces as polluting the global scope whilst not as
+// critical in the server is still a bad practice.
+goog.provide('demo.listfiles');
+
+// Import some utilities from the closure libs
+goog.require('goog.array');
+
+/**
+  * @constructor
+  * @param {string} dir The directory to list
+  */
+demo.listfiles = function(dir) {
+  // Import some node utils
+  this.fs_ = require('fs');
+  this.path_ = require('path');
+  var files = [];
+  this.getFilesInDir_(files, dir);
+  files.sort();
+  console.log(files.join('\n'));
+};
+
+/**
+  * @private
+  * @param {Array.<string>} files
+  * @param {string} dir
+  */
+demo.listfiles.prototype.getFilesInDir_ = function(files, dir) {
+  var filesInDir = this.fs_.readdirSync(dir);
+  goog.array.forEach(filesInDir, function(f) {
+    var path = this.path_.resolve(dir, f);
+    if (this.fs_.statSync(path).isDirectory()) {
+      this.getFilesInDir_(files, path);
+    } else {
+      files.push(path);
+    };
+  }, this);
+};
+
+// List the files in the current directory
+new demo.listfiles(__dirname);
+    </pre>
+    <p>
+      Ok, lets save that 'listfiles.js'. Now lets see if that compiles:
+    </p>
+    <pre>
+nccompile listfiles.js
+    </pre>
+    <p>
+      You should see the following message:
+    </p>
+    <pre>
+0 error(s), 0 warning(s), 89.0% typed
+/.../nclosure/third_party/closure-library/closure/bin/build/closurebuilder.py:
+JavaScript compilation succeeded.
+    </pre>
+    <p>
+      If not then just fix the compile errors until you get a clean compile.
+    </p>
+    <p>
+      Once the source is compiling its time to try out our new console app.
+      Note: you will probably need to chmod on the file to make it executable.
+    </p>
+    <pre>
+      ./listfiles.js
+    </pre>
+    <p>
+      And that will list the files in the current directory.  We'll that's
+      pretty useless, so why not jazz it up a bit.  Why dont we not only
+      print the file names but print the file details also. This is
+      functionality that is probably beyond the scope of a single source file
+      so lets add a new file 'fileinfo.js'.
+    </p>
+    <pre>
+
+goog.provide('demo.fileinfo');
+
+goog.require('goog.debug');
+
+/**
+ * @constructor
+ * @param {string} path The path that this instance of demo.fileinfo will
+ *    operate on.
+ */
+demo.fileinfo = function(path) {
+  this.fs_ = require('fs');
+  this.path_ = path;
+};
+
+
+/**
+ * @return {string} A descriptive message with all the relevant information on
+ *    the specified path.
+ */
+demo.fileinfo.prototype.getFileInfo = function() {
+    var details = this.fs_.statSync(this.path_);
+    return goog.debug.expose(details);
+};
+    </pre>
+    <p>
+      Now to use the class, lets apply the following changes to listfiles.js.
+    </p>
+    <pre>
+#!/usr/local/bin/node
+
+// We are now in closure mode
+require('nclosure').nclosure();
+
+// Lets declare our namespace 'demo.listfiles'.  Its always a good idea
+// to declare namespaces as polluting the global scope whilst not as
+// critical in the server is still a bad practice.
+goog.provide('demo.listfiles2');
+
+// Import some utilities from the closure libs
+goog.require('goog.array');
+<strong>
+// We need to 'include' our new class
+goog.require('demo.fileinfo');
+</strong>
+
+/**
+  * @constructor
+  * @param {string} dir The directory to list
+  */
+demo.listfiles = function(dir) {
+  // Import some node utils
+  this.fs_ = require('fs');
+  this.path_ = require('path');
+  var files = [];
+  this.getFilesInDir_(files, dir);
+  <strong>
+  // Lets turn all of those file names into a useful information list
+  files = goog.array.map(files, function(f) {
+    return '\n' + f + '\n' + new demo.fileinfo(f).getFileInfo();
+  });
+  </strong>
+  files.sort();
+  console.log(files.join('\n'));
+};
+
+/**
+  * @private
+  * @param {Array.<string>} files
+  * @param {string} dir
+  */
+demo.listfiles.prototype.getFilesInDir_ = function(files, dir) {
+  var filesInDir = this.fs_.readdirSync(dir);
+  goog.array.forEach(filesInDir, function(f) {
+    var path = this.path_.resolve(dir, f);
+    if (this.fs_.statSync(path).isDirectory()) {
+      this.getFilesInDir_(files, path);
+    } else {
+      files.push(path);
+    };
+  }, this);
+};
+
+// List the files in the current directory
+new demo.listfiles(__dirname);
+    </pre>
+    <p>
+      Time to compile again.  This time we will pass the <code>-d</code> flag
+      to the compiler. The <code>-d</code> flag tells the compiler to generate
+      a dependencies file.  This file is required when your project spans
+      multiple files.
+    </p>
+    <pre>
+nccompile -d listfiles.js
+    </pre>
+    <p>
+      Now run your app again and marvel at the beauty.
+    </p>
+    <h2>Test</h2>
+    <p>
+      Testing JavaScript has never been easy but nclosure makes it less
+      painful.  Lets create a <code>test</code> directory where we will
+      place a test file called <code>allTests.js</code>.
+    </p>
+    <pre>
+#!/usr/local/bin/node
+
+// We are now in closure mode
+require('nclosure').nclosure();
+
+goog.require('goog.testing.jsunit');
+goog.require('demo.fileinfo');
+
+// All tests with the name *test* will automatically be detected.
+function testFileInfo() {
+  var fi = new demo.fileinfo(__filename);
+  assertNotNull(fi.getFileInfo());
+};
+    </pre>
+    <p>
+      This very simple tests just checks that file info is returning something
+      when called with a real file.  Since we are now in a different directory
+      we will need to reference the dependencies file created above.  This is
+      the exact same way that you can import other people's libraries into
+      your code making reuse easy.
+    </p>
+    <p>
+      To include the deps file you created above create a file named
+      <code>closure.json</code> with the following content.
+    </p>
+    <pre>
+      {
+        // The additionalDeps allows you to include as many deps into your
+        // project as you want.  The path is relative to the location of the
+        // closure.json file
+        additionalDeps: ['../deps.js']
+      }
+    </pre>
+      Now we are ready to run the tests; to run the test you can do any of the
+      following:
+    </p>
+    <pre>
+// Run the test file itself.
+tests/allTests.js
+
+or
+
+// Run the test file using the nctest utility
+nctest tests/allTests.js
+
+or
+
+// Run a specific test in the allTests.js file
+nctest tests/allTests.js testFileInfo
+
+or
+
+// Runs all test files in the specified directory
+nctest tests/
+    </pre>
+    <p>
+      There is another option not mentioned above but you can also have test
+      suite files that should be named *suite*.js.  These files are parsed
+      for an array variable named suite and all tests in this array are then
+      run. For instance we could add a test suite called
+      'tests/testingSuite.js'.
+    </p>
+    <pre>
+var suite = ['allTests.js'];
+    </pre>
+    <p>
+      Thats it, all you need is a 'suite' variable.  You can run this test
+      suite just as you would a normal test.
+    </p>
+    <h2>Code Style</h2>
+    <p>
+      When project size and team size start growing a bit, it is very important
+      to follow a good coding style guide.  Any style guide will do really
+      as long as everyone is singing in the same key.
+    </p>
+    <p>
+      NClosure provides <code>ncstyle</code> for this purpose.  Just run it
+      on any directory and fix any warinings found.
+      <em>Note:</em> Unfortunately ncstyle requires additional installation
+      steps.  Please read and follow
+      <a href='http://code.google.com/closure/utilities/docs/linter_howto.html'
+        target='blank'>these instructions</a> to install the dependencies
+      required for ncstyle.
+    </p>
+    <p>
+      Let's run ncstyle on our directory.
+    </p>
+    <pre>
+      ncstyle .
+
+      stdout:
+      ----- FILE  :  /path/to/demo/listfiles.js -----
+      Line 40, E:0214: Missing description in @param tag
+      Line 41, E:0214: Missing description in @param tag
+      Found 4 errors, including 0 new errors, in 2 files (1 files OK).
+
+    </pre>
+    <p>
+      Basically the output is telling us that our code does not meet our
+      coding standard because its not properly docummented.  So go ahead
+      and add some documentation to the above params.
+    </p>
+    <pre>
+      // listfiles.js Lines 38-34
+      /**
+       * @private
+       * @param {Array.<string>} files The files array that will be augmented
+       *     recursively.
+       * @param {string} dir The directory to list files in.
+       */
+    </pre>
+    <p>
+      Running <code>nctest .</code> again will pass now.
+    </p>
+    <h2>Documentation</h2>
+    <p>
+      Another great advantage when using closure tools is that your code is
+      automatically jsdoc friendly.  Lets generate docs for our project:
+    </p>
+    <pre>
+      ncdoc .
+    </pre>
+    <p>
+      You will see a warning but its safe to ignore, your docs did get
+      generated successfully.  To have a look at them point your browser to
+      the <a href='docs/index.html' target='blank'>docs/index.html</a> file.
+    </p>
+    <p>
+      As you can see the docs are pretty plain.  To see a nice example of
+      nclosure docs (ncdoc) take a look at
+      <a href='http://gatapia.github.com/ncnode/' target='blank'>this page</a>
+      which is a wrapper project to the core node libs.  You can also look at
+      this page for an example of a
+      <a href='http://gatapia.github.com/ncnode/symbols/node.fs.html'
+        target='blank'>class level file</a>.
+
+    </p>
+    <h2>Additional Resources</h2>
+    <p>
+      NClosure wraps many pre existing technologies and makes them server
+      side friendly.  The original projects are still a great source
+      of information.  The resources below are resources I have found
+      extremelly helpful in using the above technologies on the client side.
+    </p>
+    <h3>Closure Tools</h3>
+    <p>
+      The closure tools web site has an excellent number of resources:
+      <ul>
+        <li><a href='http://code.google.com/closure/' target='blank'>Home Page</a></li>
+        <li><a href='http://code.google.com/closure/compiler/docs/js-for-compiler.html' target='blank'>Closure Annotations</a></li>
+        <li><a href='http://closure-library.googlecode.com/svn/docs/closure_goog_dom_dom.js.html' target='blank'>Library API</a></li>
+        <li><a href='http://groups.google.com/group/closure-compiler-discuss' target='blank'>Compiler Discussion Group</a></li>
+        <li><a href='http://groups.google.com/group/closure-library-discuss' target='blank'>Library Discussion Group</a></li>
+        <li><a href='http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml' target='blank'>Google's JavaScript Style Guide</a></li>
+      </ul>
+    </p>
+    <h3>jsdoc-toolkit</h3>
+    <p>
+      The official jsdoc-toolkit docs are the best way to get to know what tags
+      are available for you to make your docs great.
+      <ul>
+        <li><a href='http://code.google.com/p/jsdoc-toolkit/' target='blank'>Home Page</a></li>
+        <li><a href='http://code.google.com/p/jsdoc-toolkit/w/list' target='blank'>List of Tags</a></li>
+      </ul>
+    </p>
+  </body>
+</html>

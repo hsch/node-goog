@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>fileinfo.js</title>
+<link rel="stylesheet" href="../../css/prettify.css" media="all"></link>
+<link rel="stylesheet" href="../../css/all.css" media="all"></link>
+<script src="../../javascript/all.js"></script>
+<script src="../../javascript/prettify.js"></script>
+</head><body onload="prePrettyPrint();"><pre>
+goog.provide('demo.fileinfo');
+
+goog.require('goog.debug');
+
+
+
+/**
+ * @constructor
+ * @param {string} path The path that this instance of demo.fileinfo will
+ *    operate on.
+ */
+demo.fileinfo = function(path) {
+  this.fs_ = require('fs');
+  this.path_ = path;
+};
+
+
+/**
+ * @return {string} A descriptive message with all the relevant information on
+ *    the specified path.
+ */
+demo.fileinfo.prototype.getFileInfo = function() {
+  var details = this.fs_.statSync(this.path_);
+  return goog.debug.expose(details);
+};
+</pre></body></html>

@@ -1,0 +1,1 @@
+var suite = ['allTests.js'];
