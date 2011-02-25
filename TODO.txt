@@ -6,16 +6,14 @@ HIGH
 
 - Fix npm install.  Currently requires full git clone to work.
 
+- Better project documentation, including a tutorial
+
 - Better jsdoc stylesheet
 
 MED
 ---
 
-- Better project documentation, perhaps github pages
-
 - Redo the examples, make more relevant samples
-
-- Run jsdoc on entire project and improve code documentation
 
 - Not working on cygwin (running through the linked npm commands is not
   working, actually running the js files in bin manually works if we update
