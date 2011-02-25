@@ -357,11 +357,42 @@ nclosure.nccompile.prototype.addRoot_ =
     function(addedPaths, clArgs, path, wPrefix) {
   var realpath = this.isPathInMap_(addedPaths, path);
   if (!goog.isDefAndNotNull(realpath)) { return; }
-
+  var realClosureBaseDir = this.fs_.realpathSync(
+      ng_.getPath(ng_.args.closureBasePath, 'closure/goog'));
   var root = wPrefix ?
-      ('"--root_with_prefix=' + path + ' ' + realpath + '"') :
+      ('"--root_with_prefix=' + path + ' ' +
+      this.getPathToDir_(realpath, realClosureBaseDir) + '"') :
       ('--root=' + realpath);
   clArgs.push(root);
+};
+
+
+/**
+ * @private
+ * @param {string} realFrom The absolute from path.
+ * @param {string} realTo The absolute destination path.
+ * @return {string} The path to take between the directories.
+ */
+nclosure.nccompile.prototype.getPathToDir_ = function(realFrom, realTo) {
+  var from = realFrom.split('/').reverse(),
+      to = realTo.split('/').reverse(),
+      fl = from.length - 1,
+      tl = to.length - 1,
+      path = [];
+
+  // first eliminate common root
+  while ((fl >= 0) && (tl >= 0) && (from[fl] === to[tl])) {
+    fl--;
+    tl--;
+  }
+
+  // for each remaining level in the home path, add a ..
+  for (; tl >= 0; tl--) { path.push('..'); }
+
+  // for each level in the file path, add the path
+  for (; fl >= 0; fl--) { path.push(from[fl]); }
+
+  return path.join('/');
 };
 
 

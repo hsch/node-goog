@@ -33,7 +33,7 @@ function runImpl(dir) {
       'var Constt = function() {}',
     ]);
     runDoc();
-    assertFilesInIndex(['simplefile.js']);
+    assertClassInIndex(['Constt']);
     clearDir(function() { asyncTestCase.continueTesting() }); // Clean up
   });
 };
@@ -48,7 +48,7 @@ var setJSDOCOpts = function() {
 };
 
 
-function assertFilesInIndex(files) {
+function assertClassInIndex(files) {
   var indexContents = fs_.readFileSync(
     ng_.getPath(testDir, 'docs') + '/index.html').toString();
   goog.array.forEach(files, function(f) {
