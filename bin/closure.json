@@ -3,6 +3,7 @@
   // nodeDir: '../../../lib/node',
   closureBasePath:'../third_party/closure-library/closure/goog/',
   jsdocToolkitDir: '../third_party/node-jsdoc-toolkit/',
+  compiler_jar:'../third_party/ignoregoogcompiler.jar',
   additionalCompileOptions: [
     '--debug=true',
     '--process_closure_primitives=true',
