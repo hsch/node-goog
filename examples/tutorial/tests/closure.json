@@ -1,6 +1,0 @@
-{
-  // The additionalDeps allows you to include as many deps into your
-  // project as you want.  The path is relative to the location of the
-  // closure.json file
-  additionalDeps: ['../deps.js']
-}
