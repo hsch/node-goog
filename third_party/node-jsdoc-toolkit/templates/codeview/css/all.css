@@ -1,14 +1,3 @@
-/* TABLE OF CONTENTS:
- * - Browser reset
- * - HTML elements
- * - JsDoc styling
- */
-
-
-
-
-
-
 /*
  * BEGIN BROWSER RESET
  */
@@ -65,11 +54,6 @@ section,article,header,footer,nav,aside,hgroup {
 /*
  * END BROWSER RESET
  */
-
-
-
-
-
 
 /*
  * HTML ELEMENTS
@@ -329,10 +313,10 @@ dl.inheritsList dd {
 	font-weight: bold;
 }
 
-pre {
+pre.prettyprint {
 	overflow: auto;
 	font-family: Consolas, "Courier New", Courier, monospace;
-	background: #eee;
+	background-color: #111;
 }
 /* Start content */
 

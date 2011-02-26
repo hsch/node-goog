@@ -125,7 +125,7 @@ function publish(symbolSet) {
 
 	// copy static files
 	IO.copyFile(publish.conf.templatesDir+"/"+publish.conf.cssDir+"all.css", publish.conf.outDir+"/"+publish.conf.cssDir);
-  IO.copyFile(publish.conf.templatesDir+"/"+publish.conf.cssDir+"prettify.css", publish.conf.outDir+"/"+publish.conf.cssDir);
+  IO.copyFile(publish.conf.templatesDir+"/"+publish.conf.cssDir+"prettify_wynn.css", publish.conf.outDir+"/"+publish.conf.cssDir);
 	IO.copyFile(publish.conf.templatesDir+"/"+publish.conf.cssDir+"screen.css", publish.conf.outDir+"/"+publish.conf.cssDir);
 	IO.copyFile(publish.conf.templatesDir+"/"+publish.conf.cssDir+"handheld.css", publish.conf.outDir+"/"+publish.conf.cssDir);
 	IO.copyFile(publish.conf.templatesDir+"/"+publish.conf.jsDir+"all.js", publish.conf.outDir+"/"+publish.conf.jsDir);
@@ -193,7 +193,7 @@ function makeSrcFile(path, srcDir, name) {
   src = src.toString().replace(/</g, '&lt;');
 
   var html = ['<!DOCTYPE html>', '<html>', '<head>', '<title>' + name + '</title>'];
-    html.push('<link rel="stylesheet" href="../../css/prettify.css" media="all"></link>');
+    html.push('<link rel="stylesheet" href="../../css/prettify_wynn.css" media="all"></link>');
     html.push('<link rel="stylesheet" href="../../css/all.css" media="all"></link>');
     html.push('<script src="../../javascript/all.js"></script>');
     html.push('<script src="../../javascript/prettify.js"></script>');

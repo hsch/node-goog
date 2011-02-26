@@ -327,7 +327,7 @@ codeview.classFilter = ( function() {
 
 
 function prePrettyPrint() {
-  addPrettyPrintClass(document.getElementsByTagName('code'));
+  // addPrettyPrintClass(document.getElementsByTagName('code'));
   addPrettyPrintClass(document.getElementsByTagName('pre'));
   prettyPrint();
 };
