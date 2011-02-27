@@ -289,90 +289,101 @@
 #### CONSTRUCTOR DETAILS
 -->
 		<if test="!data.isBuiltin() && (data.isNamespace || data.is('CONSTRUCTOR'))">
-			<div class="details props">
-				<div class="innerProps">
-					<h2 class="sectionTitle" id="constructor">
-						{+classType+}Detail
-					</h2>
+      {!
+        var links = resolveLinks(data.desc);
+        var hasLinksOrAuthor = links || data.author;
+        var isSpecialVisibility = data.isPrivate || data.isInner;
+        var hasMiscDetails = data.deprecated || data.since ||
+          data.exceptions.length || data.returns.length ||
+          data.requires.length || data.see.length;
+      !}
+      <if test="hasLinksOrAuthor || isSpecialVisibility || hasMiscDetails">
+        <div class="details props">
+          <div class="innerProps">
+            <h2 class="sectionTitle" id="constructor">
+              {+classType+}Detail
+            </h2>
 
-					<div class="fixedFont">{!
-						if (data.isPrivate) output += "&lt;private&gt; ";
-						if (data.isInner) output += "&lt;inner&gt; ";
-					!}
-						<b>{+ data.alias +}</b><if test="classType != 'Namespace '">{+ makeSignature(data.params) +}</if>
-					</div>
+            <div class="fixedFont">{!
+              if (data.isPrivate) output += "&lt;private&gt; ";
+              if (data.isInner) output += "&lt;inner&gt; ";
+            !}
+              <b>{+ data.alias +}</b><if test="classType != 'Namespace '">{+ makeSignature(data.params) +}</if>
+            </div>
+            <if test="hasLinksOrAuthor">
+              <div class="description">
+                {+links+}
+                <if test="data.author"><br /><i>Author: </i>{+data.author+}.</if>
+              </div>
+            </if>
 
-					<div class="description">
-						{+resolveLinks(data.desc)+}
-						<if test="data.author"><br /><i>Author: </i>{+data.author+}.</if>
-					</div>
+            <if test="data.example.length">
+              <for each="example" in="data.example">
+                <pre class="code">{+example+}</pre>
+              </for>
+            </if>
 
-					<if test="data.example.length">
-						<for each="example" in="data.example">
-							<pre class="code">{+example+}</pre>
-						</for>
-					</if>
+            <if test="data.params.length">
+              <dl class="detailList params">
+                <dt class="heading">Parameters:</dt>
+                <for each="item" in="data.params">
+                  <dt>
+                    {+((item.type)?""+("<span class=\"light fixedFont\">{"+(new Link().toSymbol(item.type)+"}</span> ")) : "")+} <b>{+item.name+}</b>
+                    <if test="item.isOptional"><i>Optional<if test="item.defaultValue">, Default: {+item.defaultValue+}</if></i></if>
+                  </dt>
+                  <dd>{+resolveLinks(item.desc)+}</dd>
+                </for>
+              </dl>
+            </if>
 
-					<if test="data.params.length">
-						<dl class="detailList params">
-							<dt class="heading">Parameters:</dt>
-							<for each="item" in="data.params">
-								<dt>
-									{+((item.type)?""+("<span class=\"light fixedFont\">{"+(new Link().toSymbol(item.type)+"}</span> ")) : "")+} <b>{+item.name+}</b>
-									<if test="item.isOptional"><i>Optional<if test="item.defaultValue">, Default: {+item.defaultValue+}</if></i></if>
-								</dt>
-								<dd>{+resolveLinks(item.desc)+}</dd>
-							</for>
-						</dl>
-					</if>
+            <if test="hasMiscDetails">
+              <dl class="detailList nomargin">
+                <if test="data.deprecated">
+                  <dt>
+                    {+resolveLinks(data.deprecated)+}
+                  </dt>
+                </if>
 
-					<if test="data.deprecated || data.since || data.exceptions.length || data.returns.length || data.requires.length || data.see.length">
-						<dl class="detailList nomargin">
-							<if test="data.deprecated">
-								<dt>
-									{+resolveLinks(data.deprecated)+}
-								</dt>
-							</if>
+                <if test="data.since">
+                  <dt class="heading">Since:</dt>
+                  <dd>{+ data.since +}</dd>
+                </if>
 
-							<if test="data.since">
-								<dt class="heading">Since:</dt>
-								<dd>{+ data.since +}</dd>
-							</if>
+                <if test="data.exceptions.length">
+                  <dt class="heading">Throws:</dt>
+                  <for each="item" in="data.exceptions">
+                    <dt>
+                      {+((item.type)?"<span class=\"light fixedFont\">{"+(new Link().toSymbol(item.type))+"}</span> " : "")+} <b>{+item.name+}</b>
+                    </dt>
+                      <dd>{+resolveLinks(item.desc)+}</dd>
+                  </for>
+                </if>
 
-							<if test="data.exceptions.length">
-								<dt class="heading">Throws:</dt>
-								<for each="item" in="data.exceptions">
-									<dt>
-										{+((item.type)?"<span class=\"light fixedFont\">{"+(new Link().toSymbol(item.type))+"}</span> " : "")+} <b>{+item.name+}</b>
-									</dt>
-										<dd>{+resolveLinks(item.desc)+}</dd>
-								</for>
-							</if>
+                <if test="data.returns.length">
+                  <dt class="heading">Returns:</dt>
+                  <for each="item" in="data.returns">
+                      <dd>{+((item.type)?"<span class=\"light fixedFont\">{"+(new Link().toSymbol(item.type))+"}</span> " : "")+}{+resolveLinks(item.desc)+}</dd>
+                  </for>
+                </if>
 
-							<if test="data.returns.length">
-								<dt class="heading">Returns:</dt>
-								<for each="item" in="data.returns">
-										<dd>{+((item.type)?"<span class=\"light fixedFont\">{"+(new Link().toSymbol(item.type))+"}</span> " : "")+}{+resolveLinks(item.desc)+}</dd>
-								</for>
-							</if>
+                <if test="data.requires.length">
+                  <dt class="heading">Requires:</dt>
+                  <for each="item" in="data.requires">
+                    <dd>{+ resolveLinks(item) +}</dd>
+                  </for>
+                </if>
 
-							<if test="data.requires.length">
-								<dt class="heading">Requires:</dt>
-								<for each="item" in="data.requires">
-									<dd>{+ resolveLinks(item) +}</dd>
-								</for>
-							</if>
-
-							<if test="data.see.length">
-								<dt class="heading">See:</dt>
-								<for each="item" in="data.see">
-									<dd>{+ new Link().toSymbol(item) +}</dd>
-								</for>
-							</if>
-						</dl>
-					</if>
-				</div>
-			</div>
+                <if test="data.see.length">
+                  <dt class="heading">See:</dt>
+                  <for each="item" in="data.see">
+                    <dd>{+ new Link().toSymbol(item) +}</dd>
+                  </for>
+                </if>
+              </dl>
+            </if>
+          </div>
+        </div>
+      </if>
 		</if>
 <!--
 #### FIELD DETAILS
