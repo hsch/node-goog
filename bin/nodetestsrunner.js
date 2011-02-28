@@ -47,7 +47,7 @@ nclosure.NodeTestsRunner = function(testFiles, args) {
 };
 
 
-/** @typedef {{err:string,stdout:string,stderr:string,report:string}} */
+/** @typedef {{stdout:string,stderr:string,report:string,file:string}} */
 nclosure.NodeTestsRunner.result;
 
 
@@ -81,7 +81,6 @@ nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
   console.error('Running Tests [' + file + ']');
 
   var fs = require('fs');
-  var exec = 'nodetestinstance ' + file + ' ' + this.args_;
   var that = this;
   var reportFile = '.tmptestreport.json';
   var cmd = require('child_process').
@@ -95,8 +94,6 @@ nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
   };
   cmd.stderr.on('data', ondata);
   cmd.stdout.on('data', ondata);
-  cmd.on('uncaughtException',
-         function(error) { err = error; console.error(error.stack); });
   cmd.on('exit', function(code) {
     var report = '';
     if (require('path').existsSync(reportFile)) {
@@ -104,10 +101,10 @@ nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
       fs.unlinkSync(reportFile);
     }
 
+    /** @type {nclosure.NodeTestsRunner.result} */
     var results = {
       'file': file,
       'exitCode': code,
-      'err': err,
       'stdout': stdout,
       'stderr': stderr,
       'report': report

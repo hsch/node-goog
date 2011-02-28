@@ -94,7 +94,7 @@ nclosure.ncstyle.fs_ = /** @type {extern_fs} */ (require('fs'));
  * @return {boolean} Wether the specified path is a directory.
  */
 nclosure.ncstyle.isDir_ = function(f) {
-  return nclosure.ncstyle.fs_.statSync(f)['isDirectory']();
+  return nclosure.ncstyle.fs_.statSync(f).isDirectory();
 };
 
 

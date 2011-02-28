@@ -29,6 +29,7 @@ global.navigator = { userAgent: 'node.js' };
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
 goog.require('goog.testing.stacktrace');
+goog.require('goog.testing.stacktrace.Frame');
 goog.require('nclosure.core');
 
 
@@ -79,6 +80,9 @@ nclosure.NodeTestInstance = function(file, args) {
   this.loadAdditionalTestingDependencies_();
   this.setUpTestCaseInterceps_(args || '');
   this.overwriteAsyncTestCaseProblemPoints_();
+
+  process.on('uncaughtException', goog.bind(this.onTestComplete_, this));
+
   this.run();
 };
 
@@ -111,9 +115,9 @@ nclosure.NodeTestInstance.prototype.overwriteAsyncTestCaseProblemPoints_ =
   // AsyncTestCase.ControlBreakingException which causes all sorts of problems
   // in this context.  Using object 'pump_' notation because
   // @suppress {visibility} is being ignored by the libs compiler
-  var opump = goog.testing.AsyncTestCase.prototype['pump_'];
+  var opump = goog.testing.AsyncTestCase.prototype.pump_;
   var that = this;
-  goog.testing.AsyncTestCase.prototype['pump_'] = function(opt_doFirst) {
+  goog.testing.AsyncTestCase.prototype.pump_ = function(opt_doFirst) {
     try {
       opump.call(this, opt_doFirst);
     } catch (ex) {
@@ -132,6 +136,7 @@ nclosure.NodeTestInstance.prototype.overwriteAsyncTestCaseProblemPoints_ =
  * Sets up the test filter to use when auto detecting tests.
  * @param {string} filter The filter to apply to the running tests.
  * @private
+ * @suppress {visibility}
  */
 nclosure.NodeTestInstance.prototype.setUpTestCaseInterceps_ =
     function(filter) {
@@ -152,7 +157,7 @@ nclosure.NodeTestInstance.prototype.setUpTestCaseInterceps_ =
   };
 
   // Ignore this, return 1
-  goog.testing.TestCase.prototype['countNumFilesLoaded_'] =
+  goog.testing.TestCase.prototype.countNumFilesLoaded_ =
       function() { return 1; }
 
   goog.testing.TestCase.Result.prototype.isStrict = function() { return true; }
@@ -293,11 +298,13 @@ nclosure.NodeTestInstance.parseStackFrameLine_ = function(line) {
  * @const
  */
 nclosure.NodeTestInstance.IGNOREABLE_LINES_ = [
+  'testing/asynctestcase.js',
   'testing/testcase.js',
   'testing/asserts.js',
   'testing/stacktrace.js',
   '.createAndRunTestCase_',
-  'nodetestinstance.js'
+  'nodetestinstance.js',
+  'ChildProcess.'
 ];
 
 
