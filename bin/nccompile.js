@@ -126,11 +126,15 @@ nclosure.nccompile.prototype.init_ = function(cliArgs, options) {
 
   this.compile_ = options.compile;
   this.deps_ = options.deps;
-
   this.fileToCompile_ = cliArgs[cliArgs.length - 1];
 
   if (!this.fileToCompile_) {
     throw new Error('No file specified, usage nccompile <filetocompile>');
+  }
+  if (this.compile_) {
+    console.log('The -c [compile] flag is not fully operational yet.  Please ' +
+                'use cauting when running .min.js files as they are not yet ' +
+                'fully compatible with Node\'s require(...) syntaxt.');
   }
 
   this.tmpFileName_ = this.fileToCompile_.replace('.js', '.tmp.js');
@@ -332,12 +336,12 @@ nclosure.nccompile.prototype.addAdditionalRoots_ =
     function(addedPaths, clArgs, wPrefix) {
 
   if (ng_.args.additionalCompileRoots) {
-    ng_.args.additionalCompileRoots.forEach(function(root) {
+    goog.array.forEach(ng_.args.additionalCompileRoots, function(root) {
       this.addRoot_(addedPaths, clArgs, root, wPrefix);
-    });
+    }, this);
   } else if (ng_.args.additionalDeps) {
     // Only try to guess roots if additionalCompileRoots not specified
-    ng_.args.additionalDeps.forEach(function(dep) {
+    goog.array.forEach(ng_.args.additionalDeps, function(dep) {
       var path = dep.substring(0, dep.lastIndexOf('/'));
       this.addRoot_(addedPaths, clArgs, path, wPrefix);
     }, this);
