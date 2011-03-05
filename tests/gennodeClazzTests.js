@@ -89,7 +89,7 @@ function testAddFunct() {
   var c = new nclosure.gennode.clazz('c');
   var exp = '\ngoog.provide("c");\n' +
             '\n/**\n *\n */\nc.prototype.functName = function() {' +
-            '\n  return c.core_.functName();' +
+            '\n  return c.core_.functName.apply(c.core_, arguments);' +
             '\n};' +
             coreprefix + 'c.core_ = require("c");';
   c.addFunct('functName');
@@ -101,21 +101,21 @@ function testAddFuncts() {
   var exp = '\ngoog.provide("c");\n' +
 
             '\n/**\n *\n */\nc.prototype.functName = function() {' +
-            '\n  return c.core_.functName();' +
+            '\n  return c.core_.functName.apply(c.core_, arguments);' +
             '\n};\n' +
 
             '\n/**\n * desc2\n */\nc.prototype.functName2 = function() {' +
-            '\n  return c.core_.functName2();' +
+            '\n  return c.core_.functName2.apply(c.core_, arguments);' +
             '\n};\n' +
 
             '\n/**\n * desc3\n * @return {ret.type}\n */\n' +
             'c.prototype.functName3 = function() {' +
-            '\n  return c.core_.functName3();' +
+            '\n  return c.core_.functName3.apply(c.core_, arguments);' +
             '\n};\n' +
 
             '\n/**\n * @param {type.ns} arg1\n */\nc.prototype.functName4 = ' +
               'function(arg1) {' +
-            '\n  return c.core_.functName4(arg1);' +
+            '\n  return c.core_.functName4.apply(c.core_, arguments);' +
             '\n};\n' +
 
             '\n/**' +
@@ -124,7 +124,7 @@ function testAddFuncts() {
               '\n * @return {ret.type5}' +
               '\n */\nc.functName5 = ' +
               'function(arg1, arg2) {' +
-            '\n  return c.core_.functName5(arg1, arg2);' +
+            '\n  return c.core_.functName5.apply(c.core_, arguments);' +
             '\n};' +
 
             coreprefix + 'c.core_ = require("c");';

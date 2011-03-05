@@ -167,6 +167,19 @@ Once installed simply run the following command to `linter` your code.
 
 		ncstyle <directory>
 
+## Node Wrappers
+
+NClosure contains a set of wrappers around the core node.js libraries.  These
+wrappers can be used to give type safety when using these libraries. Eg:
+
+    goog.provide('namespace');
+
+    // Import the 'node.fs' namespace. All node core libs live inside the
+    // 'node' namespace.
+    goog.require('node.fs');
+
+    console.log('Files: ' + node.fs.readdirSync('.'));
+
 ## Advanced Configuration
 
 `nclosure` can be configured in several ways.  The easiest is to modify the
