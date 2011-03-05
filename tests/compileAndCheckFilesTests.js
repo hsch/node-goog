@@ -12,8 +12,10 @@ goog.require('goog.array');
 var baseDir = '../';
 var compileDirs = ['lib/', 'bin/']
 var checkDirs = ['lib/', 'bin/', 'examples/simple', 'examples/animals'];
-var additionalFiles = ['examples/animals/example.js', 'examples/simple/example.js'];
-var ignoreable = ['.min.js', 'deps.js', '.externs.js', '.tmp.js', 'utils.js'];
+var additionalFiles = ['examples/animals/example.js',
+  'examples/simple/example.js'];
+var ignoreable = ['.min.js', 'deps.js', 'externs.js',
+  '.tmp.js', 'utils.js', '.node.js', '/node/'];
 var doNotDelete = ['simple/deps.js', 'animals/deps.js', 'bin/deps.js'];
 
 var allTestableFiles = getAllTestableFiles();
@@ -37,7 +39,7 @@ function readFilesInDir(d, allFiles) {
     if (fs_.statSync(d + f).isDirectory()) {
       if (f === 'docs') { return; }
       return readFilesInDir(d + f + '/', allFiles);
-    } else if (isValidTestableFile(f)) {
+    } else if (isValidTestableFile(d + f)) {
       allFiles.push(ng_.getPath(d, f));
     }
   });
@@ -83,7 +85,7 @@ function doNextFile(files, operation, oncomplete) {
 };
 
 function compileFileImpl(file, callback) {
-  console.log('nccompile ' + file);
+  console.error('\tnccompile ' + file);
   asyncTestCase.waitForAsync();
   require('child_process').exec('nccompile ' + file,
       function(err, stdout, stderr) {
@@ -106,7 +108,7 @@ function compileFileImpl(file, callback) {
 };
 
 function checkFileImpl(file, callback) {
-  console.log('ncstyle ' + file);
+  console.error('\tncstyle ' + file);
   asyncTestCase.waitForAsync();
   require('child_process').exec('ncstyle ' + file,
       function(err, stdout, stderr) {

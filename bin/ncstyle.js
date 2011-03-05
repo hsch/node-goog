@@ -42,6 +42,9 @@ goog.provide('nclosure.ncstyle');
 
 goog.require('goog.array');
 goog.require('goog.string');
+
+goog.require('node.fs');
+
 goog.require('nclosure.core');
 goog.require('nclosure.opts');
 
@@ -82,19 +85,11 @@ nclosure.ncstyle = function() {
 
 /**
  * @private
- * @const
- * @type {extern_fs}
- */
-nclosure.ncstyle.fs_ = /** @type {extern_fs} */ (require('fs'));
-
-
-/**
- * @private
  * @param {string} f The file or directory path.
  * @return {boolean} Wether the specified path is a directory.
  */
 nclosure.ncstyle.isDir_ = function(f) {
-  return nclosure.ncstyle.fs_.statSync(f).isDirectory();
+  return node.fs.statSync(f).isDirectory();
 };
 
 
@@ -104,7 +99,7 @@ nclosure.ncstyle.isDir_ = function(f) {
  *    on.
  */
 nclosure.ncstyle.prototype.fixBashInstructionsOnDir_ = function(dir) {
-  goog.array.forEach(nclosure.ncstyle.fs_.readdirSync(dir),
+  goog.array.forEach(node.fs.readdirSync(dir),
       function(f) {
         var path = ng_.getPath(dir, f);
         if (nclosure.ncstyle.isDir_(path)) {
@@ -122,14 +117,12 @@ nclosure.ncstyle.prototype.fixBashInstructionsOnDir_ = function(dir) {
  */
 nclosure.ncstyle.prototype.fixBashInstructions_ = function(dir, file) {
   if (this.isIgnorableFile_(dir, file)) return;
-  var fileContents = nclosure.ncstyle.fs_.
-      readFileSync(ng_.getPath(dir, file), encoding = 'utf8');
+  var fileContents = node.fs.readFileSync(ng_.getPath(dir, file)).toString();
   var m = /^# !([^;]+)\;/g.exec(fileContents);
   if (!m) { return; }
   var fixed = m[1].replace(/ /g, '');
   fileContents = fileContents.replace(m[0], '#!' + fixed);
-  nclosure.ncstyle.fs_.writeFileSync(ng_.getPath(dir, file),
-      fileContents, encoding = 'utf8');
+  node.fs.writeFileSync(ng_.getPath(dir, file), fileContents);
 };
 
 
@@ -199,7 +192,7 @@ nclosure.ncstyle.prototype.getLinterExcludeFiles_ = function(dir) {
  */
 nclosure.ncstyle.prototype.getAllIgnoreableFilesIn_ =
     function(allFiles, dir) {
-  goog.array.forEach(nclosure.ncstyle.fs_.readdirSync(dir),
+  goog.array.forEach(node.fs.readdirSync(dir),
       function(f) {
         var path = ng_.getPath(dir, f);
         if (!nclosure.ncstyle.isDir_(path)) {
@@ -257,7 +250,7 @@ nclosure.ncstyle.prototype.getLinterExcludeDir_ = function(dir) {
  */
 nclosure.ncstyle.prototype.getAllIgnoreableDirectoriesIn_ =
     function(allDirs, dir) {
-  goog.array.forEach(nclosure.ncstyle.fs_.readdirSync(dir),
+  goog.array.forEach(node.fs.readdirSync(dir),
       function(d) {
         var path = ng_.getPath(dir, d);
         if (!nclosure.ncstyle.isDir_(path)) return;

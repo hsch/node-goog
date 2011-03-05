@@ -37,15 +37,24 @@ function testCompileWithNoDepsArg() {
   runCompilerWithCommandImpl('nccompile -c ' + __filename, true, false);
 };
 
-function testCompileWithQuietArg() {
+function testCompileWithDepsOnly() {
   runCompilerWithCommandImpl('nccompile -d ' + __filename, false, true);
 };
 
-function testCompileWithDepsOnlyArg() {
+function testCompileWithAll() {
   runCompilerWithCommandImpl('nccompile -c -d ' + __filename, true, true);
 };
 
+function testVerboseWithAll() {
+  runCompilerWithCommandImpl('nccompile -v -c -d ' + __filename, true, true);
+};
+
+function testVerboseWithNone() {
+  runCompilerWithCommandImpl('nccompile -v ' + __filename, false, false);
+};
+
 function runCompilerWithCommandImpl(cmd, compiledMinFile, depsFile) {
+  console.error('\t' + cmd);
   asyncTestCase.stepTimeout = 10000;
   asyncTestCase.waitForAsync();
 
@@ -55,15 +64,17 @@ function runCompilerWithCommandImpl(cmd, compiledMinFile, depsFile) {
       assertNull('There were errors running: ' +
         cmd + ' message: ' + err.message + '\n' + err.stack, err);
     }
-    assertFilesExist(compiledMinFile, depsFile);
+    assertFilesExist(cmd, compiledMinFile, depsFile);
   });
 };
 
-function assertFilesExist(compiledMinFile, depsFile) {
-  assertEquals('Expected the compiled min file [' + min + '] to[' +
+function assertFilesExist(cmd, compiledMinFile, depsFile) {
+  assertEquals('CMD[' + cmd + '] Expected the compiled min file [' +
+    min + '] to[' +
     (compiledMinFile ? 'exist' : 'not exist') + ']',
     compiledMinFile, path.existsSync(min));
-  assertEquals('Expected the deps file [' + deps + '] to[' +
+  assertEquals('CMD[' + cmd + '] Expected the deps file [' +
+    deps + '] to[' +
     (depsFile ? 'exist' : 'not exist') + ']',
     depsFile, path.existsSync(deps));
   asyncTestCase.continueTesting();

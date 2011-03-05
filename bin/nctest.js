@@ -38,8 +38,10 @@ var ng_ = require('nclosure').nclosure();
 
 goog.provide('nclosure.nctest');
 
-
 goog.require('goog.array');
+
+goog.require('node.fs');
+goog.require('node.path');
 
 goog.require('nclosure.NodeTestsRunner');
 goog.require('nclosure.core');
@@ -56,18 +58,6 @@ goog.require('nclosure.core');
  * @constructor
  */
 nclosure.nctest = function() {
-  /**
-   * @private
-   * @type {extern_fs}
-   */
-  this.fs_ = /** @type {extern_fs} */ (require('fs'));
-
-  /**
-   * @private
-   * @type {extern_path}
-   */
-  this.path_ = /** @type {extern_path} */ (require('path'));
-
   /**
    * @private
    * @type {nclosure.NodeTestsRunner}
@@ -88,7 +78,7 @@ nclosure.nctest = function() {
  * @return {Array.<string>} All tests files in this directory (recursive).
  */
 nclosure.nctest.prototype.getAllTestFiles_ = function(dirOrFile) {
-  if (!this.fs_.statSync(dirOrFile).isDirectory()) {
+  if (!node.fs.statSync(dirOrFile).isDirectory()) {
     return this.getTestSuiteFiles_(dirOrFile) || [dirOrFile];
   }
 
@@ -104,7 +94,7 @@ nclosure.nctest.prototype.getAllTestFiles_ = function(dirOrFile) {
  *    return the test suite files relative to this file's directory.
  */
 nclosure.nctest.prototype.getTestSuiteFiles_ = function(file) {
-  var contents = this.fs_.readFileSync(file).toString();
+  var contents = node.fs.readFileSync(file).toString();
   var suiteJsRegex = /var\s+suite\s*\=\s*\[([^;]+)\]/gim;
 
   var m = suiteJsRegex.exec(contents);
@@ -143,10 +133,10 @@ nclosure.nctest.prototype.getTestArgs_ = function() {
  */
 nclosure.nctest.prototype.readDirRecursiveSyncImpl_ =
     function(dir, allFiles) {
-  var files = this.fs_.readdirSync(dir);
+  var files = node.fs.readdirSync(dir);
   goog.array.forEach(files, function(f) {
     var path = ng_.getPath(dir, f);
-    if (this.fs_.statSync(path).isDirectory()) {
+    if (node.fs.statSync(path).isDirectory()) {
       return this.readDirRecursiveSyncImpl_(path, allFiles);
     } else if (f.toLowerCase().indexOf('suite') >= 0) {
       var suiteFiles = this.getTestSuiteFiles_(path);

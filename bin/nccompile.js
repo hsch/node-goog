@@ -36,6 +36,9 @@ goog.provide('nclosure.nccompile');
 
 goog.require('nclosure.core');
 
+// nccompile should not require any node. namespace stuff as its required
+// to generate the deps for this namespace and hence cannot rely on it.
+
 
 
 /**
@@ -48,21 +51,6 @@ goog.require('nclosure.core');
 nclosure.nccompile = function() {
 
   /**
-  * @private
-  * @const
-  * @type {extern_fs}
-  */
-  this.fs_ = /** @type {extern_fs} */ (require('fs'));
-
-
-  /**
-  * @private
-  * @const
-  * @type {extern_path}
-  */
-  this.path_ = /** @type {extern_path} */ (require('path'));
-
-  /**
    * @private
    * @type {boolean}
    */
@@ -73,6 +61,12 @@ nclosure.nccompile = function() {
    * @type {boolean}
    */
   this.deps_ = false;
+
+  /**
+   * @private
+   * @type {boolean}
+   */
+  this.verbose_ = false;
 
   /**
    * @private
@@ -104,7 +98,8 @@ nclosure.nccompile = function() {
     'compile': ['c', 'Produces the <filename>.min.js file. If ommitted the ' +
           ' code is still compiled and warnings shown, the compiled file is ' +
           'just NOT written'],
-    'deps': ['d', 'Produces a deps.js file.']
+    'deps': ['d', 'Produces a deps.js file.'],
+    'verbose': ['v', 'Verbose output.']
   });
 
   var that = this;
@@ -125,6 +120,7 @@ nclosure.nccompile.prototype.init_ = function(cliArgs, options) {
   process.on('uncaughtException', onexit);
 
   this.compile_ = options.compile;
+  this.verbose_ = options.verbose;
   this.deps_ = options.deps;
   this.fileToCompile_ = cliArgs[cliArgs.length - 1];
 
@@ -163,12 +159,14 @@ nclosure.nccompile.prototype.runCommands_ = function() {
  */
 nclosure.nccompile.prototype.runDependencies_ = function() {
   var that = this;
-  var fileDir = this.compiledFileName_.substring(0,
-      this.compiledFileName_.lastIndexOf('/') + 1);
+  var fileDir = ng_.getFileDirectory(this.fileToCompile_);
   var depsFile = this.deps_ ? ng_.getPath(fileDir, 'deps.js') : '';
   this.runCommand_(this.getDepsClArgs_(), 'depswriter.py',
       depsFile, '', null, function(err) {
-        if (err) throw err;
+        if (err) {
+          console.error(err.stack);
+          throw err;
+        }
         that.runCompilation_();
       });
 };
@@ -178,17 +176,19 @@ nclosure.nccompile.prototype.runDependencies_ = function() {
  * @private
  */
 nclosure.nccompile.prototype.runCompilation_ = function() {
-  var fileContents = this.fs_.
-      readFileSync(this.fileToCompile_, encoding = 'utf8');
+  var fileContents = require('fs').readFileSync(this.fileToCompile_).toString();
 
   var bashInst = this.createTmpFile_(fileContents);
-  this.fs_.
+  require('fs').
       renameSync(this.fileToCompile_, this.fileToCompileIgnore_);
   var clArgs = this.getCompilerClArgs_();
+  var verbose = this.verbose_;
   this.runCommand_(clArgs, 'closurebuilder.py',
       this.compile_ ? this.compiledFileName_ : '', bashInst, function(output) {
         var lastArg = clArgs[clArgs.length - 1];
-        if (lastArg.lastIndexOf('--') < 0) { return output; }
+        if (lastArg.lastIndexOf('--') < 0) {
+          return output.replace(/ --/g, '\n  --');
+        }
         lastArg = lastArg.substring(lastArg.lastIndexOf('--'));
         if (output.indexOf(lastArg) < 0) { return output; }
         return output.substring(output.indexOf('\n', output.indexOf(lastArg)));
@@ -202,11 +202,11 @@ nclosure.nccompile.prototype.runCompilation_ = function() {
  */
 nclosure.nccompile.prototype.onExit_ =
     function(err) {
-  if (this.path_.existsSync(this.tmpFileName_)) {
-    this.fs_.unlinkSync(this.tmpFileName_);
+  if (require('path').existsSync(this.tmpFileName_)) {
+    require('fs').unlinkSync(this.tmpFileName_);
   }
-  if (this.path_.existsSync(this.fileToCompileIgnore_)) {
-    this.fs_.renameSync(this.fileToCompileIgnore_, this.fileToCompile_);
+  if (require('path').existsSync(this.fileToCompileIgnore_)) {
+    require('fs').renameSync(this.fileToCompileIgnore_, this.fileToCompile_);
   }
   if (err) { console.error(err.stack); }
 };
@@ -218,8 +218,7 @@ nclosure.nccompile.prototype.onExit_ =
  * @return {string} Any bash shell instructions that need to be copied into
  *    the compiled file.
  */
-nclosure.nccompile.prototype.createTmpFile_ =
-    function(contents) {
+nclosure.nccompile.prototype.createTmpFile_ = function(contents) {
   var bashInstIdx = contents.indexOf('#!');
   var hasInst = bashInstIdx === 0; // Must be top line
   var bashInst = '';
@@ -232,8 +231,7 @@ nclosure.nccompile.prototype.createTmpFile_ =
   var newCode = //'goog.require(\'nclosure\');' +
       (hasInst ? '\n' : '') +
       contents;
-  this.fs_.writeFileSync(this.tmpFileName_, newCode,
-      encoding = 'utf8');
+  require('fs').writeFileSync(this.tmpFileName_, newCode);
   return bashInst;
 };
 
@@ -256,24 +254,28 @@ nclosure.nccompile.prototype.runCommand_ = function(clArgs, command,
                          'closure/bin/build/' + command);
   exec += ' ' + clArgs.join(' ');
   var that = this;
-  var cmd = require('child_process').exec(exec,
+  if (this.verbose_) console.error(exec.replace(/ --/g, '\n  --'));
+  require('child_process').exec(exec, [],
       function(err, stdout, stderr) {
-        if (err) {
-          console.error('\nError in command:\n' + exec);
-          err.stack = err.stack.replace(/\.tmp\.js/g, '.js');
-        }
-        if (callback) callback(err);
+    if (that.verbose_) console.error('Command completed');
+    if (err) {
+      err.stack = err.stack.replace(/\.tmp\.js/g, '.js');
+      console.error('\nError in command:\n' +
+                    exec.replace(/ --/g, '\n  --') + '\n' + err.stack);
+    }
 
-        if (stderr) {
-          if (formatOutput) stderr = formatOutput(stderr);
-          console.error(stderr.replace(/\.tmp\.js/g, '.js'));
-        }
-        if (stdout && targetFile) {
-          stdout = stdout.replace(/\.tmp\.js/g, '.js');
-          stdout = (bashInstructions || '') + stdout;
-          that.fs_.writeFileSync(targetFile, stdout, encoding = 'utf8');
-        }
-      });
+    if (stderr) {
+      if (formatOutput) stderr = formatOutput(stderr);
+      console.error(stderr.replace(/\.tmp\.js/g, '.js'));
+    }
+    if (stdout && targetFile) {
+      if (that.verbose_) console.error('Writing file to: ' + targetFile);
+      stdout = stdout.replace(/\.tmp\.js/g, '.js');
+      stdout = (bashInstructions || '') + stdout;
+      require('fs').writeFileSync(targetFile, stdout);
+    }
+    if (callback) callback(err);
+  });
 };
 
 
@@ -284,8 +286,8 @@ nclosure.nccompile.prototype.runCommand_ = function(clArgs, command,
  */
 nclosure.nccompile.prototype.getCompilerClArgs_ =
     function() {
-  var path = this.getDirectory_(this.tmpFileName_);
-  var addedPaths = {};
+  var path = ng_.getFileDirectory(this.fileToCompile_);
+  var addedPaths = [];
   var clArgs = [];
   this.addRoot_(addedPaths, clArgs, ng_.args.closureBasePath, false);
   this.addRoot_(addedPaths, clArgs, path, false);
@@ -293,7 +295,7 @@ nclosure.nccompile.prototype.getCompilerClArgs_ =
   var binPath = ng_.getPath(__dirname, '../bin');
   this.addRoot_(addedPaths, clArgs, libPath, false);
   this.addRoot_(addedPaths, clArgs, binPath, false);
-  this.addAdditionalRoots_(addedPaths, clArgs, false);
+  clArgs = this.addAdditionalRoots_(addedPaths, clArgs, false);
 
   clArgs.push('--input=' + this.tmpFileName_);
   clArgs.push('--output_mode=compiled');
@@ -303,13 +305,11 @@ nclosure.nccompile.prototype.getCompilerClArgs_ =
 
   clArgs.push(
       '--compiler_flags=--js=' +
-      ng_.getPath(ng_.args.closureBasePath,
+          ng_.getPath(ng_.args.closureBasePath,
       'closure/goog/deps.js'),
+      '--compiler_flags=--externs=' +
+          ng_.getPath(libPath, 'externs.js'),
       '--compiler_flags=--compilation_level=ADVANCED_OPTIMIZATIONS',
-      '--compiler_flags=--externs=' +
-      ng_.getPath(libPath, 'node.externs.js'),
-      '--compiler_flags=--externs=' +
-      ng_.getPath(libPath, 'node.static.externs.js'),
       '--compiler_flags=--output_wrapper=' +
       '"(function() {this.window=this;%output%})();"'
   );
@@ -331,6 +331,8 @@ nclosure.nccompile.prototype.getCompilerClArgs_ =
  *    duplicate checking.
  * @param {Array.<string>} clArgs The array to add any additional deps to.
  * @param {boolean}  wPrefix Wether to use root_with_prefix.
+ * @return {Array.<string>} A filterd argument list with no duplicate root
+ *    paths
  */
 nclosure.nccompile.prototype.addAdditionalRoots_ =
     function(addedPaths, clArgs, wPrefix) {
@@ -346,12 +348,26 @@ nclosure.nccompile.prototype.addAdditionalRoots_ =
       this.addRoot_(addedPaths, clArgs, path, wPrefix);
     }, this);
   }
+  // Now we sort in length order (shortest path first) and see if we have
+  // included duplicates. TODO: This is not nice code.  It assumes that
+  // roots are the first thing added to the command line args array.
+  // However not doing it like this would require 2 passes and not up
+  // for it right now.
+  clArgs.sort();
+  var noDuplicates = [];
+  goog.array.forEach(clArgs, function(a) {
+    if (!goog.array.find(noDuplicates,
+                           function(d) { return a.indexOf(d) >= 0 })) {
+      noDuplicates.push(a);
+    }
+  });
+  return noDuplicates;
 };
 
 
 /**
  * @private
- * @param {Object.<number>} addedPaths A cache of all loaded files, for
+ * @param {Array.<string>} addedPaths A cache of all loaded files, for
  *    duplicate checking.
  * @param {Array.<string>} clArgs The array to add any additional deps to.
  * @param {string} path The path to add as a root or root_with_prefix.
@@ -361,7 +377,7 @@ nclosure.nccompile.prototype.addRoot_ =
     function(addedPaths, clArgs, path, wPrefix) {
   var realpath = this.isPathInMap_(addedPaths, path);
   if (!goog.isDefAndNotNull(realpath)) { return; }
-  var realClosureBaseDir = this.fs_.realpathSync(
+  var realClosureBaseDir = require('fs').realpathSync(
       ng_.getPath(ng_.args.closureBasePath, 'closure/goog'));
   var root = wPrefix ?
       ('"--root_with_prefix=' + path + ' ' +
@@ -406,26 +422,27 @@ nclosure.nccompile.prototype.getPathToDir_ = function(realFrom, realTo) {
  *   dependency check operation.
  */
 nclosure.nccompile.prototype.getDepsClArgs_ = function() {
-  var path = this.getDirectory_(this.fileToCompile_);
-  var addedPaths = {};
+  var path = ng_.getFileDirectory(this.fileToCompile_);
+  var addedPaths = [];
   var clArgs = [];
   this.addRoot_(addedPaths, clArgs, path, true);
-  this.addAdditionalRoots_(addedPaths, clArgs, true);
-  return clArgs;
+  return this.addAdditionalRoots_(addedPaths, clArgs, true);
 };
 
 
 /**
  * @private
- * @param {Object.<number>} map The map to check.
+ * @param {Array.<string>} map Already added roots.
  * @param {string} s The string to check in the map.
  * @return {string?} null if the string is already in the map.  If not it is
  *    then added to the specified map and we return the real path of the file;.
  */
 nclosure.nccompile.prototype.isPathInMap_ = function(map, s) {
-  var real = this.fs_.realpathSync(s);
-  if (map[real]) return null;
-  map[real] = 1;
+  var real = require('fs').realpathSync(s);
+  if (goog.array.find(map, function(m) {
+    return real.indexOf(m) >= 0;
+  })) { return null; }
+  map.push(real);
   return real;
 };
 

@@ -6,6 +6,13 @@ HIGH
 
 - Better jsdoc stylesheet
 
+- Why do we need to include lib/ and bin/ in all nclosure runs.  This should
+ not be required as its just polluting the compiler with sutff 99% of people
+ will not use.  If we are using the code in here it should be moved somewhere
+ better.
+
+- Remove all if (typeof(goog) !== undefined) ... Its a hack
+
 MED
 ---
 

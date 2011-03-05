@@ -30,6 +30,9 @@ goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
 goog.require('goog.testing.stacktrace');
 goog.require('goog.testing.stacktrace.Frame');
+
+goog.require('node.fs');
+
 goog.require('nclosure.core');
 
 
@@ -188,7 +191,7 @@ nclosure.NodeTestInstance.prototype.createAsyncTestCase_ = function() {
  * @return {string} The test file contents.
  */
 nclosure.NodeTestInstance.prototype.loadTestContents_ = function() {
-  return require('fs').readFileSync(this.file_, encoding = 'utf8');
+  return node.fs.readFileSync(this.file_).toString();
 };
 
 
@@ -228,7 +231,7 @@ nclosure.NodeTestInstance.prototype.createAndRunTestCase_ = function() {
 nclosure.NodeTestInstance.prototype.onTestComplete_ = function() {
   var data = this.testCase_.getReport(false);
   var reportFile = '.tmptestreport.json';
-  require('fs').writeFileSync(reportFile, data);
+  node.fs.writeFileSync(reportFile, data);
 };
 
 

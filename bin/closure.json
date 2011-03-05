@@ -1,6 +1,7 @@
 {
   // nodeDir is only required for development
   // nodeDir: '../../../lib/node',
+  additionalDeps:['../lib/third_party/node/deps.js'],
   closureBasePath:'../third_party/closure-library/closure/goog/',
   jsdocToolkitDir: '../third_party/node-jsdoc-toolkit/',
   compiler_jar:'../third_party/ignoregoogcompiler.jar',
@@ -34,6 +35,7 @@
   ],
   jsdocToolkitTemplate: 'codeview',
   additionalLinterOptions: [
-    '--strict', '-r'
+    '--strict', '-r',
+    '-e', 'lib/node/'
   ]
 }
