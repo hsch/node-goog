@@ -158,14 +158,14 @@ nclosure.ncstyle.prototype.getLinterArgs_ = function(dir) {
   }
   var excludes = this.getLinterExcludeFiles_(dir);
   var excludesDir = this.getLinterExcludeDir_(dir);
-  var args = [];
+  var args = ['-r', dir];
+
   if (excludes.length) args.push('-x ' + excludes.join(','));
   if (excludesDir.length) args.push('-e ' + excludesDir.join(','));
 
   if (this.settings_.additionalLinterOptions) {
     args = goog.array.concat(args, this.settings_.additionalLinterOptions);
   }
-  args.push(dir);
   return args;
 };
 

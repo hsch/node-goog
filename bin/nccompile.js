@@ -293,8 +293,9 @@ nclosure.nccompile.prototype.getCompilerClArgs_ =
   this.addRoot_(addedPaths, clArgs, path, false);
   var libPath = ng_.getPath(__dirname, '../lib');
   var binPath = ng_.getPath(__dirname, '../bin');
+  // lib allows all clases to use nclosure namepath and also 
+	// all the third_party libs
   this.addRoot_(addedPaths, clArgs, libPath, false);
-  this.addRoot_(addedPaths, clArgs, binPath, false);
   clArgs = this.addAdditionalRoots_(addedPaths, clArgs, false);
 
   clArgs.push('--input=' + this.tmpFileName_);

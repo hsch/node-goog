@@ -35,7 +35,7 @@
   ],
   jsdocToolkitTemplate: 'codeview',
   additionalLinterOptions: [
-    '--strict', '-r',
-    '-e', 'lib/node/'
+    '--strict', 
+    '-e', '/node/'
   ]
 }
