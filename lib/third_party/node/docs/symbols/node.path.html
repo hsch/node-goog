@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf8"></meta>
 		<meta name="generator" content="JsDoc Toolkit"></meta>
-		<title>node.path | JsDoc Reference</title>
+		<title>node.path | .</title>
 
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"></meta>
 		<meta name="mobileoptimized" content="0"></meta>
@@ -114,6 +114,8 @@
 				
 					<li><a href="../symbols/node.global.html">node<span class='break'> </span>.<span class='break'> </span>global</a></li>
 				
+					<li><a href="../symbols/node.global.Buffer.html">node<span class='break'> </span>.<span class='break'> </span>global<span class='break'> </span>.<span class='break'> </span>Buffer</a></li>
+				
 					<li><a href="../symbols/node.http.html">node<span class='break'> </span>.<span class='break'> </span>http</a></li>
 				
 					<li><a href="../symbols/node.http.Agent.html">node<span class='break'> </span>.<span class='break'> </span>http<span class='break'> </span>.<span class='break'> </span>Agent</a></li>
@@ -149,6 +151,10 @@
 					<li><a href="../symbols/node.path.html">node<span class='break'> </span>.<span class='break'> </span>path</a></li>
 				
 					<li><a href="../symbols/node.process.html">node<span class='break'> </span>.<span class='break'> </span>process</a></li>
+				
+					<li><a href="../symbols/node.process.EventEmitter.html">node<span class='break'> </span>.<span class='break'> </span>process<span class='break'> </span>.<span class='break'> </span>EventEmitter</a></li>
+				
+					<li><a href="../symbols/node.process.EventEmitter.Buffer.html">node<span class='break'> </span>.<span class='break'> </span>process<span class='break'> </span>.<span class='break'> </span>EventEmitter<span class='break'> </span>.<span class='break'> </span>Buffer</a></li>
 				
 					<li><a href="../symbols/node.querystring.html">node<span class='break'> </span>.<span class='break'> </span>querystring</a></li>
 				
@@ -226,7 +232,7 @@
 					
 
 					
-						<li>Defined in: <a href="../symbols/src/node_wrappers_node.path.js.html">node.path.js</a></li>
+						<li>Defined in: <a href="../symbols/src/node.path.js.html">node.path.js</a></li>
 					
 						
 				</ul>
@@ -297,7 +303,7 @@
 									<td class="nameDescription">
 										<div class="fixedFont">node.path.<b><a href="../symbols/node.path.html#.existsSync">existsSync</a></b>(path)
 										</div>
-										<div class="description"></div>
+										<div class="description">Synchronous version of <code>path.exists</code>.</div>
 									</td>
 								</tr>
 							
@@ -339,7 +345,7 @@
 								>
 									<td class="attributes">static &nbsp;</td>
 									<td class="nameDescription">
-										<div class="fixedFont">node.path.<b><a href="../symbols/node.path.html#.resolve">resolve</a></b>()
+										<div class="fixedFont">node.path.<b><a href="../symbols/node.path.html#.resolve">resolve</a></b>(var_args)
 										</div>
 										<div class="description">Resolves <code>to</code> to an absolute path.</div>
 									</td>
@@ -505,6 +511,7 @@ with either true or false. Example:
     path.exists('&#47;etc&#47;passwd', function (exists) {
       util.debug(exists ? "it's there" : "no passwd!");
     });
+</pre>
 
 									
 
@@ -524,7 +531,7 @@ with either true or false. Example:
 											<dd></dd>
 										
 											<dt>
-												<span class="light fixedFont">{function(Error?|...[*]):undefined}</span> <b>callback</b>
+												<span class="light fixedFont">{function(Error?|...[*]):undefined=}</span> <b>callback</b>
 												
 											</dt>
 											<dd></dd>
@@ -550,7 +557,7 @@ with either true or false. Example:
 								</div>
 
 								<div class="description">
-									
+									Synchronous version of <code>path.exists</code>.
 
 									
 
@@ -724,7 +731,7 @@ Example:
 
 									
 
-									<span class="light">node.path.</span><b>resolve</b>()
+									<span class="light">node.path.</span><b>resolve</b>(var_args)
 								</div>
 
 								<div class="description">
@@ -773,6 +780,17 @@ Examples:
 
 								
 
+								
+									<dl class="detailList params">
+										<dt class="heading">Parameters:</dt>
+										
+											<dt>
+												<span class="light fixedFont">{...string}</span> <b>var_args</b>
+												
+											</dt>
+											<dd>A list of path fragments to resolve.</dd>
+										
+									</dl>
 								
 
 								
