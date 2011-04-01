@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 
 /**
  * @fileoverview Utility class to run tests in their own process (isolation)

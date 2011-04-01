@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 
 /**
  * @fileOverview This test is to try to get the async stuff working better.

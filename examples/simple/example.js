@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 
 /**
  * @fileoverview  To get started with nclosure you will need to do the

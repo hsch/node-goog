@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 
 var ng_ = require('nclosure').nclosure();
 
