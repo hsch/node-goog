@@ -49,14 +49,14 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 	function addEvent(element, newFunction, eventType) {
 		var oldEvent = eval("element." + eventType);
 		var eventContentType = eval("typeof element." + eventType)
-		
+
 		if ( eventContentType != 'function' ) {
 			eval("element." + eventType + " = newFunction")
 		} else {
 			eval("element." + eventType + " = function(e) { oldEvent(e); newFunction(e); }")
 		}
 	}
-	
+
 	// Get the the inner width of the browser window
 	function getWindowWidth() {
 		if (window.innerWidth) {
@@ -66,10 +66,10 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 		} else if (document.body.clientWidth) {
 			return document.body.clientWidth;
 		} else{
-			return 0;	
+			return 0;
 		}
 	}
-	
+
 	function addCssLink(cssHref) {
 		var cssNode = document.createElement('link');
 		var windowWidth;
@@ -79,7 +79,7 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 		cssNode.href = cssHref;
 		document.getElementsByTagName("head")[0].appendChild(cssNode);
 	}
-	
+
 
 
 	/* Start public */
@@ -98,15 +98,15 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 		LoadCss: function(cssScreen, cssHandheld, mobileMaxWidth) {
 			// Set config values
 			if (typeof(cssScreen) != "undefined") {
-				config.cssScreen = cssScreen;	
+				config.cssScreen = cssScreen;
 			}
 			if (typeof(cssHandheld) != "undefined") {
-				config.cssHandheld = cssHandheld;	
+				config.cssHandheld = cssHandheld;
 			}
 			if (typeof(mobileMaxWidth) != "undefined") {
-				config.mobileMaxWidth = mobileMaxWidth;	
+				config.mobileMaxWidth = mobileMaxWidth;
 			}
-			
+
 			// Check if CSS is loaded
 			var cssloadCheckNode = document.createElement('div');
 			cssloadCheckNode.className = config.testDivClass;
@@ -115,11 +115,11 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 				noMediaQuery = true;
 			}
 			cssloadCheckNode.parentNode.removeChild(cssloadCheckNode)
-			
+
 			if (noMediaQuery == true) {
-				// Browser does not support Media Queries, so JavaScript will supply a fallback 
+				// Browser does not support Media Queries, so JavaScript will supply a fallback
 				var cssHref = "";
-				
+
 				// Determines what CSS file to load
 				if (getWindowWidth() <= config.mobileMaxWidth) {
 					cssHref = config.cssHandheld;
@@ -128,7 +128,7 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 					cssHref = config.cssScreen;
 					newCssMediaType = "screen";
 				}
-				
+
 				// Add CSS link to <head> of page
 				if (cssHref != "" && currentCssMediaType != newCssMediaType) {
 					var currentCssLinks = document.styleSheets
@@ -156,16 +156,16 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 					} else {
 						addCssLink(cssHref)
 					}
-										
+
 					currentCssMediaType = newCssMediaType;
 				}
 
-				
-				// Check screen size again if user resizes window 
+
+				// Check screen size again if user resizes window
 				addEvent(window, wbos.CssTools.MediaQueryFallBack.LoadCssDelayed, 'onresize')
 			}
 		},
-		
+
   		/**
 		 * Runs LoadCSS after a short delay
 		 *
@@ -178,7 +178,7 @@ wbos.CssTools.MediaQueryFallBack = ( function() {
 			clearTimeout(delay);
 			delay = setTimeout( "wbos.CssTools.MediaQueryFallBack.LoadCss()", config.resizeDelay)
 		}
-		
+
 	}
 	/* End public */
 })();
@@ -212,7 +212,7 @@ wbos.Events = ( function() {
 		AddEvent: function( element, newFunction, eventType ) {
 			var oldEvent = eval("element." + eventType);
 			var eventContentType = eval("typeof element." + eventType)
-			
+
 			if ( eventContentType != 'function' ) {
 				eval("element." + eventType + " = newFunction")
 			} else {
@@ -279,7 +279,7 @@ codeview.classFilter = ( function() {
 			filterList(listItems, search, document.getElementById('MethodDetail').getElementsByTagName('li'))
 		}
 	}
-	
+
 	function filterList(listItems, search, relatedElements) {
 		var itemContent = ""
 		for (var i=0; i < listItems.length; i++) {
@@ -298,7 +298,7 @@ codeview.classFilter = ( function() {
 			}
 		}
 	}
-	
+
 	function filterRelatedList(listItem, search, relatedElements) {
 		var itemIndex = parseInt(listItem.className.replace('item', ''))
 		if (itemIndex <= relatedElements.length) {
@@ -307,11 +307,11 @@ codeview.classFilter = ( function() {
 			}
 		}
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	/* Start public */
 	return {
 		Init: function() {
@@ -319,8 +319,23 @@ codeview.classFilter = ( function() {
 				document.getElementById('ClassFilter'),
 				onkeyup_ClassFilter,
 				"onkeyup"
-			)					
+			)
 		}
 	}
 	/* End public */
 })();
+
+
+function prePrettyPrint() {
+  // addPrettyPrintClass(document.getElementsByTagName('code'));
+  addPrettyPrintClass(document.getElementsByTagName('pre'));
+  prettyPrint();
+};
+
+function addPrettyPrintClass(nodelist) {
+  for (var i = 0, len = nodelist.length; i < len; i++) {
+    var n = nodelist[i];
+    if (n.className) n.className += ' prettyprint';
+    else n.className = 'prettyprint';
+  }
+};
