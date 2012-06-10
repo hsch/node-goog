@@ -24,13 +24,16 @@
  *    annotation docs</a>.
  */
 
+// TODO: Since npm link does not work on windows lets just hack this for now.
+// this probably means that npm install will now no longer work.
+var rootLibDir = '../lib/';
 
 /**
  * @private
  * @const
  * @type {nclosure.core}
  */
-var ng_ = require('nclosure').nclosure();
+var ng_ = require(rootLibDir + 'nclosure').nclosure();
 
 goog.provide('nclosure.nccompile');
 
@@ -345,7 +348,7 @@ nclosure.nccompile.prototype.addAdditionalRoots_ =
   } else if (ng_.args.additionalDeps) {
     // Only try to guess roots if additionalCompileRoots not specified
     goog.array.forEach(ng_.args.additionalDeps, function(dep) {
-      var path = dep.substring(0, dep.lastIndexOf('/'));
+      var path = dep.substring(0, dep.search(/[\/\\][^\/\\]*$/g));
       this.addRoot_(addedPaths, clArgs, path, wPrefix);
     }, this);
   }
@@ -395,8 +398,8 @@ nclosure.nccompile.prototype.addRoot_ =
  * @return {string} The path to take between the directories.
  */
 nclosure.nccompile.prototype.getPathToDir_ = function(realFrom, realTo) {
-  var from = realFrom.split('/').reverse(),
-      to = realTo.split('/').reverse(),
+  var from = realFrom.split(/[\/\\]/).reverse(),
+      to = realTo.split(/[\/\\]/).reverse(),
       fl = from.length - 1,
       tl = to.length - 1,
       path = [];
@@ -454,7 +457,7 @@ nclosure.nccompile.prototype.isPathInMap_ = function(map, s) {
  * @return {string} The parent directory of the soecified file.
  */
 nclosure.nccompile.prototype.getDirectory_ = function(file) {
-  var pathIdx = file.lastIndexOf('/');
+  var pathIdx = file.search(/[\/\\][^\/\\]*$/g);
   var path = pathIdx > 0 ? file.substring(0, pathIdx) : '.';
   return path;
 };

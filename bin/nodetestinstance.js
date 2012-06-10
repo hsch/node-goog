@@ -65,7 +65,7 @@ nclosure.NodeTestInstance = function(file, args) {
    * @private
    * @type {string}
    */
-  this.shortName_ = file.substring(file.lastIndexOf('/') + 1);
+  this.shortName_ = file.substring(file.search(/[\/\\][^\/\\]*$/g) + 1);
 
   /**
    * @private
@@ -95,7 +95,7 @@ nclosure.NodeTestInstance = function(file, args) {
  */
 nclosure.NodeTestInstance.prototype.loadAdditionalTestingDependencies_ =
     function() {
-  var dir = this.file_.substring(0, this.file_.lastIndexOf('/'));
+  var dir = this.file_.substring(0, this.file_.search(/[\/\\][^\/\\]*$/g));
   ng_.loadAditionalDependenciesInSettingsFile(ng_.getPath(dir, 'closure.json'));
   ng_.loadDependenciesFile(dir, 'deps.js');
 };
@@ -276,7 +276,7 @@ nclosure.NodeTestInstance.parseStackFrameLine_ = function(line) {
   line = line.substring(line.indexOf(' at ') + 4);
   // return new goog.testing.stacktrace.Frame('', line, '', '', line);
 
-  if (line.charAt(0) === '/') { // Path to test file
+  if (line.charAt(0) === '/' || line.charAt(0) === '\\') { // Path to test file
     return new goog.testing.stacktrace.Frame('', '', '', '', line);
   }
   var contextAndFunct = line.substring(0, line.lastIndexOf(' ')).split('.');

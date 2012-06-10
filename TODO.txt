@@ -3,6 +3,8 @@ TODO
 
 HIGH
 ----
+- npm link does not work on windows so hard coding rootLibDir which means that
+  the lib may now work when installed in npm install.
 - ncstyle cannot be run in the lib directory as it does not ignore the 
   node directory and the -e flag is being ignored.
 

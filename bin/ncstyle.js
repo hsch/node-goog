@@ -66,7 +66,7 @@ nclosure.ncstyle = function() {
   var dir = process.argv[2];
   var isDir = nclosure.ncstyle.isDir_(dir);
   if (!isDir) {
-    dir = dir.substring(0, dir.lastIndexOf('/') + 1);
+    dir = dir.substring(0, dir.search(/[\/\\][^\/\\]*$/g) + 1);
   }
   var that = this;
   var onexit = function(err) {

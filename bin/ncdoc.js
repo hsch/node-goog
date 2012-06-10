@@ -84,7 +84,7 @@ nclosure.ncdoc.prototype.init_ = function(args) {
  * @param {string} entryPoint The file/directory to document.
  */
 nclosure.ncdoc.prototype.createJSDocArgs_ = function(args, entryPoint) {
-  var entryPointDirIdx = entryPoint.lastIndexOf('/');
+  var entryPointDirIdx = entryPoint.search(/[\/\\][^\/\\]*$/g);;
   var title = entryPointDirIdx > 0 ?
       entryPoint.substring(entryPointDirIdx + 1) : entryPoint;
   var entryPointDir = entryPointDirIdx > 0 ?
