@@ -118,8 +118,9 @@ nclosure.nccompile = function() {
 nclosure.nccompile.prototype.init_ = function(cliArgs, options) {
   var that = this;
   var onexit = function(err) { that.onExit_.call(that, err); };
+ 
+
   process.on('exit', onexit);
-  process.on('SIGINT', onexit);
   process.on('uncaughtException', onexit);
 
   this.compile_ = options.compile;

@@ -39,7 +39,7 @@ code design and maintainability by providing support for:
 
 			git clone git://github.com/gatapia/nclosure.git
 			cd nclosure
-			npm link
+			npm link   NOTE: npm link does not work on windows! :(
 
 ## Closure Library
 
