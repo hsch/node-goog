@@ -39,7 +39,6 @@ var rootLibDir = '../lib/';
  * @type {nclosure.core}
  */
 var ng_ = require(rootLibDir + 'nclosure').nclosure();
-
 goog.provide('nclosure.nctest');
 
 goog.require('goog.array');
@@ -49,7 +48,6 @@ goog.require('node.path');
 
 goog.require('nclosure.NodeTestsRunner');
 goog.require('nclosure.core');
-
 
 
 /**

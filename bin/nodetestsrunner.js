@@ -84,17 +84,18 @@ nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
   var that = this;
   var reportFile = '.tmptestreport.json';
   var cmd = require('child_process').
-      spawn('nodetestinstance', [file, this.args_]);
+      spawn('node', ['bin/nodetestinstance.js', file, this.args_]);
+
   var stderr = '', stdout = '', err;
   var ondata = function(d) {
     d = goog.string.trim(d.toString());
     if (!d) return;
     stderr += d;
     console.error(d);
-  };
+  };  
   cmd.stderr.on('data', ondata);
   cmd.stdout.on('data', ondata);
-  cmd.on('exit', function(code) {
+  cmd.on('exit', function(code) {    
     var report = '';
     if (require('path').existsSync(reportFile)) {
       report = fs.readFileSync(reportFile).toString();
@@ -109,7 +110,6 @@ nclosure.NodeTestsRunner.prototype.runNextTestImpl_ = function(file) {
       'stderr': stderr,
       'report': report
     };
-
     that.onTestCompleted_(results);
   });
 };

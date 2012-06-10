@@ -78,7 +78,6 @@ nclosure.ncstyle = function() {
     if (err) { console.error(err.stack); }
   };
   process.on('exit', onexit);
-  process.on('SIGINT', onexit);
   process.on('uncaughtException', onexit);
 
   this.runFixStyle_(dir, function() {
