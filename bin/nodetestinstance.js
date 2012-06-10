@@ -8,20 +8,13 @@
  * @author guido@tapia.com.au (Guido Tapia)
  */
 
-
-// TODO: Since npm link does not work on windows lets just hack this for now.
-// this probably means that npm install will now no longer work.
-var rootLibDir = '../lib/';
-
 /**
  * @private
  * @const
  * @type {nclosure.core}
  */
-var ng_ = require(rootLibDir + 'nclosure').nclosure();
-
+var ng_ = require('../lib/nclosure').nclosure();
 goog.provide('nclosure.NodeTestInstance');
-
 
 /**
  * goog/testing/testcase.js Reads this property as soon as it's 'required' so
@@ -29,6 +22,8 @@ goog.provide('nclosure.NodeTestInstance');
  * @type {{userAgent:string}}
  */
 global.navigator = { userAgent: 'node.js' };
+window = global;
+
 
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.TestCase');
@@ -38,8 +33,6 @@ goog.require('goog.testing.stacktrace.Frame');
 goog.require('node.fs');
 
 goog.require('nclosure.core');
-
-
 
 /**
  * @constructor
@@ -52,7 +45,6 @@ goog.require('nclosure.core');
  * nctest command.
  */
 nclosure.NodeTestInstance = function(file, args) {
-
   /**
    * @private
    * @type {string}
@@ -89,7 +81,6 @@ nclosure.NodeTestInstance = function(file, args) {
   this.overwriteAsyncTestCaseProblemPoints_();
 
   process.on('uncaughtException', goog.bind(this.onTestComplete_, this));
-
   this.run();
 };
 
@@ -195,7 +186,8 @@ nclosure.NodeTestInstance.prototype.createAsyncTestCase_ = function() {
  * @return {string} The test file contents.
  */
 nclosure.NodeTestInstance.prototype.loadTestContents_ = function() {
-  return node.fs.readFileSync(this.file_).toString();
+  var contents = node.fs.readFileSync(this.file_).toString();
+  return contents;
 };
 
 
@@ -209,8 +201,11 @@ nclosure.NodeTestInstance.prototype.loadTestContentsIntoMemory_ =
     contents = this.convertHtmlTestToJS_(contents);
   }
   contents = contents.replace(/^#![^\n]+/, '\n'); // remove shebang
-  process.binding('evals').Script.
-      runInThisContext(contents, this.shortName_);
+  try {
+    require('vm').runInThisContext(contents, this.shortName_);
+  } catch(ex) {
+    console.log(ex)
+  }
 };
 
 
@@ -339,5 +334,4 @@ nclosure.NodeTestInstance.stackFramesToString_ = function(frames) {
   }
   return stack.join('');
 };
-
 new nclosure.NodeTestInstance(process.argv[2], process.argv[3]);

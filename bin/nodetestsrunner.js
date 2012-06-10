@@ -66,7 +66,7 @@ nclosure.NodeTestsRunner.prototype.execute = function() {
 nclosure.NodeTestsRunner.prototype.runNextTest_ = function() {
   if (this.testFiles_.length === 0) {
     this.displayResults_();
-  } else {
+  } else {    
     this.runNextTestImpl_(this.testFiles_.pop());
   }
 };

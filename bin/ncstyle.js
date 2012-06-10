@@ -30,17 +30,12 @@
  *    Google's JavaScript Style Guide</a>
  */
 
-
-// TODO: Since npm link does not work on windows lets just hack this for now.
-// this probably means that npm install will now no longer work.
-var rootLibDir = '../lib/';
-
 /**
  * @private
  * @const
  * @type {nclosure.core}
  */
-var ng_ = require(rootLibDir + 'nclosure').nclosure();
+var ng_ = require('../lib/nclosure').nclosure();
 
 goog.provide('nclosure.ncstyle');
 

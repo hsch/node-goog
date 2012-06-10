@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../../../lib/nclosure').nclosure();
+require('../lib/nclosure').nclosure();
 
 goog.require('goog.testing.jsunit');
 goog.require('nclosure.examples.simple.Example');

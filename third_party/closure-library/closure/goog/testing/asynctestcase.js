@@ -615,7 +615,6 @@ goog.testing.AsyncTestCase.prototype.startTimeoutTimer_ = function() {
     this.timeoutHandle_ = this.timeout(goog.bind(function() {
       this.dbgLog_('Timeout timer fired with id ' + this.timeoutHandle_);
       this.timeoutHandle_ = null;
-
       this.doTopOfStackAsyncError_('Timed out while waiting for ' +
           'continueTesting() to be called.');
     }, this, null), this.stepTimeout);

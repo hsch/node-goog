@@ -53,7 +53,7 @@
  * Does not require an opts parameter as we are providing all the options in
  * the closure.json file in this directory;
  */
-require('nclosure').nclosure();
+require('../lib/nclosure').nclosure();
 
 /*
  * Now that the nclosure is initialised you can use any base.js functionality

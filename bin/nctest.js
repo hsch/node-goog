@@ -28,17 +28,12 @@
  * @see <a href='http://www.jsunit.net/'>jsunit official docs.</a>
  */
 
-
-// TODO: Since npm link does not work on windows lets just hack this for now.
-// this probably means that npm install will now no longer work.
-var rootLibDir = '../lib/';
-
 /**
  * @private
  * @const
  * @type {nclosure.core}
  */
-var ng_ = require(rootLibDir + 'nclosure').nclosure();
+var ng_ = require('../lib/nclosure').nclosure();
 goog.provide('nclosure.nctest');
 
 goog.require('goog.array');
@@ -60,12 +55,14 @@ goog.require('nclosure.core');
  * @constructor
  */
 nclosure.nctest = function() {
+  var testFiles = this.getAllTestFiles_(process.argv[2]);
+  ng_.debug('nctest - testFiles:', testFiles);
+
   /**
    * @private
    * @type {nclosure.NodeTestsRunner}
    */
-  this.tr_ = new nclosure.NodeTestsRunner(
-      this.getAllTestFiles_(process.argv[2]), this.getTestArgs_());
+  this.tr_ = new nclosure.NodeTestsRunner(testFiles, this.getTestArgs_());
 
   process.on('uncaughtException', goog.bind(this.onException_, this));
 

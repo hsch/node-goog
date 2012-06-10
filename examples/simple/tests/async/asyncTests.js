@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('nclosure').nclosure();
+require('../lib/nclosure').nclosure();
 
 goog.require('goog.testing.AsyncTestCase');
 goog.require('goog.testing.jsunit');
