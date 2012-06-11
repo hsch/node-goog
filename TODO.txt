@@ -1,0 +1,30 @@
+TODO
+====
+
+HIGH
+----
+- npm link does not work on windows so hard coding rootLibDir which means that
+  the lib may now work when installed in npm install.
+- ncstyle cannot be run in the lib directory as it does not ignore the 
+  node directory and the -e flag is being ignored.
+
+MED
+---
+
+- Not working on cygwin (running through the linked npm commands is not
+  working, actually running the js files in bin manually works if we update
+  the paths to be all relative).
+
+- Include GJSLINT and FIXJSSTYLE in distribution
+
+- The compiled file does not run.  Not too critical as on the server start up
+time is less of a priority.
+
+
+LOW
+---
+
+- Redo the examples, make more relevant samples
+
+- Improve the number of closure tests passing the test suite. see
+  tests/closure_lib_tsts.html
